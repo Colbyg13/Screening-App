@@ -6,6 +6,7 @@ import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import React, { useState } from 'react';
 import { useLocation, useNavigate, useRoutes } from 'react-router-dom';
+import { useSessionContext } from '../../contexts/SessionContext';
 import NavbarItem from './NavbarItem';
 
 export const ROUTES = {
@@ -40,6 +41,7 @@ export default function Navbar() {
 
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const { sessionStarted } = useSessionContext();
 
   const [open, setOpen] = useState(true);
 
@@ -52,21 +54,32 @@ export default function Navbar() {
           title="Close"
           onClick={() => setOpen(open => !open)}
         />
-        {[
-          ROUTES.Home,
-          ROUTES.Session,
-          ROUTES.Records,
-          ROUTES.Offline,
-        ].map(({ title, path, Icon }) => (
-          <NavbarItem
-            key={path}
-            open={open}
-            Icon={Icon}
-            title={title}
-            selected={pathname.startsWith(path)}
-            onClick={() => navigate(path)}
-          />
-        ))}
+        <NavbarItem
+          open={open}
+          Icon={ROUTES.Home.Icon}
+          title={ROUTES.Home.title}
+          selected={pathname.startsWith(ROUTES.Home.path)}
+          onClick={() => navigate(ROUTES.Home.path)}
+        /><NavbarItem
+          open={open}
+          Icon={ROUTES.Session.Icon}
+          title={ROUTES.Session.title}
+          subsection={sessionStarted ? <div className='h-2 w-2 border bg-green-600 rounded-full'/> : null}
+          selected={pathname.startsWith(ROUTES.Session.path)}
+          onClick={() => navigate(ROUTES.Session.path)}
+        /><NavbarItem
+          open={open}
+          Icon={ROUTES.Records.Icon}
+          title={ROUTES.Records.title}
+          selected={pathname.startsWith(ROUTES.Records.path)}
+          onClick={() => navigate(ROUTES.Records.path)}
+        /><NavbarItem
+          open={open}
+          Icon={ROUTES.Offline.Icon}
+          title={ROUTES.Offline.title}
+          selected={pathname.startsWith(ROUTES.Offline.path)}
+          onClick={() => navigate(ROUTES.Offline.path)}
+        />
       </div>
       <div>
         <NavbarItem

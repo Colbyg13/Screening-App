@@ -1,6 +1,11 @@
 import { createContext, useContext } from "react";
 
-const RecordContext = createContext();
+const RecordContext = createContext({
+    getRecord: () => {},
+    getMultipleRecord: options => {},
+    createOrUpdateRecords: records => {},
+    deleteRecords: recordIds => {},
+});
 
 export const useRecordContext = () => useContext(RecordContext);
 
@@ -11,6 +16,8 @@ export default function RecordProvider({ children }) {
      * Should allow the application to have access to all records anywhere
      * Should provide an api for CRUD into our DB
      */
+
+    
 
     return (
         <RecordContext.Provider

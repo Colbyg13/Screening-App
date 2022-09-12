@@ -5,6 +5,7 @@ export default function NavbarItem({
     Icon,
     title,
     selected,
+    subsection,
     onClick,
 }) {
 
@@ -14,7 +15,10 @@ export default function NavbarItem({
         >
             <Icon />
             {open ? (
-                <span>{title}</span>
+                <div className='relative'>
+                    <span>{title}</span>
+                    <div className='absolute top-1 -right-2'>{subsection}</div>
+                </div>
             ) : null}
         </div>
     )
