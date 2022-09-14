@@ -14,7 +14,7 @@ function App() {
       <SessionProvider>
         <div className="h-screen w-full flex">
           <Navbar />
-          <div className="w-full h-full relative">
+          <div className="w-full h-full relative bg-gray-200">
             <Routes>
               <Route path={ROUTES.Home.path} element={<HomePage />} />
               <Route path={ROUTES.Session.path} element={<Sessions />} />

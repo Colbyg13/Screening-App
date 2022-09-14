@@ -41,7 +41,7 @@ export default function Navbar() {
 
   const navigate = useNavigate();
   const { pathname } = useLocation();
-  const { sessionStarted } = useSessionContext();
+  const { sessionIsRunning } = useSessionContext();
 
   const [open, setOpen] = useState(true);
 
@@ -64,7 +64,7 @@ export default function Navbar() {
           open={open}
           Icon={ROUTES.Session.Icon}
           title={ROUTES.Session.title}
-          subsection={sessionStarted ? <div className='h-2 w-2 border bg-green-600 rounded-full'/> : null}
+          subsection={sessionIsRunning ? <div className='h-2 w-2 border bg-green-600 rounded-full'/> : null}
           selected={pathname.startsWith(ROUTES.Session.path)}
           onClick={() => navigate(ROUTES.Session.path)}
         /><NavbarItem

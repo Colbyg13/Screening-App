@@ -2,11 +2,13 @@ import { createContext, useContext, useState } from "react";
 import replace from "../utils/replace";
 
 const SessionContext = createContext({
-    sessionStarted: false,
+    sessionIsRunning: false,
     generalFields: {},
     stations: [],
     sessionRecords: [],
     createOrUpdateRecord: () => { },
+    startSession: () => { },
+    stopSession: () => { },
 });
 
 export const useSessionContext = () => useContext(SessionContext);
@@ -43,41 +45,55 @@ export default function SessionProvider({ children }) {
     // TODO: update this to get the correct value from db
     let recordId = 0;
 
-    const [sessionStarted, setSessionStarted] = useState(false);
+    const [sessionIsRunning, setSessionIsRunning] = useState(window.api.getIsServerRunning());
 
     const [generalFields, setGeneralFields] = useState(testGeneralFields);
 
     const [stations, setStations] = useState(testStations);
 
-    // TODO: get current session records for initial state based on generalInformation and date?
     const [sessionRecords, setSessionRecords] = useState([]);
 
-    const createOrUpdateRecord = recordUpdate => {
+    async function startSession() {
+        // TODO: get current session records for initial state based on generalInformation and date?
+        // const sessionRecords = await getRecordsFromDB() // Make sure to pass in this value down below
+        const response = await window.api.startServer(generalFields, stations, sessionRecords, createOrUpdateRecord);
+        console.log({ response });
+        setSessionIsRunning(true);
+        // setSessionRecords(sessionRecords);
+    }
 
-        // get record from DB. If exists update else create new record
+    async function stopSession() {
+        const response = await window.api.stopServer();
+        console.log({ response });
+        setSessionIsRunning(false);
+    }
 
+    function createOrUpdateRecord(recordUpdate) {
 
-        // TODO: UPDATE. USING FOR TESTING PURPOSES RIGHT NOW
-        setSessionRecords(records => {
+        const oldRecord = sessionRecords.find(({ id }) => id === recordUpdate.id);
 
-            const oldRecord = records.find(({ id }) => id === recordUpdate.id);
-
-            // if there isn't a record in our array we want to create it
-            if (!oldRecord) return [...records, recordUpdate];
-
-            // otherwise update the record
-            return replace(records, records.indexOf(oldRecord), {
+        if (oldRecord) {
+            const updatedRecord = {
                 ...oldRecord,
                 ...recordUpdate,
-            });
-        });
+            };
+
+            // TODO: Update record in DB
+            setSessionRecords(records => replace(records, records.indexOf(oldRecord), updatedRecord));
+
+        } else {
+
+            // TODO: Create new record
+            setSessionRecords(records => [...records, recordUpdate]);
+        }
     }
 
     return (
         <SessionContext.Provider
             value={{
-                sessionStarted,
-                setSessionStarted,
+                sessionIsRunning,
+                startSession,
+                stopSession,
                 generalFields,
                 stations,
                 sessionRecords,

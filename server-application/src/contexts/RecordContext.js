@@ -1,5 +1,7 @@
 import { createContext, useContext } from "react";
 
+// MAYBE DON'T NEED THIS FILE? Just use mongo db node module
+
 const RecordContext = createContext({
     getRecord: () => {},
     getMultipleRecord: options => {},

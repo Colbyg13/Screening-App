@@ -4,8 +4,9 @@ import { useSessionContext } from "../../contexts/SessionContext";
 export default function Sessions() {
 
   const {
-    sessionStarted,
-    setSessionStarted,
+    sessionIsRunning,
+    startSession,
+    stopSession,
     generalFields,
     stations,
     sessionRecords,
@@ -13,8 +14,7 @@ export default function Sessions() {
   } = useSessionContext();
 
   console.log({
-    sessionStarted,
-    setSessionStarted,
+    sessionIsRunning,
     generalFields,
     stations,
     sessionRecords,
@@ -22,9 +22,9 @@ export default function Sessions() {
 
 
   return (
-    <div className="w-full h-full bg-gray-200 flex justify-center items-center" >
+    <div className="w-full h-full flex justify-center items-center" >
       <div className="flex flex-col space-y-4 text">
-        {sessionStarted ? (
+        {sessionIsRunning ? (
           <>
             <div>
               <h2 className="text-2xl ">General Info:</h2>
@@ -52,7 +52,7 @@ export default function Sessions() {
             <Button
               size="large"
               variant="outlined"
-              onClick={() => setSessionStarted(false)}
+              onClick={stopSession}
             >
               Finish Session
             </Button>
@@ -61,7 +61,7 @@ export default function Sessions() {
           <Button
             size="large"
             variant="outlined"
-            onClick={() => setSessionStarted(true)}
+            onClick={startSession}
           >
             Start Session
           </Button>
