@@ -8,8 +8,18 @@ import {
   StatusBar,
 } from 'react-native';
 import StationsListItem from '../components/StationsListItem';
+import { useSessionContext } from '../contexts/SessionContext';
 const StationsList = (props) => {
-  const stations = props.data.stations;
+  // const stations = props.data.stations;
+
+  const {
+    sessionInfo,
+    sessionInfo: {
+      stations = [],
+    } = {},
+  } = useSessionContext();
+
+  console.log({ sessionInfo })
 
   const handlePress = (item) => {
     console.log('you pressed me', item);

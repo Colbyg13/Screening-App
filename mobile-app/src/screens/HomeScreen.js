@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Text, View } from 'react-native';
 import { Stack, Button } from '@react-native-material/core';
+import { useSessionContext } from '../contexts/SessionContext';
 
 const sessionData = {
   sessionId: 1,
@@ -49,16 +50,26 @@ const sessionData = {
 }
 
 const HomeScreen = ({ navigation }) => {
-  console.log('navigation', navigation);
+  // console.log('navigation', navigation);
   const [loading, setLoading] = useState(false);
-  const handleOnPress = () => {
+  const { connectToSession } = useSessionContext();
+  const handleOnPress = async () => {
     setLoading(!loading);
-    let delay = 2500;
-
-    setTimeout(function () {
+    try {
+      await connectToSession();
       setLoading(false);
-      navigation.navigate('Station Selection', { sessionData });
-    }, delay);
+      navigation.navigate('Station Selection');
+    } catch (e) {
+      console.error(e)
+      setLoading(false);
+    }
+
+    // let delay = 2500;
+
+    // setTimeout(function () {
+    // setLoading(false);
+    // navigation.navigate('Station Selection', { sessionData });
+    // }, delay);
   };
   return (
     <View

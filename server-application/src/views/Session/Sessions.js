@@ -10,7 +10,6 @@ export default function Sessions() {
     generalFields,
     stations,
     sessionRecords,
-    createOrUpdateRecord,
   } = useSessionContext();
 
   console.log({

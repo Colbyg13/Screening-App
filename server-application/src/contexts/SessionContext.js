@@ -24,6 +24,7 @@ const testGeneralFields = [{
 }]
 
 const testStations = [{
+    id: 1,
     name: 'Station 1',
     fields: [{
         name: 'Name',
@@ -31,6 +32,16 @@ const testStations = [{
     }, {
         name: 'Birthday',
         type: 'date'
+    }]
+}, {
+    id: 2,
+    name: 'Station 2',
+    fields: [{
+        name: 'Height',
+        type: 'number'
+    }, {
+        name: 'Weight',
+        type: 'number'
     }]
 }]
 
@@ -45,7 +56,7 @@ export default function SessionProvider({ children }) {
     // TODO: update this to get the correct value from db
     let recordId = 0;
 
-    const [sessionIsRunning, setSessionIsRunning] = useState(window.api.getIsServerRunning());
+    const [sessionIsRunning, setSessionIsRunning] = useState(window.api.getIsSessionRunning());
 
     const [generalFields, setGeneralFields] = useState(testGeneralFields);
 
@@ -56,36 +67,16 @@ export default function SessionProvider({ children }) {
     async function startSession() {
         // TODO: get current session records for initial state based on generalInformation and date?
         // const sessionRecords = await getRecordsFromDB() // Make sure to pass in this value down below
-        const response = await window.api.startServer(generalFields, stations, sessionRecords, createOrUpdateRecord);
+        const response = await window.api.startSession(generalFields, stations);
         console.log({ response });
         setSessionIsRunning(true);
         // setSessionRecords(sessionRecords);
     }
 
     async function stopSession() {
-        const response = await window.api.stopServer();
+        const response = await window.api.stopSession();
         console.log({ response });
         setSessionIsRunning(false);
-    }
-
-    function createOrUpdateRecord(recordUpdate) {
-
-        const oldRecord = sessionRecords.find(({ id }) => id === recordUpdate.id);
-
-        if (oldRecord) {
-            const updatedRecord = {
-                ...oldRecord,
-                ...recordUpdate,
-            };
-
-            // TODO: Update record in DB
-            setSessionRecords(records => replace(records, records.indexOf(oldRecord), updatedRecord));
-
-        } else {
-
-            // TODO: Create new record
-            setSessionRecords(records => [...records, recordUpdate]);
-        }
     }
 
     return (
@@ -97,7 +88,6 @@ export default function SessionProvider({ children }) {
                 generalFields,
                 stations,
                 sessionRecords,
-                createOrUpdateRecord,
             }}
         >
             {children}
