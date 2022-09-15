@@ -5,12 +5,12 @@ import { Pressable } from '@react-native-material/core';
 const StationsListItem = (props) => {
   station = props.item;
   return (
-    <Pressable style={styles.item} onPress={props.onPress} pressEffect='ripple' pressEffectColor='green'>
+    <Pressable key={station.id} style={styles.item} onPress={props.onPress} pressEffect='ripple' pressEffectColor='green'>
       <View>
         <Text style={styles.title}>{station.title}</Text>
         {station.fields.map((item) => {
           return (
-            <View style={styles.fieldsView}>
+            <View key={item.name} style={styles.fieldsView}>
               <Text style={styles.fieldsitem}>{item.name}</Text>
             </View>
           );
