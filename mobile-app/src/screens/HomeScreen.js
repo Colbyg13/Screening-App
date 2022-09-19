@@ -9,6 +9,7 @@ const sessionData = {
     {
       id: 1,
       title: 'Station 1',
+      label: '01',
       fields: [
         {
           name: 'Name',
@@ -24,7 +25,25 @@ const sessionData = {
     },
     {
       id: 2,
+      title: 'Station 2',
+      label: '02',
+      fields: [
+        {
+          name: 'Blood Pressure',
+          type: 'text',
+          required: 'yes'
+        },
+        {
+          name: 'BPM',
+          type: 'number',
+          required: 'no'
+        }
+      ]
+    },
+    {
+      id: 3,
       title: 'Station 3',
+      label: '03',
       fields: [
         {
           name: 'Weight',
@@ -51,17 +70,17 @@ const sessionData = {
 
 const HomeScreen = ({ navigation }) => {
   // console.log('navigation', navigation);
-  const [loading, setLoading] = useState(false);
-  const { connectToSession } = useSessionContext();
+  // const [loading, setLoading] = useState(false);
+  const { connectToSession, loading } = useSessionContext();
   const handleOnPress = async () => {
-    setLoading(!loading);
+    // setLoading(!loading);
     try {
       await connectToSession();
-      setLoading(false);
+      // setLoading(false);
       navigation.navigate('Station Selection');
     } catch (e) {
       console.error(e)
-      setLoading(false);
+      // setLoading(false);
     }
 
     // let delay = 2500;
