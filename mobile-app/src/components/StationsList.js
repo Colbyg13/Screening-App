@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {
   View,
   Text,
@@ -7,23 +7,30 @@ import {
   StyleSheet,
   StatusBar,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import StationsListItem from '../components/StationsListItem';
 const StationsList = (props) => {
-  const stations = props.data.stations;
-
+  const navigation = useNavigation();
+  const [stations, setStations] = useState(props.data.stations);
+  console.log("STATIONS", stations);
   const handlePress = (item) => {
+    const selectedStation = item
     console.log('you pressed me', item);
+    navigation.navigate('Current Session Queue', { selectedStation });
   }
   const renderStationItem = ({ item }) => {
-    return <StationsListItem onPress={() => handlePress(item)} item={item} />;
+    let isFirstStation = false;
+    if(item.id === 1) isFirstStation = true;
+    item.isStationOne = isFirstStation;
+    return <StationsListItem key={item.id} onPress={() => handlePress(item)} item={item} />;
   };
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.pageDirection}>Select a station</Text>
       <FlatList
         data={stations}
+        keyExtractor={item => item.id}
         renderItem={renderStationItem}
-        keyExtractor={(item) => item.id}
       />
     </SafeAreaView>
   );

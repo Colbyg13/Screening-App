@@ -4,12 +4,14 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './src/screens/HomeScreen';
 import StationSelectionScreen from './src/screens/StationSelectionScreen';
+import QueueScreen from './src/screens/QueueScreen';
+import AddToOnlineQueue from './src/screens/AddToOnlineQueue';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home">
+      <Stack.Navigator initialRouteName='Home'>
         <Stack.Screen
           name='Home'
           component={HomeScreen}
@@ -19,6 +21,16 @@ export default function App() {
           name='Station Selection'
           component={StationSelectionScreen}
           options={{ title: 'Stations' }}
+        />
+        <Stack.Screen
+          name='Current Session Queue'
+          component={QueueScreen}
+          options={{ title: 'Current Session' }}
+        />
+        <Stack.Screen
+          name='Add To Queue'
+          component={AddToOnlineQueue}
+          options={{ title: 'Add to Queue'}}
         />
       </Stack.Navigator>
     </NavigationContainer>
