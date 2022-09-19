@@ -1,9 +1,195 @@
-import React from 'react'
-import { View, Text, StyleSheet } from 'react-native';
+import { TextInput, Pressable } from '@react-native-material/core';
+import {
+  Provider,
+  Button,
+  Dialog,
+  DialogHeader,
+  DialogContent,
+  DialogActions,
+  Text,
+} from '@react-native-material/core';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, StatusBar } from 'react-native';
 const AddToOnlineQueue = ({ route }) => {
-  return (
-    <View><Text style={{fontSize: 24, textAlign: 'center', marginTop: 30}}>AddToOnlineQueue</Text></View>
-  )
-}
+  const [formState, setFormState] = useState({}); //used to keep track of inputs. 
+  const [fields, setFields] = useState([]); //used to keep track of inputs and match them to the patient.
+  const [visible, setVisible] = useState(false); //opens the dialog/modal.
+  const [patient, setPatient] = useState({});
+  const station = route.params.station;
+  const numFields = station.fields.length;
 
-export default AddToOnlineQueue
+  const defaultState = () => {
+    let newFields = []; 
+    for (let i = 0; i < numFields; i++) {
+      const varName = station.fields[i].name;
+      setFormState((prevState) => ({ ...prevState, [varName]: '' }));
+      newFields.push(varName);
+    }
+    setFields(newFields);
+  };
+
+  useEffect(() => { //sets the state for the form dynamically. I have not implemented validation yet. 
+    defaultState();
+  }, []);
+
+  useEffect(() => {
+    console.log('Fields after default state was called', fields);
+  }, [fields]);
+
+  useEffect(() => { //sets the default patient to have a null id, and the correct fields for the station. 
+    setPatient((prevState) => ({ ...prevState, data: formState, id: null }));
+  }, [formState]);
+
+  const handleSubmit = () => {
+    console.log('You pressed submit');
+    console.log('Current State: ', formState);
+    //Some validation function
+    //call function to handle SOCKET EVENT TO ADD NEW RECORD TO SESSION/QUEUE
+    //On success open dialog with new ID, name, and DOB
+    //On dialog close go back to session and update list of patients
+    let newId = Math.floor(Math.random() * 10); //this id will be given in the server
+    setPatient((prevState) => ({ ...prevState, id: newId })); //on server success set the patient in state for display.
+
+    setVisible(true); //opens the modal/dialog
+  };
+
+  const renderInput = (field) => {
+    return (
+      <View key={field.name} style={styles.row}>
+        <Text style={styles.fieldName}>{field.name}:</Text>
+        <View>
+          <TextInput
+            onChangeText={(newText) => {
+              console.log(newText);
+              setFormState((prevState) => ({
+                ...prevState,
+                [field.name]: newText,
+              }));
+            }}
+            style={styles.fieldInput}
+            required={field.required}
+          ></TextInput>
+        </View>
+      </View>
+    );
+  };
+  return (
+    // must be wrapped in this to use dialog/modal
+    <Provider>
+      <View style={styles.container}>
+        <Text style={{ fontSize: 24, textAlign: 'center', marginTop: 30 }}>
+          AddToOnlineQueue
+        </Text>
+        <Text style={styles.pageDirection}>Patient Information</Text>
+        <View>
+          {station.fields.map((field) => {
+            return renderInput(field);
+          })}
+        </View>
+
+        <View style={styles.wrapper}>
+          <Pressable
+            style={styles.btnSubmit}
+            pressEffect='ripple'
+            pressEffectColor='#4c5e75'
+            onPress={handleSubmit}
+          >
+            <Text style={styles.btnText}>Submit</Text>
+          </Pressable>
+          <Pressable
+            style={styles.btnCancel}
+            pressEffect='ripple'
+            pressEffectColor='#FCB8B8'
+          >
+            <Text style={styles.btnText}>Cancel</Text>
+          </Pressable>
+        </View>
+        <Dialog visible={visible} onDismiss={() => setVisible(false)}>
+          <DialogHeader title='Added to Queue Successully!' />
+          <DialogContent>
+            <Text>New ID: {patient.id}</Text>
+            {fields.map((field) => {
+              return (
+                <Text>
+                  {field}: {patient.data[field]}
+                </Text>
+              );
+            })}
+          </DialogContent>
+          <DialogActions>
+            <Button
+              title='Ok'
+              compact
+              variant='text'
+              onPress={() => setVisible(false)}
+            />
+          </DialogActions>
+        </Dialog>
+      </View>
+    </Provider>
+  );
+};
+
+const styles = StyleSheet.create({
+  container: {
+    height: '100%',
+    marginTop: StatusBar.currentHeight || 0,
+    backgroundColor: '#ffffff',
+  },
+  fieldName: {
+    alignSelf: 'flex-start',
+    marginBottom: 5,
+    fontSize: 22,
+  },
+  pageDirection: {
+    margin: 10,
+    fontSize: 34,
+    alignSelf: 'start',
+  },
+  fieldInput: {
+    width: 200,
+    padding: 5,
+    fontSize: 30,
+  },
+  row: {
+    marginLeft: 20,
+    marginTop: 20,
+    flexDirection: 'column',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  wrapper: {
+    marginTop: 30,
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+  },
+  btnSubmit: {
+    alignSelf: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    backgroundColor: '#A3CDFF',
+    height: 50,
+    width: 100,
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginRight: 20,
+  },
+  btnCancel: {
+    alignSelf: 'flex-end',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 10,
+    backgroundColor: '#FF6464',
+    height: 50,
+    width: 100,
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginRight: 20,
+  },
+  btnText: {
+    fontSize: 22,
+  },
+});
+export default AddToOnlineQueue;

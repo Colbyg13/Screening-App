@@ -48,6 +48,7 @@ const mockData = [
   },
 ];
 const SessionQueue = (props) => {
+  const station = props.station;
   const [isStationOne, setIsStationOne] = useState(props.station.isStationOne);
   const navigation = useNavigation();
   const handlePress = (item) => {
@@ -56,8 +57,10 @@ const SessionQueue = (props) => {
     //navigation.navigate('Current Session Queue', { selectedStation });
   };
   const handleAddToQueuePress = () => {
-    navigation.navigate('Add To Queue');
+    navigation.navigate('Add To Queue', { station });
   }
+
+  //NEED SOCKET EVENT TO LISTEN FOR NEW DATA ADDED
   const renderQueueItem = ({ item }) => {
     return (
       <SessionQueueItem
