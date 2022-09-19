@@ -14,9 +14,10 @@ const SessionQueueItem = (props) => {
       pressEffectColor='green'
     >
       <View>
-        <Text style={styles.title}>{person.name}</Text>
+        <Text style={styles.title}>Name: {person.name}</Text>
         <View key={person.name} style={styles.fieldsView}>
           <Text style={styles.fieldsitem}>ID: {person.id}</Text>
+          <Text style={styles.fieldsitem}>DOB: {person.dob}</Text>
         </View>
       </View>
     </Pressable>
@@ -30,14 +31,16 @@ const styles = StyleSheet.create({
     padding: 20,
     marginVertical: 8,
     marginHorizontal: 16,
+    borderRadius: 10,
+    overflow: 'hidden',
   },
   title: {
     marginBottom: 10,
-    fontSize: 30,
-    alignSelf: 'center',
+    fontSize: 32,
+    fontWeight: '500',
   },
   fieldsView: {
-    alignItems: 'center',
+    alignItems: 'start',
   },
   fieldsitem: {
     fontSize: 22,
