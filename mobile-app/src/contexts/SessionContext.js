@@ -2,11 +2,16 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import findServer from "../utils/find-server";
 import promiseRace from "../utils/rase";
-const SERVER_PORT = 3333;
-let socket;
+
+export const SERVER_PORT = 3333;
+export const MAX_TRIES = 20;
 
 const SessionContext = createContext({
-    session: {},
+    isConnected: false,
+    loading: false,
+    sessionInfo: {},
+    selectedStation: () => { },
+    setSelectedStationId: () => { },
     connectToSession: () => { },
     disconnectFromSession: () => { },
     sendRecord: () => { },
@@ -16,17 +21,21 @@ export const useSessionContext = () => useContext(SessionContext);
 
 export default function SessionProvider({ children }) {
 
+    // Connected to server
     const [isConnected, setIsConnected] = useState(false);
     const [loading, setLoading] = useState(false);
     const [sessionInfo, setSessionInfo] = useState();
     const [selectedStationId, setSelectedStationId] = useState();
-    const selectedStation = sessionInfo?.stations?.find(({id}) => id === selectedStationId);
+    const selectedStation = sessionInfo?.stations?.find(({ id }) => id === selectedStationId);
+    const [socket, setSocket] = useState();
 
     useEffect(() => {
         console.log('Finding Server')
         tryFindingServer()
             .then(ipAddress => {
-                socket = io(ipAddress);
+                console.log('server found', ipAddress)
+                const socket = io(ipAddress);
+                setSocket(socket);
             })
     }, [])
 
@@ -36,17 +45,26 @@ export default function SessionProvider({ children }) {
         if (socket) {
             socket.on('connect', () => {
                 console.log('CONNECTED')
+                socket.on('session-info-update', newSessionInfo => {
+                    console.log('session-info-update', newSessionInfo);
+                    setSessionInfo(newSessionInfo);
+                })
                 setIsConnected(true);
             });
 
             socket.on('disconnect', () => {
                 console.log('DISCONNECTED')
+                socket.off('session-info-update');
                 setIsConnected(false);
             });
+
+            console.log('socket.connect()')
+            socket.connect();
 
             return () => {
                 socket.off('connect');
                 socket.off('disconnect');
+                socket.off('session-info-update');
             };
         }
     }, [socket]);
@@ -55,16 +73,11 @@ export default function SessionProvider({ children }) {
         setLoading(true);
         if (socket) {
             console.log('Connecting to session');
-            socket.connect();
             return promiseRace([
                 new Promise((res, rej) => socket.emit('session connect', sessionInfo => {
                     if (sessionInfo) {
                         setSessionInfo(sessionInfo)
                         res('Session Found')
-                        socket.on('session-info-update', newSessionInfo => {
-                            console.log('session-info-update', newSessionInfo);
-                            setSessionInfo(newSessionInfo);
-                        })
                     }
                     rej('Error: Unable to connect to session - session not started.')
                 }))
@@ -80,12 +93,13 @@ export default function SessionProvider({ children }) {
 
     async function disconnectFromSession() {
         console.log('Disconnection from session...');
-        // socket.disconnect();
+        socket.off('session-info-update');
+        setSessionInfo();
     }
 
     async function sendRecord(recordPayload) {
         console.log('Sending record...', recordPayload);
-        socket.emit("update-record", recordPayload)
+        socket.emit("update-record", recordPayload);
     }
 
     return (
@@ -106,16 +120,14 @@ export default function SessionProvider({ children }) {
     );
 }
 
-let tries = 0;
-
-async function tryFindingServer() {
+async function tryFindingServer(tries = 0) {
     try {
         const serverIp = await findServer(SERVER_PORT)
         return serverIp;
     } catch (error) {
         // console.error({ error })
         setTimeout(() => {
-            if (tries++ < 20) tryFindingServer()
+            if (tries < MAX_TRIES) tryFindingServer(tries + 1)
         }, 5000);
     }
 }
