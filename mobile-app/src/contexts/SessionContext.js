@@ -122,7 +122,7 @@ export default function SessionProvider({ children }) {
 
 async function tryFindingServer(tries = 0) {
     try {
-        const serverIp = await findServer(SERVER_PORT)
+        const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
         return serverIp;
     } catch (error) {
         // console.error({ error })

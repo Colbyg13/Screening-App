@@ -21,7 +21,7 @@ const io = new Server(server, {
 let sessionIsRunning = false;
 let sessionInfo;
 
-app.get('/', (req, res) => {
+app.get('/api/v1/server', (req, res) => {
     res.json({ name: 'Test Computer' });
 });
 
