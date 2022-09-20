@@ -25,7 +25,7 @@ const testGeneralFields = [{
 
 const testStations = [{
     id: 1,
-    name: 'Station 1',
+    title: 'Station 1',
     fields: [{
         name: 'Name',
         type: 'text'
@@ -35,7 +35,7 @@ const testStations = [{
     }]
 }, {
     id: 2,
-    name: 'Station 2',
+    title: 'Station 2',
     fields: [{
         name: 'Height',
         type: 'number'

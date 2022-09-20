@@ -8,18 +8,23 @@ import {
   DialogActions,
   Text,
 } from '@react-native-material/core';
+import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, StatusBar } from 'react-native';
+import { useSessionContext } from '../contexts/SessionContext';
 const AddToOnlineQueue = ({ route }) => {
+  const navigation = useNavigation();
+  const { sendRecord, selectedStation: station } = useSessionContext();
   const [formState, setFormState] = useState({}); //used to keep track of inputs. 
   const [fields, setFields] = useState([]); //used to keep track of inputs and match them to the patient.
   const [visible, setVisible] = useState(false); //opens the dialog/modal.
   const [patient, setPatient] = useState({});
-  const station = route.params.station;
+  // const station = route.params.station;
   const numFields = station.fields.length;
 
+
   const defaultState = () => {
-    let newFields = []; 
+    let newFields = [];
     for (let i = 0; i < numFields; i++) {
       const varName = station.fields[i].name;
       setFormState((prevState) => ({ ...prevState, [varName]: '' }));
@@ -40,14 +45,15 @@ const AddToOnlineQueue = ({ route }) => {
     setPatient((prevState) => ({ ...prevState, data: formState, id: null }));
   }, [formState]);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     console.log('You pressed submit');
     console.log('Current State: ', formState);
     //Some validation function
     //call function to handle SOCKET EVENT TO ADD NEW RECORD TO SESSION/QUEUE
     //On success open dialog with new ID, name, and DOB
     //On dialog close go back to session and update list of patients
-    let newId = Math.floor(Math.random() * 10); //this id will be given in the server
+    const newId = await sendRecord(formState);
+    // let newId = Math.floor(Math.random() * 10); //this id will be given in the server
     setPatient((prevState) => ({ ...prevState, id: newId })); //on server success set the patient in state for display.
 
     setVisible(true); //opens the modal/dialog
@@ -63,7 +69,7 @@ const AddToOnlineQueue = ({ route }) => {
               console.log(newText);
               setFormState((prevState) => ({
                 ...prevState,
-                [field.name]: newText,
+                [field.name.toLowerCase()]: newText,
               }));
             }}
             style={styles.fieldInput}
@@ -111,7 +117,7 @@ const AddToOnlineQueue = ({ route }) => {
             {fields.map((field) => {
               return (
                 <Text>
-                  {field}: {patient.data[field]}
+                  {field}: {patient.data[field.toLowerCase()]}
                 </Text>
               );
             })}
@@ -121,7 +127,10 @@ const AddToOnlineQueue = ({ route }) => {
               title='Ok'
               compact
               variant='text'
-              onPress={() => setVisible(false)}
+              onPress={() => {
+                setVisible(false)
+                navigation.navigate('Current Session Queue')
+              }}
             />
           </DialogActions>
         </Dialog>

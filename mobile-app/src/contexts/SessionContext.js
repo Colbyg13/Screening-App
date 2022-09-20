@@ -1,10 +1,9 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import findServer from "../utils/find-server";
 import promiseRace from "../utils/rase";
-import os from 'os'
-const ifaces = os.networkInterfaces();
+const SERVER_PORT = 3333;
 let socket;
-// const socket = io('http://192.168.86.231:3333');
 
 const SessionContext = createContext({
     session: {},
@@ -20,22 +19,20 @@ export default function SessionProvider({ children }) {
     const [isConnected, setIsConnected] = useState(false);
     const [loading, setLoading] = useState(false);
     const [sessionInfo, setSessionInfo] = useState();
+    const [selectedStationId, setSelectedStationId] = useState();
+    const selectedStation = sessionInfo?.stations?.find(({id}) => id === selectedStationId);
 
     useEffect(() => {
-        //   Used to find the server application
-        const networkIps = Object.keys(ifaces)
-            .map(dev => ifaces[dev].filter(details => {
-                if (details.family === 'IPv4' && details.internal === false) {
-                    return details.address;
-                }
-            }))
-            .filter(Boolean);
-            
-        console.log({ networkIps })
+        console.log('Finding Server')
+        tryFindingServer()
+            .then(ipAddress => {
+                socket = io(ipAddress);
+            })
     }, [])
 
 
     useEffect(() => {
+        console.log('socket changed')
         if (socket) {
             socket.on('connect', () => {
                 console.log('CONNECTED')
@@ -64,6 +61,10 @@ export default function SessionProvider({ children }) {
                     if (sessionInfo) {
                         setSessionInfo(sessionInfo)
                         res('Session Found')
+                        socket.on('session-info-update', newSessionInfo => {
+                            console.log('session-info-update', newSessionInfo);
+                            setSessionInfo(newSessionInfo);
+                        })
                     }
                     rej('Error: Unable to connect to session - session not started.')
                 }))
@@ -83,9 +84,8 @@ export default function SessionProvider({ children }) {
     }
 
     async function sendRecord(recordPayload) {
-        console.log('Sending record...');
-        socket.emit("update-record", recordPayload);
-
+        console.log('Sending record...', recordPayload);
+        socket.emit("update-record", recordPayload)
     }
 
     return (
@@ -94,6 +94,8 @@ export default function SessionProvider({ children }) {
                 isConnected,
                 loading,
                 sessionInfo,
+                selectedStation,
+                setSelectedStationId,
                 connectToSession,
                 disconnectFromSession,
                 sendRecord,
@@ -102,4 +104,18 @@ export default function SessionProvider({ children }) {
             {children}
         </SessionContext.Provider>
     );
+}
+
+let tries = 0;
+
+async function tryFindingServer() {
+    try {
+        const serverIp = await findServer(SERVER_PORT)
+        return serverIp;
+    } catch (error) {
+        // console.error({ error })
+        setTimeout(() => {
+            if (tries++ < 20) tryFindingServer()
+        }, 5000);
+    }
 }

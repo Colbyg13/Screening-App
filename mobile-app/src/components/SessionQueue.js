@@ -10,6 +10,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import SessionQueueItem from './SessionQueueItem';
 import AddToQueueBtn from './AddToQueueBtn';
+import { useSessionContext } from '../contexts/SessionContext';
 const mockData = [
   {
     id: 1,
@@ -48,8 +49,11 @@ const mockData = [
   },
 ];
 const SessionQueue = (props) => {
-  const station = props.station;
-  const [isStationOne, setIsStationOne] = useState(props.station.isStationOne);
+  // const station = props.station;
+  const {sessionInfo: {stations, records}, selectedStation: station} = useSessionContext();
+  const isStationOne = stations[0] === station;
+  console.log({station, stations})
+  // const [isStationOne, setIsStationOne] = useState(props.station.isStationOne);
   const navigation = useNavigation();
   const handlePress = (item) => {
     //const selectedStation = item
@@ -72,11 +76,11 @@ const SessionQueue = (props) => {
   };
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.stationTitle}>{props.station.title}</Text>
+      <Text style={styles.stationTitle}>{station?.title}</Text>
       <Text style={styles.pageDirection}>Current Session</Text>
       <Text style={styles.searchBar}>Search Bar will go here</Text>
       <FlatList
-        data={mockData}
+        data={records}
         keyExtractor={(item) => item.id}
         renderItem={renderQueueItem}
         style={styles.flatList}

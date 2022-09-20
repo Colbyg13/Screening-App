@@ -18,6 +18,7 @@ const StationsList = (props) => {
     sessionInfo: {
       stations = [],
     } = {},
+    setSelectedStationId,
   } = useSessionContext();
 
   console.log({ sessionInfo })
@@ -26,14 +27,15 @@ const StationsList = (props) => {
   // const [stations, setStations] = useState(props.data.stations);
   console.log("STATIONS", stations);
   const handlePress = (item) => {
-    const selectedStation = item
+    // const selectedStation = item
+    setSelectedStationId(item.id)
     console.log('you pressed me', item);
-    navigation.navigate('Current Session Queue', { selectedStation });
+    navigation.navigate('Current Session Queue');
   }
   const renderStationItem = ({ item }) => {
-    let isFirstStation = false;
-    if(item.id === 1) isFirstStation = true;
-    item.isStationOne = isFirstStation;
+    // let isFirstStation = false;
+    // if(item.id === 1) isFirstStation = true;
+    // item.isStationOne = isFirstStation;
     return <StationsListItem key={item.id} onPress={() => handlePress(item)} item={item} />;
   };
   return (
