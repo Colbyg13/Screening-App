@@ -121,6 +121,7 @@ export default function SessionProvider({ children }) {
 }
 
 async function tryFindingServer(tries = 0) {
+    // return 'http://10.75.167.190:3333';
     try {
         const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
         return serverIp;
