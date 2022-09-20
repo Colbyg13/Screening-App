@@ -19,7 +19,6 @@ export default function Sessions() {
     sessionRecords,
   })
 
-
   return (
     <div className="w-full h-full flex justify-center items-center" >
       <div className="flex flex-col space-y-4 text">

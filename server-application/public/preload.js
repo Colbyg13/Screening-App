@@ -22,7 +22,6 @@ let sessionIsRunning = false;
 let sessionInfo;
 
 app.get('/', (req, res) => {
-    console.log(`We've been hit!`)
     res.json({ name: 'Test Computer' });
 });
 
@@ -30,39 +29,41 @@ io.on("connection", socket => {
     console.log("USER CONNECTED");
 
     socket.on("session connect", getSessionInfo => {
-        console.log("User connecting to station...")
-        getSessionInfo(sessionInfo);
+        if (sessionIsRunning) {
+            console.log("User connecting to station...")
+            getSessionInfo(sessionInfo);
+        }
     })
 
     socket.on('update-record', recordUpdate => {
-        console.log('UPDATING RECORD...', recordUpdate)
-        const {
-            records = []
-        } = sessionInfo;
+        if (sessionIsRunning) {
+            console.log('UPDATING RECORD...', recordUpdate)
+            const {
+                records = []
+            } = sessionInfo;
 
-        const oldRecord = records.find(({ id }) => id === recordUpdate);
+            const oldRecord = records.find(({ id }) => id === recordUpdate);
 
-        // TODO: update to save in DB 
+            // TODO: update to save in DB 
 
-        if (oldRecord) {
+            if (oldRecord) {
+                sessionInfo = {
+                    ...sessionInfo,
+                    records: replace(records, records.indexOf(oldRecord), { ...oldRecord, ...recordUpdate })
+                }
+            }
+
+            const newId = Math.floor(Math.random() * 99999);
+
             sessionInfo = {
                 ...sessionInfo,
-                records: replace(records, records.indexOf(oldRecord), { ...oldRecord, ...recordUpdate })
+                records: [...records, { id: newId, ...recordUpdate }]
             }
+
+            console.log('Sending session-info-update', sessionInfo)
+
+            socket.emit('session-info-update', sessionInfo)
         }
-
-        const newId = Math.floor(Math.random() * 99999);
-
-        sessionInfo = {
-            ...sessionInfo,
-            records: [...records, { id: newId, ...recordUpdate }]
-        }
-
-        // getId(recordUpdate.id || newId);
-
-        console.log('Sending session-info-update', sessionInfo)
-
-        socket.emit('session-info-update', sessionInfo)
     })
 
 })
@@ -75,10 +76,9 @@ contextBridge.exposeInMainWorld("api", {
     // SERVER FUNCTIONS
     getIP: ip.address,
     getIsSessionRunning: () => sessionIsRunning,
-    startSession: (generalFields, stations) => new Promise((res, rej) => {
+    startSession: (generalFields, stations) => {
         console.log('STARTING SESSION')
         if (!sessionIsRunning) {
-            io.disconnectSockets();
 
             sessionInfo = {
                 generalFields,
@@ -88,20 +88,20 @@ contextBridge.exposeInMainWorld("api", {
             };
 
             sessionIsRunning = true;
-            res('Session started successfully.')
+            return 'Session started successfully.';
         }
-        else rej('The Session is already running.')
-    }),
-    stopSession: () => new Promise((res, rej) => {
+
+        throw new Error('The Session is already running.');
+    },
+    stopSession: () => {
         console.log('STOPPING SESSION')
         if (sessionIsRunning) {
-            io.disconnectSockets();
             sessionInfo = undefined;
             sessionIsRunning = false;
-            res('Successfully stopped session')
+            return 'Successfully stopped session';
         }
-        else rej('The session is already stopped')
-    }),
+        else throw new Error('The session is already stopped');
+    },
 });
 
 server.listen(SERVER_PORT, () => {
