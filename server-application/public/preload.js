@@ -3,20 +3,15 @@ const ip = require('ip');
 const express = require("express");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
-var cors = require('cors');
-
+const cors = require('cors');
 
 const SERVER_PORT = 3333;
+
 
 const app = express();
 app.use(cors())
 const server = createServer(app);
-const io = new Server(server, {
-    // allowRequest: (req, callback) => {
-    //     const noOriginHeader = req.headers.origin === undefined;
-    //     callback(null, noOriginHeader); // only allow requests without 'origin' header
-    // },
-});
+const io = new Server(server);
 
 let sessionIsRunning = false;
 let sessionInfo;
@@ -35,6 +30,7 @@ io.on("connection", socket => {
         }
     })
 
+    // TODO: move to endpoint
     socket.on('update-record', recordUpdate => {
         if (sessionIsRunning) {
             console.log('UPDATING RECORD...', recordUpdate)
