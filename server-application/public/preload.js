@@ -9,7 +9,8 @@ const SERVER_PORT = 3333;
 
 
 const app = express();
-app.use(cors())
+app.use(cors());
+app.use(express.json());
 const server = createServer(app);
 const io = new Server(server);
 
@@ -20,48 +21,56 @@ app.get('/api/v1/server', (req, res) => {
     res.json({ name: 'Test Computer' });
 });
 
+app.post('/api/v1/update-record', (req, res) => {
+
+    console.log('Updating Record', req.body)
+
+    const {
+        body: record,
+    } = req;
+
+    if (sessionIsRunning) {
+        console.log('UPDATING RECORD...', record)
+        const {
+            records = []
+        } = sessionInfo;
+
+        const oldRecord = records.find(({ id }) => id === record);
+
+        // TODO: update to save in DB 
+
+        if (oldRecord) {
+            sessionInfo = {
+                ...sessionInfo,
+                records: replace(records, records.indexOf(oldRecord), { ...oldRecord, ...record })
+            }
+        }
+
+        const newId = Math.floor(Math.random() * 99999);
+
+        sessionInfo = {
+            ...sessionInfo,
+            records: [...records, { id: newId, ...record }]
+        }
+
+        console.log('Sending session-info-update', sessionInfo)
+
+        io.emit('session-info-update', sessionInfo)
+
+        res.status(201).json({ newId });
+    }
+})
+
 io.on("connection", socket => {
     console.log("USER CONNECTED");
 
-    socket.on("session connect", getSessionInfo => {
+    socket.on("session connect", callback => {
         if (sessionIsRunning) {
             console.log("User connecting to station...")
-            getSessionInfo(sessionInfo);
+            callback(sessionInfo);
         }
+        else callback();
     })
-
-    // TODO: move to endpoint
-    socket.on('update-record', recordUpdate => {
-        if (sessionIsRunning) {
-            console.log('UPDATING RECORD...', recordUpdate)
-            const {
-                records = []
-            } = sessionInfo;
-
-            const oldRecord = records.find(({ id }) => id === recordUpdate);
-
-            // TODO: update to save in DB 
-
-            if (oldRecord) {
-                sessionInfo = {
-                    ...sessionInfo,
-                    records: replace(records, records.indexOf(oldRecord), { ...oldRecord, ...recordUpdate })
-                }
-            }
-
-            const newId = Math.floor(Math.random() * 99999);
-
-            sessionInfo = {
-                ...sessionInfo,
-                records: [...records, { id: newId, ...recordUpdate }]
-            }
-
-            console.log('Sending session-info-update', sessionInfo)
-
-            socket.emit('session-info-update', sessionInfo)
-        }
-    })
-
 })
 
 contextBridge.exposeInMainWorld("api", {

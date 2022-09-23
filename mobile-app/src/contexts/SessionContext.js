@@ -1,3 +1,4 @@
+import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
 import findServer from "../utils/find-server";
@@ -28,6 +29,7 @@ export default function SessionProvider({ children }) {
     const [selectedStationId, setSelectedStationId] = useState();
     const selectedStation = sessionInfo?.stations?.find(({ id }) => id === selectedStationId);
     const [socket, setSocket] = useState();
+    const [serverIp, setServerIp] = useState();
 
     useEffect(() => {
         console.log('Finding Server')
@@ -35,6 +37,7 @@ export default function SessionProvider({ children }) {
             .then(ipAddress => {
                 console.log('server found', ipAddress)
                 const socket = io(ipAddress);
+                setServerIp(ipAddress);
                 setSocket(socket);
             })
     }, [])
@@ -99,7 +102,14 @@ export default function SessionProvider({ children }) {
 
     async function sendRecord(recordPayload) {
         console.log('Sending record...', recordPayload);
-        socket.emit("update-record", recordPayload);
+        const endpoint = `${serverIp}/api/v1/update-record`;
+        console.log({ endpoint, recordPayload })
+        try {
+            const result = await axios.post(endpoint, recordPayload);
+            return result.data.newId;
+        } catch (error) {
+            console.error(error)
+        }
     }
 
     return (

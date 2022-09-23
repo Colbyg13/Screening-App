@@ -7,7 +7,7 @@ export default async function findServer(port, path = '') {
         ...Array(256).fill().map((_, i) => {
             const updatedIp = ipAddress.replace(/^(\d+\.\d+\.\d+).*$/, `$1.${i}`);
             const fullIp = `http://${updatedIp}:${port}/${path}`
-            return axios.get(fullIp, { timeout: 3000 })
+            return axios.get(fullIp, { timeout: 1000 })
         }),
     ])
         .then(results => results.filter(({ status }) => status === 'fulfilled'))
