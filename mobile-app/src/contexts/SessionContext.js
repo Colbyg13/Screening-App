@@ -42,26 +42,24 @@ export default function SessionProvider({ children }) {
             })
     }, [])
 
-
     useEffect(() => {
         console.log('socket changed')
         if (socket) {
             socket.on('connect', () => {
-                console.log('CONNECTED')
+                console.log('Connected to server');
                 socket.on('session-info-update', newSessionInfo => {
                     console.log('session-info-update', newSessionInfo);
                     setSessionInfo(newSessionInfo);
-                })
+                });
                 setIsConnected(true);
             });
 
             socket.on('disconnect', () => {
-                console.log('DISCONNECTED')
+                console.log('Disconnected from server');
                 socket.off('session-info-update');
                 setIsConnected(false);
             });
 
-            console.log('socket.connect()')
             socket.connect();
 
             return () => {
@@ -77,35 +75,36 @@ export default function SessionProvider({ children }) {
         if (socket) {
             console.log('Connecting to session');
             return promiseRace([
-                new Promise((res, rej) => socket.emit('session connect', sessionInfo => {
+                new Promise((res, rej) => socket.emit('session connect', {}, sessionInfo => {
                     if (sessionInfo) {
                         setSessionInfo(sessionInfo)
                         res('Session Found')
                     }
-                    rej('Error: Unable to connect to session - session not started.')
+                    rej('Unable to connect to session. Session not started.')
                 }))
-            ], 'Error. Could not find server.')
+            ], 'Could not find server.')
                 .finally(() => {
                     setLoading(false);
                 });
         } else {
             setLoading(false);
-            throw new Error('Could not find server')
+            throw new Error('Could not find server.')
         }
     }
 
     async function disconnectFromSession() {
-        console.log('Disconnection from session...');
+        console.log('Disconnecting from session...');
         socket.off('session-info-update');
         setSessionInfo();
     }
 
     async function sendRecord(recordPayload) {
         console.log('Sending record...', recordPayload);
-        const endpoint = `${serverIp}/api/v1/update-record`;
-        console.log({ endpoint, recordPayload })
+        const createRecord = !!recordPayload._id;
+        const endpoint = createRecord ? 'create-record' : 'update-record';
+        const url = `${serverIp}/api/v1/${endpoint}`;
         try {
-            const result = await axios.post(endpoint, recordPayload);
+            const result = await axios.post(url, recordPayload);
             return result.data.newId;
         } catch (error) {
             console.error(error)
@@ -136,7 +135,6 @@ async function tryFindingServer(tries = 0) {
         const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
         return serverIp;
     } catch (error) {
-        // console.error({ error })
         setTimeout(() => {
             if (tries < MAX_TRIES) tryFindingServer(tries + 1)
         }, 5000);
