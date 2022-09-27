@@ -12,13 +12,6 @@ export default function Sessions() {
     sessionRecords,
   } = useSessionContext();
 
-  console.log({
-    sessionIsRunning,
-    generalFields,
-    stations,
-    sessionRecords,
-  })
-
   return (
     <div className="w-full h-full flex justify-center items-center" >
       <div className="flex flex-col space-y-4 text">
@@ -27,16 +20,16 @@ export default function Sessions() {
             <div>
               <h2 className="text-2xl ">General Info:</h2>
               {generalFields.map(({ name, value }) => (
-                <div className="ml-4">{name} - {value}</div>
+                <div className="ml-4" key={name}>{name} - {value}</div>
               ))}
             </div>
             <div>
               <h2 className="text-2xl ">Stations:</h2>
               {stations.map(({ name, fields = [] }) => (
-                <div>
+                <div key={name}>
                   <div className="text-lg ml-4">{name}:</div>
                   {fields.map(({ name, type }) => (
-                    <div className="ml-8">* {name} - {type}</div>
+                    <div className="ml-8" key={name}>* {name} - {type}</div>
                   ))}
                 </div>
               ))}

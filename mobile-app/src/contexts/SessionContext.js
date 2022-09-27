@@ -75,7 +75,7 @@ export default function SessionProvider({ children }) {
         if (socket) {
             console.log('Connecting to session');
             return promiseRace([
-                new Promise((res, rej) => socket.emit('session connect', {}, sessionInfo => {
+                new Promise((res, rej) => socket.emit('connect-to-session', {}, sessionInfo => {
                     if (sessionInfo) {
                         setSessionInfo(sessionInfo)
                         res('Session Found')
@@ -94,17 +94,19 @@ export default function SessionProvider({ children }) {
 
     async function disconnectFromSession() {
         console.log('Disconnecting from session...');
+        socket.emit('disconnect-from-session');
         socket.off('session-info-update');
         setSessionInfo();
     }
 
     async function sendRecord(recordPayload) {
         console.log('Sending record...', recordPayload);
-        const createRecord = !!recordPayload._id;
-        const endpoint = createRecord ? 'create-record' : 'update-record';
-        const url = `${serverIp}/api/v1/${endpoint}`;
+        const createRecord = !recordPayload._id;
+        const createOrUpdate = createRecord ? 'create' : 'update';
+        const url = `${serverIp}/api/v1/patients/${createOrUpdate}`;
         try {
             const result = await axios.post(url, recordPayload);
+            console.log({ result });
             return result.data.newId;
         } catch (error) {
             console.error(error)
