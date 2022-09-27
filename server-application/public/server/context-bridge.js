@@ -22,8 +22,10 @@ module.exports = APP => {
                     //TODO: get the session and records and to continue the session
                 }
                 else {
+                    // COLBY WILL DO THIS
                     //TODO: Create a session in the DB and use that information
                     APP.sessionInfo = {
+                        // id from db
                         generalFields,
                         stations,
                         records: [],
