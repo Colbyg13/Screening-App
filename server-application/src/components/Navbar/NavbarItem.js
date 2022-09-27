@@ -10,7 +10,7 @@ export default function NavbarItem({
 }) {
 
     return (
-        <div className={`px-2 py-1 flex w-full space-x-2 ${selected ? 'bg-gray-300' : ''}`}
+        <div className={`px-2 py-1 flex w-full space-x-2 hover:bg-gray-200 cursor-pointer ${selected ? 'bg-gray-300' : ''}`}
             onClick={onClick}
         >
             <Icon />

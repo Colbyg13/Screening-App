@@ -46,7 +46,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(true);
 
   return (
-    <div className='h-full shadow-lg border-r border-gray-600 flex flex-col justify-between'>
+    <div className={`h-full shadow-lg border-r border-gray-600 flex flex-col justify-between ${open ? 'min-w-[150px]' : ''}`}>
       <div>
         <NavbarItem
           open={open}
@@ -60,20 +60,23 @@ export default function Navbar() {
           title={ROUTES.Home.title}
           selected={pathname.startsWith(ROUTES.Home.path)}
           onClick={() => navigate(ROUTES.Home.path)}
-        /><NavbarItem
+        />
+        <NavbarItem
           open={open}
           Icon={ROUTES.Session.Icon}
           title={ROUTES.Session.title}
-          subsection={sessionIsRunning ? <div className='h-2 w-2 border bg-green-600 rounded-full'/> : null}
+          subsection={sessionIsRunning ? <div className='h-2 w-2 border bg-green-600 rounded-full' /> : null}
           selected={pathname.startsWith(ROUTES.Session.path)}
           onClick={() => navigate(ROUTES.Session.path)}
-        /><NavbarItem
+        />
+        <NavbarItem
           open={open}
           Icon={ROUTES.Records.Icon}
           title={ROUTES.Records.title}
           selected={pathname.startsWith(ROUTES.Records.path)}
           onClick={() => navigate(ROUTES.Records.path)}
-        /><NavbarItem
+        />
+        <NavbarItem
           open={open}
           Icon={ROUTES.Offline.Icon}
           title={ROUTES.Offline.title}
