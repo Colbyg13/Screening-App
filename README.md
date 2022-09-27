@@ -8,3 +8,6 @@ Server Application:
 
 Mobile Application:
 `cd mobile-app && expo start` 
+
+##To Test the App Download the Expo Go App from the app store.
+'The mobile application terminal will display a QR code that will open the app on your device.'
