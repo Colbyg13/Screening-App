@@ -67,6 +67,27 @@ export default function SessionProvider({ children }) {
         }
     }, [socket]);
 
+    async function tryFindingServer() {
+        // const serverIp =  'http://10.75.167.190:3333';
+        if (!isConnected) {
+            setServerLoading(true);
+
+            try {
+                const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
+                if (serverIp) {
+                    console.log(`Server found on: ${serverIp}`);
+                    const socket = io(serverIp);
+                    setServerIp(serverIp);
+                    setSocket(socket);
+                    setServerLoading(false);
+                }
+            } catch (error) {
+                console.error(error);
+                setServerLoading(false);
+            }
+        }
+    }
+
     async function connectToSession() {
         setLoading(true);
         if (socket) {
@@ -86,27 +107,6 @@ export default function SessionProvider({ children }) {
         } else {
             setLoading(false);
             throw new Error('Could not find server.')
-        }
-    }
-
-    async function tryFindingServer() {
-        // const serverIp =  'http://10.75.167.190:3333';
-        if (!isConnected) {
-            setServerLoading(true);
-
-            try {
-                const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
-                if (serverIp) {
-                    console.log(`Server found on: ${serverIp}`);
-                    const socket = io(serverIp);
-                    setServerIp(serverIp);
-                    setSocket(socket);
-                    setServerLoading(false);
-                }
-            } catch (error) {
-                console.error(error);
-                setServerLoading(false);
-            }
         }
     }
 
