@@ -24,12 +24,22 @@ module.exports = APP => {
                 else {
                     // COLBY WILL DO THIS
                     //TODO: Create a session in the DB and use that information
-                    APP.sessionInfo = {
-                        // id from db
-                        generalFields,
-                        stations,
-                        records: [],
-                    };
+                    console.log('creatingSession');
+                    let newSessionId;
+                    APP.db.collection("sessions")
+                        .insertOne({generalFields: generalFields, stations: stations})
+                        .then(result => {
+                            newSessionId = result.insertedId
+
+                            APP.sessionInfo = {
+                                // id from db
+                                session_id: newSessionId,
+                                generalFields,
+                                stations,
+                                records: [],
+                            };
+
+                        })
                 }
 
                 APP.sessionIsRunning = true;
