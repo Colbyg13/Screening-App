@@ -5,12 +5,14 @@ import findServer from "../utils/find-server";
 import promiseRace from "../utils/rase";
 
 export const SERVER_PORT = 3333;
-export const MAX_TRIES = 20;
+export const MAX_TRIES = 5;
 
 const SessionContext = createContext({
     isConnected: false,
     loading: false,
+    serverLoading: false,
     sessionInfo: {},
+    tryFindingServer: () => { },
     selectedStation: () => { },
     setSelectedStationId: () => { },
     connectToSession: () => { },
@@ -25,6 +27,7 @@ export default function SessionProvider({ children }) {
     // Connected to server
     const [isConnected, setIsConnected] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [serverLoading, setServerLoading] = useState(false);
     const [sessionInfo, setSessionInfo] = useState();
     const [selectedStationId, setSelectedStationId] = useState();
     const selectedStation = sessionInfo?.stations?.find(({ id }) => id === selectedStationId);
@@ -32,14 +35,8 @@ export default function SessionProvider({ children }) {
     const [serverIp, setServerIp] = useState();
 
     useEffect(() => {
-        console.log('Finding Server')
-        tryFindingServer()
-            .then(ipAddress => {
-                console.log('server found', ipAddress)
-                const socket = io(ipAddress);
-                setServerIp(ipAddress);
-                setSocket(socket);
-            })
+        console.log('Finding Server');
+        tryFindingServer();
     }, [])
 
     useEffect(() => {
@@ -92,6 +89,27 @@ export default function SessionProvider({ children }) {
         }
     }
 
+    async function tryFindingServer() {
+        // const serverIp =  'http://10.75.167.190:3333';
+        if (!isConnected) {
+            setServerLoading(true);
+
+            try {
+                const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
+                if (serverIp) {
+                    console.log(`Server found on: ${serverIp}`);
+                    const socket = io(serverIp);
+                    setServerIp(serverIp);
+                    setSocket(socket);
+                    setServerLoading(false);
+                }
+            } catch (error) {
+                console.error(error);
+                setServerLoading(false);
+            }
+        }
+    }
+
     async function disconnectFromSession() {
         console.log('Disconnecting from session...');
         socket.emit('disconnect-from-session');
@@ -120,6 +138,8 @@ export default function SessionProvider({ children }) {
                 loading,
                 sessionInfo,
                 selectedStation,
+                serverLoading,
+                tryFindingServer,
                 setSelectedStationId,
                 connectToSession,
                 disconnectFromSession,
@@ -129,16 +149,4 @@ export default function SessionProvider({ children }) {
             {children}
         </SessionContext.Provider>
     );
-}
-
-async function tryFindingServer(tries = 0) {
-    // return 'http://10.75.167.190:3333';
-    try {
-        const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
-        return serverIp;
-    } catch (error) {
-        setTimeout(() => {
-            if (tries < MAX_TRIES) tryFindingServer(tries + 1)
-        }, 5000);
-    }
 }

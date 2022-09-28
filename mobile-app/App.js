@@ -7,45 +7,38 @@ import StationSelectionScreen from './src/screens/StationSelectionScreen';
 import QueueScreen from './src/screens/QueueScreen';
 import AddToOnlineQueue from './src/screens/AddToOnlineQueue';
 import { Text } from '@react-native-material/core';
+import ServerStatus from './src/components/ServerStatus';
 const Stack = createNativeStackNavigator();
-
-function InnerApp() {
-  const { isConnected } = useSessionContext()
-
-  return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName='Home' screenOptions={{
-        headerRight: (props) => <Text>{isConnected ? 'Connected' : 'Offline'}</Text>
-      }}>
-        <Stack.Screen
-          name='Home'
-          component={HomeScreen}
-          options={{ title: 'Home Screen' }}
-        />
-        <Stack.Screen
-          name='Station Selection'
-          component={StationSelectionScreen}
-          options={{ title: 'Stations' }}
-        />
-        <Stack.Screen
-          name='Current Session Queue'
-          component={QueueScreen}
-          options={{ title: 'Current Session' }}
-        />
-        <Stack.Screen
-          name='Add To Queue'
-          component={AddToOnlineQueue}
-          options={{ title: 'Add to Queue' }}
-        />
-      </Stack.Navigator>
-    </NavigationContainer>
-  );
-}
 
 export default function App() {
   return (
     <SessionProvider>
-      <InnerApp />
+      <NavigationContainer>
+        <Stack.Navigator initialRouteName='Home' screenOptions={{
+          headerRight: (props) => <ServerStatus />
+        }}>
+          <Stack.Screen
+            name='Home'
+            component={HomeScreen}
+            options={{ title: 'Home Screen' }}
+          />
+          <Stack.Screen
+            name='Station Selection'
+            component={StationSelectionScreen}
+            options={{ title: 'Stations' }}
+          />
+          <Stack.Screen
+            name='Current Session Queue'
+            component={QueueScreen}
+            options={{ title: 'Current Session' }}
+          />
+          <Stack.Screen
+            name='Add To Queue'
+            component={AddToOnlineQueue}
+            options={{ title: 'Add to Queue' }}
+          />
+        </Stack.Navigator>
+      </NavigationContainer>
     </SessionProvider>
   )
 }
