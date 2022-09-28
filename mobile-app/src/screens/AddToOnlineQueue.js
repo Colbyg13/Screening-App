@@ -27,7 +27,7 @@ const AddToOnlineQueue = ({ route }) => {
     let newFields = [];
     for (let i = 0; i < numFields; i++) {
       const varName = station.fields[i].name;
-      setFormState((prevState) => ({ ...prevState, [varName]: '' }));
+      setFormState((prevState) => ({ ...prevState, [varName.toLowerCase()]: '' }));
       newFields.push(varName);
     }
     setFields(newFields);

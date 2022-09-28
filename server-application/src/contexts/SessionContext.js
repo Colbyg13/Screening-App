@@ -67,7 +67,7 @@ export default function SessionProvider({ children }) {
     function startSession() {
         // TODO: get current session records for initial state based on generalInformation and date?
         // const sessionRecords = await getRecordsFromDB() // Make sure to pass in this value down below
-        const response = window.api.startSession(generalFields, stations);
+        const response = window.api.startSession({generalFields, stations});
         console.log({ response });
         setSessionIsRunning(true);
         // setSessionRecords(sessionRecords);
