@@ -11,10 +11,10 @@ export default function SessionManager() {
 
     return (
         <div className='flex'>
-            <div className='h-full w-full bg-green-300'>
+            <div className='w-full'>
                 <StationManager />
             </div>
-            <div className='h-full w-full bg-blue-300'>
+            <div className='w-full'>
                 <FieldDataManager />
             </div>
         </div>

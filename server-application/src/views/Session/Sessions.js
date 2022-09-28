@@ -13,7 +13,7 @@ export default function Sessions() {
       ) : (
         <SessionManager />
       )}
-      <div className="absolute bottom-2 left-4 text-sm">IPv4: {window.api.getIP()}</div>
+      <div className="absolute bottom-2 right-4 text-sm">IPv4: {window.api.getIP()}</div>
     </div>
 
   )
