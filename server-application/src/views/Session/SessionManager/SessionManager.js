@@ -19,8 +19,8 @@ export default function SessionManager() {
                 variant="contained"
                 style={{
                     position: 'absolute',
-                    bottom: 10,
-                    right: 10,
+                    bottom: 16,
+                    right: 32,
                 }}
             >
                 Start Session
