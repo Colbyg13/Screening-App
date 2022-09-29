@@ -24,20 +24,22 @@ export const useSessionContext = () => useContext(SessionContext);
 
 export default function SessionProvider({ children }) {
 
-    // Connected to server
+    // SERVER
+    const [serverIp, setServerIp] = useState();
+    const [socket, setSocket] = useState();
     const [isConnected, setIsConnected] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [serverLoading, setServerLoading] = useState(false);
+
+    // SESSION
+    const [loading, setLoading] = useState(false);
     const [sessionInfo, setSessionInfo] = useState();
     const [selectedStationId, setSelectedStationId] = useState();
     const selectedStation = sessionInfo?.stations?.find(({ id }) => id === selectedStationId);
-    const [socket, setSocket] = useState();
-    const [serverIp, setServerIp] = useState();
 
     useEffect(() => {
         console.log('Finding Server');
         tryFindingServer();
-    }, [])
+    }, []);
 
     useEffect(() => {
         console.log('socket changed')

@@ -27,15 +27,21 @@ module.exports = APP => {
                     { $inc: { "latestID": 1 } },
                 )
                 .then(({ value: { latestID } = {} } = {}) => {
-                    
+
+                    const generalInfo = APP.sessionInfo.generalFields.reduce((all, { key, value }) => ({
+                        ...all,
+                        [key]: value,
+                    }), {});
+
                     const newUser = {
                         id: latestID,
-                        created_at: new Date(),
-                        last_modified: new Date(),
-                        session_id: APP.sessionInfo.session_id,
+                        createdAt: new Date(),
+                        lastModified: new Date(),
+                        sessionId: APP.sessionInfo.sessionId,
+                        ...generalInfo,
                         ...record,
                     };
-                    console.log('session ID', newUser.session_id, typeof(newUser.session_id));
+                    console.log('session ID', newUser.sessionId, typeof (newUser.sessionId));
 
                     APP.db.collection("patients")
                         .insertOne(newUser)

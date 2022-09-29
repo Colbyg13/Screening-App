@@ -26,8 +26,8 @@ const AddToOnlineQueue = ({ route }) => {
   const defaultState = () => {
     let newFields = [];
     for (let i = 0; i < numFields; i++) {
-      const varName = station.fields[i].name;
-      setFormState((prevState) => ({ ...prevState, [varName.toLowerCase()]: '' }));
+      const varName = station.fields[i].key;
+      setFormState((prevState) => ({ ...prevState, [varName]: '' }));
       newFields.push(varName);
     }
     setFields(newFields);
@@ -69,7 +69,7 @@ const AddToOnlineQueue = ({ route }) => {
               console.log(newText);
               setFormState((prevState) => ({
                 ...prevState,
-                [field.name.toLowerCase()]: newText,
+                [field.key]: newText,
               }));
             }}
             style={styles.fieldInput}
@@ -117,7 +117,7 @@ const AddToOnlineQueue = ({ route }) => {
             {fields.map((field) => {
               return (
                 <Text>
-                  {field}: {patient.data[field.toLowerCase()]}
+                  {station.fields.find(({ key }) => key === field)?.name}: {patient.data[field]}
                 </Text>
               );
             })}
