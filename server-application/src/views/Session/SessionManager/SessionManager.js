@@ -1,22 +1,29 @@
+import { Button } from '@mui/material';
 import React from 'react';
 import { useSessionContext } from '../../../contexts/SessionContext';
-import FieldDataManager from './FieldDataManager';
 import StationManager from './StationManager';
 
 export default function SessionManager() {
 
-    const {
-
-    } = useSessionContext();
+    const { startSession } = useSessionContext();
 
     return (
-        <div className='flex'>
-            <div className='w-full'>
-                <StationManager />
-            </div>
-            <div className='w-full'>
-                <FieldDataManager />
-            </div>
-        </div>
+        <>
+            <StationManager />
+            <Button
+                size="large"
+                color="success"
+                variant="contained"
+                onClick={startSession}
+                style={{
+                    position: 'absolute',
+                    bottom: 10,
+                    right: 10,
+                }}
+            >
+                Start Session
+            </Button>
+            {/* <div className="absolute bottom-2 left-4 text-sm">IPv4: {window.api.getIP()}</div> */}
+        </>
     )
 }

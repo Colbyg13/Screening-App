@@ -1,25 +1,31 @@
-import React from 'react'
+import { Badge, ListItem } from '@mui/material';
+import React from 'react';
 
 export default function NavbarItem({
     open,
     Icon,
     title,
     selected,
-    subsection,
+    displayBadge,
     onClick,
 }) {
 
     return (
-        <div className={`px-2 py-1 flex w-full space-x-2 hover:bg-gray-200 cursor-pointer ${selected ? 'bg-gray-300' : ''}`}
+        <ListItem
+            key={title}
+            selected={selected}
+            button
             onClick={onClick}
         >
-            <Icon />
-            {open ? (
-                <div className='relative'>
+            <div className='flex items-center space-x-2'>
+                <Icon />
+                {open ? (
                     <span>{title}</span>
-                    <div className='absolute top-1 -right-2'>{subsection}</div>
-                </div>
-            ) : null}
-        </div>
-    )
+                ) : null}
+                {displayBadge ? (
+                    <Badge variant="dot" overlap="circular" color="success" />
+                ) : null}
+            </div>
+        </ListItem>
+    );
 }

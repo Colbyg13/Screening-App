@@ -4,6 +4,8 @@ import React from 'react';
 import StationField from './StationField';
 
 export default function StationFields({
+    isGeneral,
+    stationIndex,
     station: {
         name,
         fields = [],
@@ -14,31 +16,30 @@ export default function StationFields({
     deleteStation,
 }) {
 
-
     return (
-        <div>
-            <div className='flex'>
-                <h2>{name}</h2>
-                {deleteStation ? (
-                    <IconButton
-                        onClick={deleteStation}
-                    >
-                        <DeleteForeverOutlinedIcon style={{
-                            color: 'red',
-                        }} />
+        <div className='space-y-2'>
+            <div className='flex items-center'>
+                <h2 className='text-2xl'>{name}</h2>
+                {isGeneral ? null : (
+                    <IconButton onClick={() => deleteStation(stationIndex)}>
+                        <DeleteForeverOutlinedIcon style={{ color: 'red', width: 24 }} />
                     </IconButton>
-                ) : null}
+                )}
             </div>
             {fields.map((field, i) => (
                 <StationField
+                    isGeneral={isGeneral}
+                    stationIndex={stationIndex}
+                    fieldIndex={i}
                     field={field}
-                    updateField={update => updateField(i, update)}
-                    deleteField={() => deleteField(i)}
+                    updateField={updateField}
+                    deleteField={deleteField}
                 />
             ))}
             <Button
+                fullWidth
                 variant="outlined"
-                onClick={addField}
+                onClick={() => addField(stationIndex)}
             >
                 Add Field
             </Button>

@@ -1,13 +1,12 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StyleSheet } from 'react-native';
-import SessionProvider, { useSessionContext } from './src/contexts/SessionContext';
-import HomeScreen from './src/screens/HomeScreen';
-import StationSelectionScreen from './src/screens/StationSelectionScreen';
-import QueueScreen from './src/screens/QueueScreen';
-import AddToOnlineQueue from './src/screens/AddToOnlineQueue';
-import { Text } from '@react-native-material/core';
 import ServerStatus from './src/components/ServerStatus';
+import SessionProvider from './src/contexts/SessionContext';
+import AddToOnlineQueue from './src/screens/AddToOnlineQueue';
+import HomeScreen from './src/screens/HomeScreen';
+import QueueScreen from './src/screens/QueueScreen';
+import StationSelectionScreen from './src/screens/StationSelectionScreen';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
