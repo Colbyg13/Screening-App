@@ -36,7 +36,7 @@ module.exports = APP => {
                     APP.sessionInfo = {
                         // id from db
                         sessionId: result.insertedId,
-                        generalFields: normalizeFields(generalFields),
+                        generalFields: normalizeFields(generalFields.map((field, i) => ({ ...field, id: i + 1 }))),
                         stations: stations.map(station => ({
                             ...station,
                             fields: normalizeFields(station.fields),

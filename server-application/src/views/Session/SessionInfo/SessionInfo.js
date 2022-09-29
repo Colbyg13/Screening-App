@@ -16,8 +16,8 @@ export default function SessionInfo() {
                 onClick={stopSession}
                 style={{
                     position: 'absolute',
-                    bottom: 10,
-                    right: 10,
+                    bottom: 16,
+                    right: 32,
                 }}
             >
                 Finish Session
