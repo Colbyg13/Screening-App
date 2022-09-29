@@ -35,8 +35,8 @@ module.exports = APP => {
 
                     const newUser = {
                         id: latestID,
-                        created_at: new Date(),
-                        last_modified: new Date(),
+                        createdAt: new Date(),
+                        lastModified: new Date(),
                         sessionId: APP.sessionInfo.sessionId,
                         ...generalInfo,
                         ...record,

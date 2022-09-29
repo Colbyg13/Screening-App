@@ -27,7 +27,11 @@ module.exports = APP => {
                     //TODO: Create a session in the DB and use that information
                     console.log('creatingSession');
                     const result = await APP.db.collection("sessions")
-                        .insertOne({ generalFields, stations })
+                        .insertOne({
+                            generalFields,
+                            stations,
+                            createdAt: new Date(),
+                        })
 
                     APP.sessionInfo = {
                         // id from db
