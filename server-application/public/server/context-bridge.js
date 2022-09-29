@@ -51,7 +51,7 @@ module.exports = APP => {
                 return 'Session started successfully';
             }
 
-            throw new Error('The Session is already running');
+            return 'The Session is already running';
         },
         stopSession: () => {
             console.log('Stopping session...')
@@ -60,7 +60,7 @@ module.exports = APP => {
                 APP.sessionIsRunning = false;
                 return 'Successfully stopped session';
             }
-            else throw new Error('The session is already stopped');
+            return 'The session is already stopped';
         },
     });
 

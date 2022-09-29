@@ -24,8 +24,11 @@ const initialSystemInfo = {
         value: '',
     }],
     stations: [{
-        name: '',
-        type: '',
+        name: 'Station 1',
+        fields: [{
+            name: '',
+            type: '',
+        }]
     }],
 }
 
