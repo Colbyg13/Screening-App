@@ -104,7 +104,7 @@ module.exports = APP => {
                 { $set: patient },
                 { returnNewDocument: true }
             )
-            .then(updatedRecord => {
+            .then(({ value: updatedRecord }) => {
 
                 if (APP.sessionIsRunning) {
 
