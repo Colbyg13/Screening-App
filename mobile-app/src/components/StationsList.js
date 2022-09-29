@@ -11,8 +11,6 @@ import { useNavigation } from '@react-navigation/native';
 import StationsListItem from '../components/StationsListItem';
 import { useSessionContext } from '../contexts/SessionContext';
 const StationsList = (props) => {
-  // const stations = props.data.stations;
-
   const {
     sessionInfo,
     sessionInfo: {
@@ -20,22 +18,14 @@ const StationsList = (props) => {
     } = {},
     setSelectedStationId,
   } = useSessionContext();
-
-  console.log({ sessionInfo })
-
+  console.log('Session info in Ipad', { sessionInfo })
   const navigation = useNavigation();
-  // const [stations, setStations] = useState(props.data.stations);
-  console.log("STATIONS", stations);
   const handlePress = (item) => {
-    // const selectedStation = item
     setSelectedStationId(item.id)
     console.log('you pressed me', item);
     navigation.navigate('Current Session Queue');
   }
   const renderStationItem = ({ item }) => {
-    // let isFirstStation = false;
-    // if(item.id === 1) isFirstStation = true;
-    // item.isStationOne = isFirstStation;
     return <StationsListItem key={item.id} onPress={() => handlePress(item)} item={item} />;
   };
   return (
