@@ -79,7 +79,7 @@ export default function Navbar() {
           open={open}
           Icon={ROUTES.Session.Icon}
           title={ROUTES.Session.title}
-          subsection={sessionIsRunning ? <div className='h-2 w-2 border bg-green-600 rounded-full' /> : null}
+          displayBadge={sessionIsRunning}
           selected={pathname.startsWith(ROUTES.Session.path)}
           onClick={() => navigate(ROUTES.Session.path)}
         />
