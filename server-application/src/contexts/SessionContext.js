@@ -3,12 +3,15 @@ import replace from "../utils/replace";
 
 const SessionContext = createContext({
     sessionIsRunning: false,
-    generalFields: {},
-    stations: [],
+    sessionInfo: {},
     sessionRecords: [],
-    createOrUpdateRecord: () => { },
     startSession: () => { },
     stopSession: () => { },
+    addStation: () => { },
+    deleteStation: () => { },
+    addField: () => { },
+    updateField: () => { },
+    deleteField: () => { },
 });
 
 export const useSessionContext = () => useContext(SessionContext);
@@ -115,7 +118,7 @@ export default function SessionProvider({ children }) {
     function startSession() {
         // TODO: get current session records for initial state based on generalInformation and date?
         // const sessionRecords = await getRecordsFromDB() // Make sure to pass in this value down below
-        const response = window.api.startSession({ generalFields: sessionInfo.generalFields, stations: sessionInfo.stations });
+        const response = window.api.startSession(sessionInfo);
         console.log({ response });
         setSessionIsRunning(true);
         // setSessionRecords(sessionRecords);

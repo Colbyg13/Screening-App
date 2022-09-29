@@ -1,5 +1,6 @@
 const { contextBridge } = require("electron");
 const ip = require('ip');
+const { normalizeFields } = require("./utils");
 
 module.exports = APP => {
     contextBridge.exposeInMainWorld("api", {
@@ -25,21 +26,20 @@ module.exports = APP => {
                     // COLBY WILL DO THIS
                     //TODO: Create a session in the DB and use that information
                     console.log('creatingSession');
-                    let newSessionId;
-                    APP.db.collection("sessions")
-                        .insertOne({generalFields: generalFields, stations: stations})
-                        .then(result => {
-                            newSessionId = result.insertedId
+                    const result = await APP.db.collection("sessions")
+                        .insertOne({ generalFields, stations })
 
-                            APP.sessionInfo = {
-                                // id from db
-                                session_id: newSessionId,
-                                generalFields,
-                                stations,
-                                records: [],
-                            };
-
-                        })
+                    APP.sessionInfo = {
+                        // id from db
+                        sessionId: result.insertedId,
+                        generalFields: normalizeFields(generalFields),
+                        stations: stations.map(station => ({
+                            ...station,
+                            fields: normalizeFields(station.fields),
+                        })),
+                        records: [],
+                    };
+                    console.log({ sessionInfo: APP.sessionInfo })
                 }
 
                 APP.sessionIsRunning = true;

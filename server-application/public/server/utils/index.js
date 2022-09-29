@@ -1,3 +1,4 @@
+const _ = require('lodash');
 
 const pipe = (arg, ...callbacks) => callbacks.reduce((val, cb) => cb(val), arg);
 
@@ -20,10 +21,16 @@ const asyncTap = cb => async arg => {
     return arg;
 };
 
+const normalizeFields = fields => fields.map(field => ({
+    ...field,
+    key: _.camelCase(field.name),
+}))
+
 
 module.exports = {
     pipe,
     asyncPipe,
     tap,
     asyncTap,
+    normalizeFields,
 };

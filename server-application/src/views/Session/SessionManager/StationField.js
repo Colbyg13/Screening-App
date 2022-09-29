@@ -26,6 +26,7 @@ export default function StationField({
     return (
         <div className='flex space-x-2'>
             <TextField
+                required
                 className='w-52'
                 label="Field"
                 variant="outlined"
@@ -35,6 +36,7 @@ export default function StationField({
             />
             {isGeneral ? (
                 <TextField
+                    required
                     className='w-52'
                     label="Value"
                     variant="outlined"
@@ -44,6 +46,7 @@ export default function StationField({
                 />
             ) : (
                 <TextField
+                    required
                     className='w-52'
                     select
                     label="Type"
