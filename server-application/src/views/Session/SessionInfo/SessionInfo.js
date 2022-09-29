@@ -1,7 +1,7 @@
-import { Button } from '@mui/material'
-import React from 'react'
-import { useSessionContext } from '../../../contexts/SessionContext'
-import StationInfo from './StationInfo';
+import { Button } from '@mui/material';
+import React from 'react';
+import { useSessionContext } from '../../../contexts/SessionContext';
+import SessionInfoConsole from './SessionInfoConsole';
 import StationInfoList from './StationInfoList';
 
 export default function SessionInfo() {
@@ -9,8 +9,9 @@ export default function SessionInfo() {
     const { stopSession } = useSessionContext();
 
     return (
-        <div className='h-full'>
+        <div className='flex h-screen'>
             <StationInfoList />
+            <SessionInfoConsole />
             <Button
                 size="large"
                 color="error"

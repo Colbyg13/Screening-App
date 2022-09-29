@@ -1,5 +1,6 @@
+import { Card, CardContent, Chip } from '@mui/material'
 import React from 'react'
-import { useSessionContext } from '../../../contexts/SessionContext'
+import { SESSION_DATA_TYPE_LABELS } from '../../../constants/session-data-types'
 
 export default function StationInfo({
     isGeneral,
@@ -11,13 +12,24 @@ export default function StationInfo({
 }) {
 
     return (
-        <div className='border border-gray-800 p-4' >
-            <h2 className='text-2xl'>{name}</h2>
-            <div className='flex space-x-2'>
-                {fields.map(({ name, type, value }) => (
-                    <div className='border border-gray-400 rounded-full py-1 px-2'>{name}: {isGeneral ? value : type}</div>
-                ))}
-            </div>
-        </div>
+        <Card>
+            <CardContent>
+                <div className='space-x-2'>
+                    <div className='text-2xl'>{name}</div>
+                    <div className='text-lg'>Fields:</div>
+                    {fields.map(({ name, type, value }) => (
+                        <Chip label={`${name}: ${isGeneral ? value : SESSION_DATA_TYPE_LABELS[type]}`} variant="outlined" />
+                    ))}
+                    {users.length ? (
+                        <>
+                            <div className='text-lg'>users</div>
+                            {users.map(({ name }) => (
+                                <Chip label={name} variant="outlined" />
+                            ))}
+                        </>
+                    ) : null}
+                </div>
+            </CardContent>
+        </Card >
     )
 }

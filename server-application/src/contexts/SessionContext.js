@@ -46,7 +46,7 @@ export default function SessionProvider({ children }) {
     const [sessionIsRunning, setSessionIsRunning] = useState(window.api.getIsSessionRunning());
 
     const [sessionInfo, setSessionInfo] = useState(JSON.parse(localStorage.getItem(sessionInfoStorageKey)) || initialSystemInfo);
-
+    const [sessionLogs, setSessionLogs] = useState([]);
     const [sessionRecords, setSessionRecords] = useState([]);
 
     // Updates local storage when sessionInfo is updated
@@ -59,15 +59,21 @@ export default function SessionProvider({ children }) {
         stations: [...sessionInfo.stations, { name: `Station ${sessionInfo.stations.length + 1}`, fields: [{ name: '', type: '' }] }]
     }));
 
-    const deleteStation = index => setSessionInfo(sessionInfo => ({
-        ...sessionInfo,
-        stations: sessionInfo.stations
-            .filter((_, i) => i !== index)
-            .map((station, i) => ({
-                ...station,
-                name: `Station ${i + 1}`
-            })),
-    }));
+    const deleteStation = index => {
+        //General Fields
+        if (index === undefined) throw new Error('Cannot delete general fields');
+
+        //Stations
+        else setSessionInfo(sessionInfo => ({
+            ...sessionInfo,
+            stations: sessionInfo.stations
+                .filter((_, i) => i !== index)
+                .map((station, i) => ({
+                    ...station,
+                    name: `Station ${i + 1}`
+                })),
+        }));
+    }
 
     const addField = stationIndex => {
         // General Field
@@ -118,19 +124,20 @@ export default function SessionProvider({ children }) {
         }));
     }
 
-    function startSession() {
-        // TODO: get current session records for initial state based on generalInformation and date?
-        // const sessionRecords = await getRecordsFromDB() // Make sure to pass in this value down below
-        const response = window.api.startSession(sessionInfo);
-        console.log({ response });
-        setSessionIsRunning(true);
-        // setSessionRecords(sessionRecords);
+    async function startSession() {
+        try {
+            const response = await window.api.startSession(sessionInfo);
+            console.log({ response });
+        } catch (error) {
+
+        }
+        setSessionIsRunning(window.api.getIsSessionRunning());
     }
 
     function stopSession() {
         const response = window.api.stopSession();
         console.log({ response });
-        setSessionIsRunning(false);
+        setSessionIsRunning(window.api.getIsSessionRunning());
     }
 
     return (
@@ -138,6 +145,7 @@ export default function SessionProvider({ children }) {
             value={{
                 sessionIsRunning,
                 sessionInfo,
+                sessionLogs,
                 sessionRecords,
                 startSession,
                 stopSession,

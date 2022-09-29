@@ -12,7 +12,7 @@ export default function StationInfoList() {
     } = useSessionContext();
 
     return (
-        <div className='h-screen p-16 space-y-4 overflow-y-scroll'>
+        <div className='max-h-full flex-1 space-y-4 overflow-y-auto pt-8 px-16 pb-16'>
             <StationInfo
                 isGeneral
                 station={{
