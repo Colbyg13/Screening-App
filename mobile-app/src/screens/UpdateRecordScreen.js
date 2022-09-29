@@ -22,6 +22,25 @@ const UpdateRecordScreen = ({ route }) => {
   record = route.params.item;
   console.log('selected record', record);
   console.log('selected station', station);
+
+  const defaultState = () => {
+    let newFields = [];
+    for (let i = 0; i < numFields; i++) {
+      const varName = station.fields[i].key;
+      setFormState((prevState) => ({ ...prevState, [varName]: '' }));
+      newFields.push(varName);
+    }
+    setFields(newFields);
+  };
+
+  useEffect(() => { //sets the state for the form dynamically. I have not implemented validation yet. 
+    defaultState();
+  }, []);
+
+  useEffect(() => {
+    console.log('Fields after default state was called', fields);
+  }, [fields]);
+
   return (
     <View style={styles.container}>
       <Text>UpdateRecord</Text>
