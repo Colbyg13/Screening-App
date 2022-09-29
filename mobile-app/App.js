@@ -6,8 +6,8 @@ import HomeScreen from './src/screens/HomeScreen';
 import StationSelectionScreen from './src/screens/StationSelectionScreen';
 import QueueScreen from './src/screens/QueueScreen';
 import AddToOnlineQueue from './src/screens/AddToOnlineQueue';
-import { Text } from '@react-native-material/core';
 import ServerStatus from './src/components/ServerStatus';
+import UpdateRecordScreen from './src/screens/UpdateRecordScreen';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -36,6 +36,11 @@ export default function App() {
             name='Add To Queue'
             component={AddToOnlineQueue}
             options={{ title: 'Add to Queue' }}
+          />
+          <Stack.Screen
+          name="Update Record"
+          component={UpdateRecordScreen}
+          options={{ title: 'Update Record' }}
           />
         </Stack.Navigator>
       </NavigationContainer>

@@ -58,7 +58,8 @@ const SessionQueue = (props) => {
   const handlePress = (item) => {
     //const selectedStation = item
     console.log('you pressed me', item);
-    //navigation.navigate('Current Session Queue', { selectedStation });
+    
+    navigation.navigate('Update Record', { item });
   };
   const handleAddToQueuePress = () => {
     navigation.navigate('Add To Queue', { station });
