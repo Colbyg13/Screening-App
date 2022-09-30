@@ -70,7 +70,7 @@ export default function SessionProvider({ children }) {
     }, [socket]);
 
     async function tryFindingServer() {
-        // const serverIp =  'http://10.75.167.190:3333';
+        // const serverIp =  'http://10.75.179.46:3333';
         if (!isConnected) {
             setServerLoading(true);
 

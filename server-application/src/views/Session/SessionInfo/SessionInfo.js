@@ -1,14 +1,17 @@
-import { Button } from '@mui/material'
-import React from 'react'
-import { useSessionContext } from '../../../contexts/SessionContext'
+import { Button } from '@mui/material';
+import React from 'react';
+import { useSessionContext } from '../../../contexts/SessionContext';
+import SessionInfoConsole from './SessionInfoConsole';
+import StationInfoList from './StationInfoList';
 
 export default function SessionInfo() {
 
     const { stopSession } = useSessionContext();
 
     return (
-        <div className='h-full bg-gray-500'>
-            Session Info
+        <div className='flex h-screen'>
+            <StationInfoList />
+            <SessionInfoConsole />
             <Button
                 size="large"
                 color="error"
