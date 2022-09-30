@@ -96,6 +96,7 @@ module.exports = APP => {
 
     APP.post('/api/v1/patients/update', (req, res) => {
         const { _id: recordId, ...record } = req.body;
+        console.log('_id', _id, 'recordId', recordId, 'record', record)
         const patient = { last_modified: new Date(), ...record, };
 
         APP.db.collection("patients")
@@ -109,7 +110,7 @@ module.exports = APP => {
                 if (APP.sessionIsRunning) {
 
                     const oldRecord = APP.sessionInfo.records.find(({ _id }) => _id === recordId);
-
+                    console.log('Old record', oldRecord);
                     if (oldRecord) {
                         APP.sessionInfo = {
                             ...APP.sessionInfo,
@@ -119,6 +120,7 @@ module.exports = APP => {
                                 updatedRecord,
                             ),
                         }
+                        console.log('session info with oldRecord', APP.sessionInfo);
                     } else {
                         APP.sessionInfo = {
                             ...APP.sessionInfo,
