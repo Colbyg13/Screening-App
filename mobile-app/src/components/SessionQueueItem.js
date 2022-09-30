@@ -5,7 +5,6 @@ import SessionQueueItemStatus from './SessionQueueItemStatus';
 
 const SessionQueueItem = (props) => {
   const person = props.item;
-  console.log('person', person);
   return (
     <Pressable
       key={person.id}
@@ -19,7 +18,7 @@ const SessionQueueItem = (props) => {
           <Text style={styles.title}>Name: {person.name}</Text>
           <View key={person.name} style={styles.fieldsView}>
             <Text style={styles.fieldsitem}>ID: {person.id}</Text>
-            <Text style={styles.fieldsitem}>DOB: {person.birthday}</Text>
+            <Text style={styles.fieldsitem}>DOB: {person.dob}</Text>
           </View>
         </View>
         <View style={styles.statusWrapper}>
