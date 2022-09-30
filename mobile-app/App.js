@@ -30,7 +30,7 @@ export default function App() {
           <Stack.Screen
             name='Current Session Queue'
             component={QueueScreen}
-            options={{ title: 'Current Session' }}
+            options={{ title: 'Session' }}
           />
           <Stack.Screen
             name='Add To Queue'
