@@ -8,7 +8,8 @@ export default function StationInfoList() {
         sessionInfo: {
             generalFields,
             stations,
-        }
+        },
+        connectedUsersByStation,
     } = useSessionContext();
 
     return (
@@ -23,6 +24,7 @@ export default function StationInfoList() {
             {stations.map(station => (
                 <StationInfo
                     station={station}
+                    users={connectedUsersByStation[station.id]}
                 />
             ))}
         </div>

@@ -14,7 +14,7 @@ export default function App() {
     <SessionProvider>
       <NavigationContainer>
         <Stack.Navigator initialRouteName='Home' screenOptions={{
-          headerRight: (props) => <ServerStatus />
+          headerRight: ServerStatus,
         }}>
           <Stack.Screen
             name='Home'

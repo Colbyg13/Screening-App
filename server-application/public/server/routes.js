@@ -7,30 +7,35 @@ module.exports = APP => {
         res.json({ name: 'Test Computer' });
     });
 
-    APP.get('/api/v1/sessions', (req, res) => {
-        APP.db.collection("sessions").find().toArray((err, patients) => {
-            if (err) {
-                console.error(err);
-                res.status(400).send("Error finding sessions");
-            }
-            res.status(200).json({ patients });
-        });
+    APP.get('/api/v1/sessions/current', (req, res) => {
+        console.log({ sessionInfo: APP.sessionInfo })
+        res.json(APP.sessionInfo);
     })
 
-    APP.get('/api/v1/sessions/:sessionId', (req, res) => {
-        const sessionId = req.params.sessionId;
-        APP.db.collection("sessions").findOne(
-            { _id: ObjectId(sessionId) }
-        ).then(result => {
-            if (result) res.json(result);
+    // APP.get('/api/v1/sessions', (req, res) => {
+    //     APP.db.collection("sessions").find().toArray((err, patients) => {
+    //         if (err) {
+    //             console.error(err);
+    //             res.status(400).send("Error finding sessions");
+    //         }
+    //         res.status(200).json({ patients });
+    //     });
+    // })
 
-            res.status(400).send("Error finding session");
-        })
-            .catch(err => {
-                console.error(err);
-                res.status(400).send("Error finding session");
-            })
-    })
+    // APP.get('/api/v1/sessions/:sessionId', (req, res) => {
+    //     const sessionId = req.params.sessionId;
+    //     APP.db.collection("sessions").findOne(
+    //         { _id: ObjectId(sessionId) }
+    //     ).then(result => {
+    //         if (result) res.json(result);
+
+    //         res.status(400).send("Error finding session");
+    //     })
+    //         .catch(err => {
+    //             console.error(err);
+    //             res.status(400).send("Error finding session");
+    //         })
+    // })
 
     // PATIENT RECORDS
     APP.get('/api/v1/patients', (req, res) => {
@@ -98,7 +103,7 @@ module.exports = APP => {
         APP.db.collection("patients")
             .findOneAndUpdate(
                 { id: record.id },
-                { $set:  { lastModified: new Date(), ...record, } },
+                { $set: { lastModified: new Date(), ...record, } },
                 { returnDocument: 'after' }
             )
             .then(({ value: updatedRecord }) => {

@@ -1,7 +1,6 @@
 const { contextBridge } = require("electron");
 const ip = require('ip');
 const { normalizeFields } = require("./utils");
-const axios = require('axios');
 const { ObjectId } = require("mongodb");
 
 module.exports = APP => {
@@ -42,7 +41,6 @@ module.exports = APP => {
                             generalFields: normalizeFields(generalFields),
                             stations: stations.map((station, i) => ({
                                 ...station,
-                                id: i + 1,
                                 fields: normalizeFields(station.fields),
                             })),
                             records: [],
@@ -50,7 +48,7 @@ module.exports = APP => {
                     });
 
                 APP.sessionIsRunning = true;
-                res.send('Success')
+                res('Success')
             }
 
             rej('Session already started');

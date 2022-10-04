@@ -5,8 +5,8 @@ import { Pressable } from '@react-native-material/core';
 
 const StationsListItem = (props) => {
   station = props.item;
-  console.log(typeof(station));
-  console.log(station);
+  // console.log(typeof(station));
+  // console.log(station);
   return (
     <View style={styles.pressableWrapper}>
     <Pressable key={station.id} style={styles.item} onPress={props.onPress} pressEffect='ripple' pressEffectColor='green'>

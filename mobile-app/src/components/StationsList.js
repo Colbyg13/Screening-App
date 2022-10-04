@@ -16,12 +16,12 @@ const StationsList = (props) => {
     sessionInfo: {
       stations = [],
     } = {},
-    setSelectedStationId,
+    joinStation,
   } = useSessionContext();
-  console.log('Session info in Ipad', { sessionInfo })
+  // console.log('Session info in Ipad', { sessionInfo })
   const navigation = useNavigation();
   const handlePress = (item) => {
-    setSelectedStationId(item.id)
+    joinStation(item.id);
     console.log('you pressed me', item);
     navigation.navigate('Current Session Queue');
   }

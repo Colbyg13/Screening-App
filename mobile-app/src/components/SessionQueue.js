@@ -52,12 +52,12 @@ const SessionQueue = (props) => {
   // const station = props.station;
   const {sessionInfo: {stations, records}, selectedStation: station} = useSessionContext();
   const isStationOne = stations[0] === station;
-  console.log({station, stations})
+  // console.log({station, stations})
   // const [isStationOne, setIsStationOne] = useState(props.station.isStationOne);
   const navigation = useNavigation();
   const handlePress = (item) => {
     //const selectedStation = item
-    console.log('you pressed me', item);
+    // console.log('you pressed me', item);
     //navigation.navigate('Current Session Queue', { selectedStation });
   };
   const handleAddToQueuePress = () => {

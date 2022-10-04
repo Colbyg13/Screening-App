@@ -5,7 +5,7 @@ import SessionQueueItemStatus from './SessionQueueItemStatus';
 
 const SessionQueueItem = (props) => {
   const person = props.item;
-  console.log('person', person);
+  // console.log('person', person);
   return (
     <Pressable
       key={person.id}
