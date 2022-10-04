@@ -12,28 +12,31 @@ import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, StatusBar } from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+
 const AddToOnlineQueue = ({ route }) => {
   const navigation = useNavigation();
   const { sendRecord, selectedStation: station } = useSessionContext();
-  const [formState, setFormState] = useState({}); //used to keep track of inputs. 
+  const [formState, setFormState] = useState({}); //used to keep track of inputs.
   const [fields, setFields] = useState([]); //used to keep track of inputs and match them to the patient.
   const [visible, setVisible] = useState(false); //opens the dialog/modal.
   const [patient, setPatient] = useState({});
   // const station = route.params.station;
   const numFields = station.fields.length;
 
-
   const defaultState = () => {
     let newFields = [];
     for (let i = 0; i < numFields; i++) {
       const varName = station.fields[i].key;
+      //if type == date, save varName and `showVarName`: false,
       setFormState((prevState) => ({ ...prevState, [varName]: '' }));
       newFields.push(varName);
     }
     setFields(newFields);
   };
 
-  useEffect(() => { //sets the state for the form dynamically. I have not implemented validation yet. 
+  useEffect(() => {
+    //sets the state for the form dynamically. I have not implemented validation yet.
     defaultState();
   }, []);
 
@@ -41,7 +44,8 @@ const AddToOnlineQueue = ({ route }) => {
     console.log('Fields after default state was called', fields);
   }, [fields]);
 
-  useEffect(() => { //sets the default patient to have a null id, and the correct fields for the station. 
+  useEffect(() => {
+    //sets the default patient to have a null id, and the correct fields for the station.
     setPatient((prevState) => ({ ...prevState, data: formState, id: null }));
   }, [formState]);
 
@@ -60,6 +64,33 @@ const AddToOnlineQueue = ({ route }) => {
   };
 
   const renderInput = (field) => {
+    console.log('input type', field.type);
+
+    if (field.type === 'date') {
+      let showVar = `show${field.key}`
+      console.log(showVar);
+      return (
+        <View key={field.name} style={styles.row}>
+          <Text style={styles.fieldName}>{field.name}:</Text>
+          <Button title='show date picker'></Button>
+          <DateTimePickerModal
+            onConfirm={(newDate) => {
+              console.log(newDate);
+              setFormState((prevState) => ({
+                ...prevState,
+                [field.key]: newDate, //should set dob or whatever date to the date text. 
+              }));
+            }}
+            onCancel={() => { //should hide the date picker. 
+              setFormState((prevState) => ({
+                ...prevState,
+                [showVar]: false,
+              }))
+            }}
+          ></DateTimePickerModal>
+        </View>
+      );
+    }
     return (
       <View key={field.name} style={styles.row}>
         <Text style={styles.fieldName}>{field.name}:</Text>
@@ -117,7 +148,8 @@ const AddToOnlineQueue = ({ route }) => {
             {fields.map((field) => {
               return (
                 <Text>
-                  {station.fields.find(({ key }) => key === field)?.name}: {patient.data[field]}
+                  {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                  {patient.data[field]}
                 </Text>
               );
             })}
@@ -128,8 +160,8 @@ const AddToOnlineQueue = ({ route }) => {
               compact
               variant='text'
               onPress={() => {
-                setVisible(false)
-                navigation.navigate('Current Session Queue')
+                setVisible(false);
+                navigation.navigate('Current Session Queue');
               }}
             />
           </DialogActions>
