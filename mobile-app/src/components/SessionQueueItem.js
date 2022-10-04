@@ -44,7 +44,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     // justifyContent: 'space-between',
-    marginHorizontal: 40,
+    // marginHorizontal: 40,
   },
   itemWrapper: {
     flex: 1,
@@ -65,7 +65,6 @@ const styles = StyleSheet.create({
     flex: 1,
     display: 'flex',
     justifyContent: 'center',
-    alignContent: 'center',
   }
 });
 

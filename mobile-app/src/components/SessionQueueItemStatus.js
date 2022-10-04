@@ -15,15 +15,7 @@ export default function SessionQueueItemStatus(props) {
     return (
         <View style={styles.statusWrapper}>
             {stations.map(({ fields }, i, { length }) => {
-
-                const status = fields.every(({ key }) => person[key] !== undefined) ?
-                    STATS.COMPLETE
-                    :
-                    fields.some(({ key }) => person[key] !== undefined) ?
-                        STATS.PARTIAL
-                        :
-                        STATS.NONE;
-
+                const status = getFieldStatus(person, fields);
                 return (
                     <>
                         <View style={[styles.progressCircle, styles[status]]} />
@@ -35,15 +27,24 @@ export default function SessionQueueItemStatus(props) {
     )
 }
 
+function getFieldStatus(person, fields) {
+    return fields.every(({ key }) => {
+        if (person[key] !== undefined) return STATS.COMPLETE;
+        if (fields.some(({ key }) => person[key] !== undefined)) return STATS.PARTIAL;
+        return STATS.NONE;
+    })
+}
+
 const styles = StyleSheet.create({
     statusWrapper: {
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center'
     },
     progressCircle: {
-        height: 25,
-        width: 25,
+        aspectRatio: 1,
+        height: '50%',
         borderWidth: 2,
         borderColor: 'black',
         borderRadius: 100,
