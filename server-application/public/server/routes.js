@@ -77,8 +77,6 @@ module.exports = APP => {
                                 records: [...APP.sessionInfo.records, { _id: result.insertedId, ...newUser }]
                             }
 
-                            req.app.set('sessionInfo', APP.sessionInfo);
-
                             APP.io.sockets.emit('session-info-update', APP.sessionInfo);
 
                             // io.sockets.emit('session-info-update', sessionInfo);
@@ -95,22 +93,20 @@ module.exports = APP => {
     });
 
     APP.post('/api/v1/patients/update', (req, res) => {
-        const { _id: recordId, ...record } = req.body;
-        console.log('_id', _id, 'recordId', recordId, 'record', record)
-        const patient = { last_modified: new Date(), ...record, };
+        const record = req.body;
 
         APP.db.collection("patients")
             .findOneAndUpdate(
-                { _id: ObjectId(recordId) },
-                { $set: patient },
-                { returnNewDocument: true }
+                { id: record.id },
+                { $set:  { lastModified: new Date(), ...record, } },
+                { returnDocument: 'after' }
             )
             .then(({ value: updatedRecord }) => {
 
                 if (APP.sessionIsRunning) {
 
-                    const oldRecord = APP.sessionInfo.records.find(({ _id }) => _id === recordId);
-                    console.log('Old record', oldRecord);
+                    const oldRecord = APP.sessionInfo.records.find(({ id }) => id === updatedRecord.id);
+
                     if (oldRecord) {
                         APP.sessionInfo = {
                             ...APP.sessionInfo,
@@ -120,15 +116,12 @@ module.exports = APP => {
                                 updatedRecord,
                             ),
                         }
-                        console.log('session info with oldRecord', APP.sessionInfo);
                     } else {
                         APP.sessionInfo = {
                             ...APP.sessionInfo,
                             records: [...APP.sessionInfo.records, updatedRecord],
                         }
                     }
-
-                    req.app.set('sessionInfo', APP.sessionInfo);
 
                     APP.io.sockets.emit('session-info-update', APP.sessionInfo);
                 }
