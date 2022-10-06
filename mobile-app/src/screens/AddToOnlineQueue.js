@@ -10,7 +10,7 @@ import {
 } from '@react-native-material/core';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, StatusBar } from 'react-native';
+import { View, StyleSheet, StatusBar} from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
@@ -18,6 +18,7 @@ const AddToOnlineQueue = ({ route }) => {
   const navigation = useNavigation();
   const { sendRecord, selectedStation: station } = useSessionContext();
   const [formState, setFormState] = useState({}); //used to keep track of inputs.
+  const [dateStates, setDateStates] = useState({});
   const [fields, setFields] = useState([]); //used to keep track of inputs and match them to the patient.
   const [visible, setVisible] = useState(false); //opens the dialog/modal.
   const [patient, setPatient] = useState({});
@@ -28,7 +29,10 @@ const AddToOnlineQueue = ({ route }) => {
     let newFields = [];
     for (let i = 0; i < numFields; i++) {
       const varName = station.fields[i].key;
-      //if type == date, save varName and `showVarName`: false,
+      if (station.fields[i].type === 'date') {
+        let showname = `show${varName}`;
+        setDateStates((prevState) => ({ ...prevState, [showname]: false }));
+      }
       setFormState((prevState) => ({ ...prevState, [varName]: '' }));
       newFields.push(varName);
     }
@@ -47,6 +51,7 @@ const AddToOnlineQueue = ({ route }) => {
   useEffect(() => {
     //sets the default patient to have a null id, and the correct fields for the station.
     setPatient((prevState) => ({ ...prevState, data: formState, id: null }));
+    console.log(formState);
   }, [formState]);
 
   const handleSubmit = async () => {
@@ -67,48 +72,66 @@ const AddToOnlineQueue = ({ route }) => {
     console.log('input type', field.type);
 
     if (field.type === 'date') {
-      let showVar = `show${field.key}`
-      console.log(showVar);
+      let showname = `show${field.key}`;
+      console.log(showname);
       return (
         <View key={field.name} style={styles.row}>
           <Text style={styles.fieldName}>{field.name}:</Text>
-          <Button title='show date picker'></Button>
-          <DateTimePickerModal
-            onConfirm={(newDate) => {
-              console.log(newDate);
-              setFormState((prevState) => ({
+          <Button
+            title={`Select ${field.name}`}
+            onPress={() => {
+              setDateStates((prevState) => ({
                 ...prevState,
-                [field.key]: newDate, //should set dob or whatever date to the date text. 
+                [showname]: true,
               }));
             }}
-            onCancel={() => { //should hide the date picker. 
+          ></Button>
+          <DateTimePickerModal
+            isVisible={dateStates[showname]}
+            mode='date'
+            display='spinner'
+            themeVariant='light'
+            onConfirm={(newDate) => {
               setFormState((prevState) => ({
                 ...prevState,
-                [showVar]: false,
+                [field.key]: newDate.toLocaleDateString(), //year/month/day
+              }));
+              setDateStates((prevState) => ({
+                ...prevState,
+                [showname]: false, //should set dob or whatever date to the date text.
               }))
             }}
+            onCancel={() => {
+              //should hide the date picker.
+              setDateStates((prevState) => ({
+                ...prevState,
+                [showname]: false, //should set dob or whatever date to the date text.
+              }))
+            }}
+            maximumDate={new Date(2100, 12, 30)}
           ></DateTimePickerModal>
         </View>
       );
-    }
-    return (
-      <View key={field.name} style={styles.row}>
-        <Text style={styles.fieldName}>{field.name}:</Text>
-        <View>
-          <TextInput
-            onChangeText={(newText) => {
-              console.log(newText);
-              setFormState((prevState) => ({
-                ...prevState,
-                [field.key]: newText,
-              }));
-            }}
-            style={styles.fieldInput}
-            required={field.required}
-          ></TextInput>
+    } else {
+      return (
+        <View key={field.name} style={styles.row}>
+          <Text style={styles.fieldName}>{field.name}:</Text>
+          <View>
+            <TextInput
+              onChangeText={(newText) => {
+                console.log(newText);
+                setFormState((prevState) => ({
+                  ...prevState,
+                  [field.key]: newText,
+                }));
+              }}
+              style={styles.fieldInput}
+              required={field.required}
+            ></TextInput>
+          </View>
         </View>
-      </View>
-    );
+      );
+    }
   };
   return (
     // must be wrapped in this to use dialog/modal
@@ -147,7 +170,7 @@ const AddToOnlineQueue = ({ route }) => {
             <Text>New ID: {patient.id}</Text>
             {fields.map((field) => {
               return (
-                <Text>
+                <Text key={field.key}>
                   {station.fields.find(({ key }) => key === field)?.name}:{' '}
                   {patient.data[field]}
                 </Text>

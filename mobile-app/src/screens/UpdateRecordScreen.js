@@ -11,13 +11,15 @@ import {
 } from '@react-native-material/core';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, StatusBar } from 'react-native';
+import { View, StyleSheet, StatusBar, Keyboard } from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const UpdateRecordScreen = ({ route }) => {
   const navigation = useNavigation();
   const { sendRecord, selectedStation: station } = useSessionContext();
   const [formState, setFormState] = useState({}); //used to keep track of inputs.
+  const [dateStates, setDateStates] = useState({})
   const [fields, setFields] = useState([]);
   record = route.params.item;
   const numFields = station.fields.length;
@@ -28,6 +30,10 @@ const UpdateRecordScreen = ({ route }) => {
     let newFields = [];
     for (let i = 0; i < numFields; i++) {
       const varName = station.fields[i].key;
+      if (station.fields[i].type === 'date') {
+        let showname = `show${varName}`;
+        setDateStates((prevState) => ({ ...prevState, [showname]: false }));
+      }
       setFormState((prevState) => ({ ...prevState, [varName]: '' }));
       newFields.push(varName);
     }
@@ -37,11 +43,11 @@ const UpdateRecordScreen = ({ route }) => {
   useEffect(() => {
     //sets the state for the form dynamically. I have not implemented validation yet.
     defaultState();
-    setFormState((prevState) => ({ ...prevState, _id: record._id})) //sets object id
+    setFormState((prevState) => ({ ...prevState, _id: record._id })); //sets object id
   }, []);
 
   useEffect(() => {
-    console.log('FORM STATE UPDATED', formState)
+    console.log('FORM STATE UPDATED', formState);
   }, [formState]);
 
   useEffect(() => {
@@ -59,24 +65,92 @@ const UpdateRecordScreen = ({ route }) => {
     console.log(result);
   };
   const renderInput = (field) => {
-    return (
-      <View key={field.name} style={styles.row}>
-        <Text style={styles.fieldName}>{field.name}:</Text>
-        <View>
-          <TextInput
-            onChangeText={(newText) => {
-              console.log(newText);
-              setFormState((prevState) => ({
+    console.log('input type', field.type);
+
+    if (field.type === 'date') {
+      let showname = `show${field.key}`;
+      console.log(showname);
+      return (
+        <View key={field.name} style={styles.row}>
+          <Text style={styles.fieldName}>{field.name}:</Text>
+          <Button
+            title={`Select ${field.name}`}
+            onPress={() => {
+              setDateStates((prevState) => ({
                 ...prevState,
-                [field.key]: newText,
+                [showname]: true,
               }));
             }}
-            style={styles.fieldInput}
-            required={field.required}
-          ></TextInput>
+          ></Button>
+          <DateTimePickerModal
+            isVisible={dateStates[showname]}
+            mode='date'
+            display='spinner'
+            themeVariant='light'
+            onConfirm={(newDate) => {
+              console.log('heyo', newDate);
+              setFormState((prevState) => ({
+                ...prevState,
+                [field.key]: newDate.toLocaleDateString(), //year/month/day
+              }));
+              setDateStates((prevState) => ({
+                ...prevState,
+                [showname]: false, //should set dob or whatever date to the date text.
+              }))
+            }}
+            onCancel={() => {
+              //should hide the date picker.
+              setDateStates((prevState) => ({
+                ...prevState,
+                [showname]: false, //should set dob or whatever date to the date text.
+              }))
+            }}
+            maximumDate={new Date(2100, 12, 30)}
+          ></DateTimePickerModal>
         </View>
-      </View>
-    );
+      );
+    } else if (field.type === 'text') {
+      return (
+        <View key={field.name} style={styles.row}>
+          <Text style={styles.fieldName}>{field.name}:</Text>
+          <View>
+            <TextInput
+              onChangeText={(newText) => {
+                console.log(newText);
+                setFormState((prevState) => ({
+                  ...prevState,
+                  [field.key]: newText,
+                }));
+              }}
+              style={styles.fieldInput}
+              required={field.required}
+            ></TextInput>
+          </View>
+        </View>
+      );
+    } else if (field.type === 'number') {
+      return (
+        <View key={field.name} style={styles.row}>
+          <Text style={styles.fieldName}>{field.name}:</Text>
+          <View>
+            <TextInput
+              keyboardType='number-pad'
+              returnKeyType='done'
+              onSubmitEditing={Keyboard.dismiss}
+              onChangeText={(newText) => {
+                console.log(newText);
+                setFormState((prevState) => ({
+                  ...prevState,
+                  [field.key]: newText,
+                }));
+              }}
+              style={styles.fieldInput}
+              required={field.required}
+            ></TextInput>
+          </View>
+        </View>
+      );
+    }
   };
 
   return (
