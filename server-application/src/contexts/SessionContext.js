@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import replace from "../utils/replace";
 import { io } from "socket.io-client";
+import LOG_TYPES from "../constants/log-types";
 
 export const SERVER_PORT = 3333;
 
@@ -51,6 +52,7 @@ export default function SessionProvider({ children }) {
 
     const [sessionInfo, setSessionInfo] = useState(JSON.parse(localStorage.getItem(sessionInfoStorageKey)) || initialSystemInfo);
     const [sessionLogs, setSessionLogs] = useState([]);
+    const addSessionLog = (log, type = LOG_TYPES.GENERAL) => setSessionLogs(logs => [...logs, { log, type }]);
     const [sessionRecords, setSessionRecords] = useState([]);
     const [connectedUsers, setConnectedUsers] = useState([]);
     const connectedUsersByStation = useMemo(() => connectedUsers.reduce((connectedUsersByStation, user) => ({
@@ -71,9 +73,12 @@ export default function SessionProvider({ children }) {
             const socket = io(`http://127.0.0.1:${SERVER_PORT}`);
             socket.auth = { username: 'Admin', isAdmin: true }
             socket.on('connect', () => {
-                console.log('Connected to server');
+                // console.log('Connected to server');
+                addSessionLog('You are connected to the session');
+
                 socket.on('join-station', data => {
-                    console.log('join-station', data);
+                    // console.log('join-station', data);
+                    addSessionLog(`User ${data.username} joined station ${data.stationId}`, LOG_TYPES.JOIN_STATION);
                     setConnectedUsers(users => users.map(user => user.username === data.username ? {
                         ...user,
                         stationId: data.stationId,
@@ -81,16 +86,19 @@ export default function SessionProvider({ children }) {
                 })
                 socket.on('leave-station', data => {
                     console.log('leave-station', data);
+                    addSessionLog(`User ${data.username} left their station`, LOG_TYPES.LEAVE_STATION);
                     setConnectedUsers(users => users.map(user => user.username === data.username ? {
                         ...user,
                         stationId: undefined,
                     } : user));
                 })
                 socket.on('user-connected', newUser => {
+                    addSessionLog(`User ${newUser.username} connected to server`, LOG_TYPES.CONNECTED);
                     console.log('user-connected', newUser);
                     setConnectedUsers(users => [...users, newUser])
                 })
                 socket.on('user-disconnect', user => {
+                    addSessionLog(`User ${user.username} disconnected server`, LOG_TYPES.DISCONNECTED);
                     console.log('user-disconnect', user);
                     setConnectedUsers(users => users.filter(({ username }) => user.username !== username))
                 })
@@ -194,9 +202,31 @@ export default function SessionProvider({ children }) {
         }));
     }
 
-    async function startSession() {
+    function selectPreviousSession(sessionId) {
+        setSessionInfo(sessionInfo => ({
+            ...sessionInfo,
+            id: sessionId,
+        }))
+    }
+
+    async function getSessionList() {
         try {
-            const response = await window.api.startSession(sessionInfo);
+            console.log('Get Session List Await')
+            const response = await window.api.getSessionList();
+            console.log({ response });
+            return response;
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    async function startSession(sessionId) {
+        console.log('starting session (context)', sessionId);
+        try {
+            const response = await window.api.startSession({
+                id: sessionId,
+                ...sessionInfo,
+            });
             console.log({ response });
         } catch (err) {
             console.error(err)
@@ -208,6 +238,8 @@ export default function SessionProvider({ children }) {
         const response = window.api.stopSession();
         console.log({ response });
         setSessionIsRunning(window.api.getIsSessionRunning());
+        setSessionLogs([]);
+        setSessionRecords([]);
     }
 
     return (
@@ -219,6 +251,8 @@ export default function SessionProvider({ children }) {
                 connectedUsers,
                 connectedUsersByStation,
                 sessionRecords,
+                selectPreviousSession,
+                getSessionList,
                 startSession,
                 stopSession,
                 addStation,

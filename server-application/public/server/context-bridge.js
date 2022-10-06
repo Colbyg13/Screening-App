@@ -1,7 +1,6 @@
 const { contextBridge } = require("electron");
 const ip = require('ip');
 const { normalizeFields } = require("./utils");
-const { ObjectId } = require("mongodb");
 
 module.exports = APP => {
     contextBridge.exposeInMainWorld("api", {
@@ -12,20 +11,35 @@ module.exports = APP => {
         // SERVER FUNCTIONS
         getIP: ip.address,
         getIsSessionRunning: () => APP.sessionIsRunning,
+        getSessionList: async () => APP.db.collection("sessions").find().toArray(),
         startSession: async ({
-            sessionId,
+            id: sessionId,
             generalFields,
             stations,
         }) => new Promise((res, rej) => {
-            console.log('Starting session...')
+            console.log('Starting session...', sessionId)
             if (!APP.sessionIsRunning) {
 
-                if (sessionId) APP.db.collection("sessions")
-                    .findOne({
-                        id: ObjectId(sessionId),
-                    }).then(result => {
-                        APP.sessionInfo = result;
-                    });
+                if (sessionId) {
+                    APP.db.collection("sessions")
+                        .findOne({
+                            _id: sessionId,
+                        }).then(result => {
+                            APP.sessionInfo = result;
+                            APP.db.collection("patients").find({
+                                sessionId,
+                            }).toArray((err, patients = []) => {
+                                if (err) {
+                                    console.error(err);
+                                    res.status(400).send("Error finding patient records");
+                                }
+                                APP.sessionInfo = {
+                                    ...APP.sessionInfo,
+                                    records: patients,
+                                }
+                            });
+                        });
+                }
 
                 else APP.db.collection("sessions")
                     .insertOne({
@@ -34,10 +48,11 @@ module.exports = APP => {
                         createdAt: new Date(),
                     })
                     .then(result => {
+                        console.log({ result })
 
                         APP.sessionInfo = {
                             // id from db
-                            sessionId: result.insertedId,
+                            // sessionId: result.insertedId,
                             generalFields: normalizeFields(generalFields),
                             stations: stations.map((station, i) => ({
                                 ...station,

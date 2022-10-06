@@ -22,7 +22,7 @@ export default function StationInfo({
                     ))}
                     {users.length ? (
                         <>
-                            <div className='text-lg'>Users:</div>
+                            <div className='text-lg'>Connected Devices:</div>
                             {users.map(({ username }) => (
                                 <Chip label={username} variant="outlined" />
                             ))}

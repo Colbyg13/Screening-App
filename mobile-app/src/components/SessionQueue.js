@@ -50,8 +50,29 @@ const mockData = [
 ];
 const SessionQueue = (props) => {
   // const station = props.station;
-  const {sessionInfo: {stations, records}, selectedStation: station} = useSessionContext();
+  const { sessionInfo: { stations, records }, selectedStation: station } = useSessionContext();
+  const stationIndex = stations.indexOf(station);
   const isStationOne = stations[0] === station;
+
+  const sortedRecords = [...records].sort((recordA, recordB) => {
+    // secondary sorting
+    if (recordA.nextStationIndex === recordB.nextStationIndex) return recordA.lastModified <= recordB.lastModified ? 1 : -1;
+    // Puts our station next as first ones in the list
+    if (recordA.nextStationIndex === stationIndex) return -1;
+    if (recordB.nextStationIndex === stationIndex) return 1;
+    // complete ones last in the list
+    if (recordA.isComplete) return 1;
+    if (recordB.isComplete) return -1;
+    // if (
+    //   ((recordA.nextStationIndex > stationIndex) && (recordB.nextStationIndex > stationIndex))
+    //   ||
+    //   ((recordA.nextStationIndex < stationIndex) && (recordB.nextStationIndex < stationIndex))
+    // ) return recordA.nextStationIndex - recordB.nextStationIndex;
+    return recordA.nextStationIndex - recordB.nextStationIndex;
+
+    // if (recordA.nextStationIndex < stationIndex) return 1;
+    // return -1;
+  });
   // console.log({station, stations})
   // const [isStationOne, setIsStationOne] = useState(props.station.isStationOne);
   const navigation = useNavigation();
@@ -80,14 +101,14 @@ const SessionQueue = (props) => {
       <Text style={styles.pageDirection}>Current Session</Text>
       <Text style={styles.searchBar}>Search Bar will go here</Text>
       <FlatList
-        data={records}
+        data={sortedRecords}
         keyExtractor={(item) => item.id}
         renderItem={renderQueueItem}
         style={styles.flatList}
       />
-            {isStationOne && (
+      {isStationOne && (
         <AddToQueueBtn onPress={handleAddToQueuePress}></AddToQueueBtn>
-        )}
+      )}
     </SafeAreaView>
   );
 };

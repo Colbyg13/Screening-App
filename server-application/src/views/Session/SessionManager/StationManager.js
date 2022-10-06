@@ -30,6 +30,7 @@ export default function StationManager() {
           />
           {sessionInfo.stations.map((station, i) => (
             <StationFields
+              key={station.id}
               stationIndex={i}
               station={station}
               addField={addField}

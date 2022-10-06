@@ -1,6 +1,7 @@
 import axios from "axios";
 import { createContext, useContext, useEffect, useState } from "react";
 import { io } from "socket.io-client";
+import PatientRecord from "../classes/patient-record";
 import findServer from "../utils/find-server";
 
 export const SERVER_PORT = 3333;
@@ -49,7 +50,10 @@ export default function SessionProvider({ children }) {
                 console.log('Connected to server');
                 socket.on('session-info-update', newSessionInfo => {
                     // console.log('session-info-update', newSessionInfo);
-                    setSessionInfo(newSessionInfo);
+                    setSessionInfo({
+                        ...newSessionInfo,
+                        records: newSessionInfo?.records?.map(record => new PatientRecord(record, newSessionInfo.stations))
+                    });
                 });
                 setIsConnected(true);
             });
@@ -71,12 +75,12 @@ export default function SessionProvider({ children }) {
     }, [socket]);
 
     async function tryFindingServer() {
-        const serverIp = 'http://10.75.166.36:3333';
+        // const serverIp = 'http://10.75.169.155:3333';
         if (!isConnected) {
             setServerLoading(true);
 
             try {
-                // const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
+                const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
                 if (serverIp) {
                     console.log(`Server found on: ${serverIp}`);
                     const socket = io(serverIp);
@@ -98,7 +102,7 @@ export default function SessionProvider({ children }) {
 
             try {
                 const url = `${serverIp}/api/v1/sessions/current`;
-                const { data: sessionInfo} = await axios.get(url, {
+                const { data: sessionInfo } = await axios.get(url, {
                     headers: {
                         'Cache-Control': 'no-cache',
                         'Pragma': 'no-cache',
@@ -107,7 +111,10 @@ export default function SessionProvider({ children }) {
                 })
                 // console.log({ sessionInfo, rest })
                 if (sessionInfo) {
-                    setSessionInfo(sessionInfo)
+                    setSessionInfo({
+                        ...sessionInfo,
+                        records: sessionInfo?.records?.map(record => new PatientRecord(record, sessionInfo.stations))
+                    });
                 } else {
                     throw new Error('Session not started. Check server and try again.')
                 }
