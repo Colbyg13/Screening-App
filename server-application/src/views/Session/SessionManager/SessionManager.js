@@ -15,34 +15,28 @@ export default function SessionManager() {
                 open={openSessionModal}
                 onClose={() => setOpenSessionModal(false)}
             />
-            <form
-                onSubmit={() => {
-                    console.log('Starting Session (Manager)')
-                    startSession()
-                }}
-            >
-                <StationManager />
-                <div className='absolute bottom-4 right-8 flex space-x-4'>
-                    <Button
-                        type='button'
-                        size="large"
-                        color="warning"
-                        variant="contained"
-                        onClick={() => setOpenSessionModal(true)}
-                    >
-                        Resume Session
-                    </Button>
-                    <Button
-                        type='submit'
-                        size="large"
-                        color="success"
-                        variant="contained"
-                    >
-                        Start Session
-                    </Button>
-                </div>
-                <div className="absolute bottom-2 left-4 text-sm">IPv4: {window.api.getIP()}</div>
-            </form>
+            <StationManager />
+            <div className='absolute bottom-4 right-8 flex space-x-4'>
+                <Button
+                    type='button'
+                    size="large"
+                    color="warning"
+                    variant="contained"
+                    onClick={() => setOpenSessionModal(true)}
+                >
+                    Resume Session
+                </Button>
+                <Button
+                    type='submit'
+                    size="large"
+                    color="success"
+                    variant="contained"
+                    onClick={() => startSession()}
+                >
+                    Start Session
+                </Button>
+            </div>
+            <div className="absolute bottom-2 left-4 text-sm">IPv4: {window.api.getIP()}</div>
         </>
     )
 }

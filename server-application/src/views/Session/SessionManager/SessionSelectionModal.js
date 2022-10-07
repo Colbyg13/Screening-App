@@ -8,7 +8,6 @@ export default function SessionSelectionModal({
 }) {
 
     const {
-        selectPreviousSession,
         getSessionList,
         startSession,
     } = useSessionContext();
@@ -18,7 +17,6 @@ export default function SessionSelectionModal({
 
     useEffect(() => {
         if (open) {
-            console.log('Loading sessionList')
             setLoading(true);
             getSessionList()
                 .then(sessionList => {
@@ -32,9 +30,6 @@ export default function SessionSelectionModal({
                 })
         }
     }, [open]);
-
-    console.log({ sessionList })
-
 
     return (
         <Modal

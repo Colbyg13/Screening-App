@@ -1,5 +1,6 @@
 const { contextBridge } = require("electron");
 const ip = require('ip');
+const { ObjectId } = require("mongodb");
 const { normalizeFields } = require("./utils");
 
 module.exports = APP => {
@@ -11,62 +12,63 @@ module.exports = APP => {
         // SERVER FUNCTIONS
         getIP: ip.address,
         getIsSessionRunning: () => APP.sessionIsRunning,
-        getSessionList: async () => APP.db.collection("sessions").find().toArray(),
+        getSessionList: () => new Promise((resolve, reject) => APP.db.collection("sessions").find().toArray((err, sessions) => {
+            if (err) {
+                console.error(err);
+                reject("Error finding patient records");
+            }
+
+            resolve(sessions.map(session => ({
+                ...session,
+                _id: session._id.toString(),
+            })));
+        })),
         startSession: async ({
             id: sessionId,
             generalFields,
             stations,
-        }) => new Promise((res, rej) => {
-            console.log('Starting session...', sessionId)
-            if (!APP.sessionIsRunning) {
+        }) => new Promise((resolve, rej) => {
+            if (APP.sessionIsRunning) rej('Session already started');
 
-                if (sessionId) {
-                    APP.db.collection("sessions")
-                        .findOne({
-                            _id: sessionId,
-                        }).then(result => {
-                            APP.sessionInfo = result;
-                            APP.db.collection("patients").find({
-                                sessionId,
-                            }).toArray((err, patients = []) => {
-                                if (err) {
-                                    console.error(err);
-                                    res.status(400).send("Error finding patient records");
-                                }
-                                APP.sessionInfo = {
-                                    ...APP.sessionInfo,
-                                    records: patients,
-                                }
-                            });
-                        });
+            APP.sessionIsRunning = true;
+
+            if (sessionId) APP.db.collection("sessions").findOne({
+                _id: ObjectId(sessionId),
+            }).then(result => {
+                APP.sessionInfo = result;
+            }).then(() => APP.db.collection("patients").find({
+                sessionId: ObjectId(sessionId),
+            }).toArray((err, patients = []) => {
+                console.log({patients})
+                if (err) {
+                    console.error(err);
+                    rej("Error finding patient records");
                 }
+                APP.sessionInfo = {
+                    ...APP.sessionInfo,
+                    records: patients,
+                }
+                resolve(APP.sessionInfo);
+            }));
 
-                else APP.db.collection("sessions")
-                    .insertOne({
-                        generalFields,
-                        stations,
-                        createdAt: new Date(),
-                    })
-                    .then(result => {
-                        console.log({ result })
-
-                        APP.sessionInfo = {
-                            // id from db
-                            // sessionId: result.insertedId,
-                            generalFields: normalizeFields(generalFields),
-                            stations: stations.map((station, i) => ({
-                                ...station,
-                                fields: normalizeFields(station.fields),
-                            })),
-                            records: [],
-                        };
-                    });
-
-                APP.sessionIsRunning = true;
-                res('Success')
-            }
-
-            rej('Session already started');
+            else APP.db.collection("sessions")
+                .insertOne({
+                    generalFields,
+                    stations,
+                    createdAt: new Date(),
+                }).then(result => {
+                    APP.sessionInfo = {
+                        // id from db
+                        // sessionId: result.insertedId,
+                        generalFields: normalizeFields(generalFields),
+                        stations: stations.map((station, i) => ({
+                            ...station,
+                            fields: normalizeFields(station.fields),
+                        })),
+                        records: [],
+                    };
+                    resolve(APP.sessionInfo);
+                });
         }),
         stopSession: () => {
             console.log('Stopping session...')

@@ -202,18 +202,9 @@ export default function SessionProvider({ children }) {
         }));
     }
 
-    function selectPreviousSession(sessionId) {
-        setSessionInfo(sessionInfo => ({
-            ...sessionInfo,
-            id: sessionId,
-        }))
-    }
-
     async function getSessionList() {
         try {
-            console.log('Get Session List Await')
             const response = await window.api.getSessionList();
-            console.log({ response });
             return response;
         } catch (err) {
             console.error(err)
@@ -221,22 +212,21 @@ export default function SessionProvider({ children }) {
     }
 
     async function startSession(sessionId) {
-        console.log('starting session (context)', sessionId);
         try {
             const response = await window.api.startSession({
-                id: sessionId,
                 ...sessionInfo,
+                id: sessionId,
             });
-            console.log({ response });
+            setSessionInfo(response);
+            setSessionIsRunning(window.api.getIsSessionRunning());
         } catch (err) {
             console.error(err)
+            setSessionIsRunning(window.api.getIsSessionRunning());
         }
-        setSessionIsRunning(window.api.getIsSessionRunning());
     }
 
     function stopSession() {
-        const response = window.api.stopSession();
-        console.log({ response });
+        window.api.stopSession();
         setSessionIsRunning(window.api.getIsSessionRunning());
         setSessionLogs([]);
         setSessionRecords([]);
@@ -251,7 +241,6 @@ export default function SessionProvider({ children }) {
                 connectedUsers,
                 connectedUsersByStation,
                 sessionRecords,
-                selectPreviousSession,
                 getSessionList,
                 startSession,
                 stopSession,
