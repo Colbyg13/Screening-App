@@ -11,54 +11,18 @@ import { useNavigation } from '@react-navigation/native';
 import SessionQueueItem from './SessionQueueItem';
 import AddToQueueBtn from './AddToQueueBtn';
 import { useSessionContext } from '../contexts/SessionContext';
-const mockData = [
-  {
-    id: 1,
-    name: 'Colby G',
-    dob: '06/12/2012'
-  },
-  {
-    id: 2,
-    name: 'John Doe',
-    dob: '06/12/2011'
-  },
-  {
-    id: 3,
-    name: 'Austin P',
-    dob: '05/12/2011'
-  },
-  {
-    id: 4,
-    name: 'Samantha G',
-    dob: '03/11/2011'
-  },
-  {
-    id: 5,
-    name: 'Jessica S',
-    dob: '07/12/2011'
-  },
-  {
-    id: 6,
-    name: 'Tony Stark',
-    dob: '08/12/2011'
-  },
-  {
-    id: 7,
-    name: 'Bruce Wayne',
-    dob: '12/31/2010'
-  },
-];
 const SessionQueue = (props) => {
   // const station = props.station;
   const {sessionInfo: {stations, records}, selectedStation: station} = useSessionContext();
+  console.log(stations[0], station);
   const isStationOne = stations[0] === station;
-  console.log({station, stations})
-  // const [isStationOne, setIsStationOne] = useState(props.station.isStationOne);
+  console.log('stations yo', {station, stations}, 'is s1', isStationOne)
   const navigation = useNavigation();
   const handlePress = (item) => {
-    //const selectedStation = item
+
     console.log('you pressed me', item);
-    //navigation.navigate('Current Session Queue', { selectedStation });
+    
+    navigation.navigate('Update Record', { item });
   };
   const handleAddToQueuePress = () => {
     navigation.navigate('Add To Queue', { station });

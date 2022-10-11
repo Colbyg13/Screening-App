@@ -1,5 +1,8 @@
 const { contextBridge } = require("electron");
 const ip = require('ip');
+const { normalizeFields } = require("./utils");
+const axios = require('axios');
+const { ObjectId } = require("mongodb");
 
 module.exports = APP => {
     contextBridge.exposeInMainWorld("api", {
@@ -14,40 +17,44 @@ module.exports = APP => {
             sessionId,
             generalFields,
             stations,
-        }) => {
+        }) => new Promise((res, rej) => {
             console.log('Starting session...')
             if (!APP.sessionIsRunning) {
 
-                if (sessionId) {
-                    //TODO: get the session and records and to continue the session
-                }
-                else {
-                    // COLBY WILL DO THIS
-                    //TODO: Create a session in the DB and use that information
-                    console.log('creatingSession');
-                    let newSessionId;
-                    APP.db.collection("sessions")
-                        .insertOne({generalFields: generalFields, stations: stations})
-                        .then(result => {
-                            newSessionId = result.insertedId
+                if (sessionId) APP.db.collection("sessions")
+                    .findOne({
+                        id: ObjectId(sessionId),
+                    }).then(result => {
+                        APP.sessionInfo = result;
+                    });
 
-                            APP.sessionInfo = {
-                                // id from db
-                                session_id: newSessionId,
-                                generalFields,
-                                stations,
-                                records: [],
-                            };
+                else APP.db.collection("sessions")
+                    .insertOne({
+                        generalFields,
+                        stations,
+                        createdAt: new Date(),
+                    })
+                    .then(result => {
 
-                        })
-                }
+                        APP.sessionInfo = {
+                            // id from db
+                            sessionId: result.insertedId,
+                            generalFields: normalizeFields(generalFields),
+                            stations: stations.map((station, i) => ({
+                                ...station,
+                                id: i + 1,
+                                fields: normalizeFields(station.fields),
+                            })),
+                            records: [],
+                        };
+                    });
 
                 APP.sessionIsRunning = true;
-                return 'Session started successfully';
+                res.send('Success')
             }
 
-            throw new Error('The Session is already running');
-        },
+            rej('Session already started');
+        }),
         stopSession: () => {
             console.log('Stopping session...')
             if (APP.sessionIsRunning) {
@@ -55,7 +62,7 @@ module.exports = APP => {
                 APP.sessionIsRunning = false;
                 return 'Successfully stopped session';
             }
-            else throw new Error('The session is already stopped');
+            return 'The session is already stopped';
         },
     });
 

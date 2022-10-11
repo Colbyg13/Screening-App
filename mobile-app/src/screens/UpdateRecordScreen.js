@@ -7,24 +7,24 @@ import {
   DialogContent,
   DialogActions,
   Text,
+  SafeAreaView,
 } from '@react-native-material/core';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, StatusBar, Switch } from 'react-native';
+import { View, StyleSheet, StatusBar, Keyboard, Switch} from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
-const AddToOnlineQueue = ({ route }) => {
+const UpdateRecordScreen = ({ route }) => {
   const navigation = useNavigation();
   const { sendRecord, selectedStation: station } = useSessionContext();
   const [formState, setFormState] = useState({}); //used to keep track of inputs.
   const [dateStates, setDateStates] = useState({});
-  const [boolStates, setBoolStates] = useState({});
-  const [fields, setFields] = useState([]); //used to keep track of inputs and match them to the patient.
-  const [visible, setVisible] = useState(false); //opens the dialog/modal.
-  const [patient, setPatient] = useState({});
-  // const station = route.params.station;
+  const [fields, setFields] = useState([]);
+  record = route.params.item;
   const numFields = station.fields.length;
+  console.log('selected record', record);
+  console.log('selected station', station);
 
   const defaultState = () => {
     let newFields = [];
@@ -34,11 +34,7 @@ const AddToOnlineQueue = ({ route }) => {
         let showname = `show${varName}`;
         setDateStates((prevState) => ({ ...prevState, [showname]: false }));
       }
-      if (station.fields[i].type === 'bool') {
-        setFormState((prevState) => ({ ...prevState, [varName]: false }));
-      } else {
-        setFormState((prevState) => ({ ...prevState, [varName]: '' }));
-      }
+      setFormState((prevState) => ({ ...prevState, [varName]: '' }));
       newFields.push(varName);
     }
     setFields(newFields);
@@ -47,17 +43,16 @@ const AddToOnlineQueue = ({ route }) => {
   useEffect(() => {
     //sets the state for the form dynamically. I have not implemented validation yet.
     defaultState();
+    setFormState((prevState) => ({ ...prevState, id: record.id })); //sets object id
   }, []);
+
+  useEffect(() => {
+    console.log('FORM STATE UPDATED', formState);
+  }, [formState]);
 
   useEffect(() => {
     console.log('Fields after default state was called', fields);
   }, [fields]);
-
-  useEffect(() => {
-    //sets the default patient to have a null id, and the correct fields for the station.
-    setPatient((prevState) => ({ ...prevState, data: formState, id: null }));
-    console.log(formState);
-  }, [formState]);
 
   const handleSubmit = async () => {
     console.log('You pressed submit');
@@ -66,21 +61,19 @@ const AddToOnlineQueue = ({ route }) => {
     //call function to handle SOCKET EVENT TO ADD NEW RECORD TO SESSION/QUEUE
     //On success open dialog with new ID, name, and DOB
     //On dialog close go back to session and update list of patients
-    const newId = await sendRecord(formState);
-    // let newId = Math.floor(Math.random() * 10); //this id will be given in the server
-    setPatient((prevState) => ({ ...prevState, id: newId })); //on server success set the patient in state for display.
-
-    setVisible(true); //opens the modal/dialog
+    const result = await sendRecord(formState);
+    console.log(result);
   };
-
   const renderInput = (field) => {
+    console.log('input type', field.type);
+
     if (field.type === 'date') {
       let showname = `show${field.key}`;
+      console.log(showname);
       return (
         <View key={field.name} style={styles.row}>
           <Text style={styles.fieldName}>{field.name}:</Text>
           <Button
-            color={'#C7E1FF'}
             title={`Select ${field.name}`}
             onPress={() => {
               setDateStates((prevState) => ({
@@ -93,8 +86,9 @@ const AddToOnlineQueue = ({ route }) => {
             isVisible={dateStates[showname]}
             mode='date'
             display='spinner'
-            themeVariant='light' //important do not remove
+            themeVariant='light'
             onConfirm={(newDate) => {
+              console.log('heyo', newDate);
               setFormState((prevState) => ({
                 ...prevState,
                 [field.key]: newDate.toLocaleDateString(), //year/month/day
@@ -122,6 +116,7 @@ const AddToOnlineQueue = ({ route }) => {
           <View>
             <TextInput
               onChangeText={(newText) => {
+                console.log(newText);
                 setFormState((prevState) => ({
                   ...prevState,
                   [field.key]: newText,
@@ -176,23 +171,31 @@ const AddToOnlineQueue = ({ route }) => {
       );
     }
   };
+
   return (
-    // must be wrapped in this to use dialog/modal
     <Provider>
       <View style={styles.container}>
         <Text style={styles.pageDirection}>Patient Information</Text>
+        <View style={styles.patientInfoWrapper}>
+          <Text style={styles.patientInfoItem}>ID: {record.id}</Text>
+          <Text style={styles.patientInfoItem}>Name: {record.name}</Text>
+          <Text style={styles.patientInfoItem}>DOB: {record.dob}</Text>
+        </View>
+
+        <View>
+          <Text style={styles.pageDirection}>{station.name} Data:</Text>
+        </View>
         <View>
           {station.fields.map((field) => {
             return renderInput(field);
           })}
         </View>
-
         <View style={styles.wrapper}>
           <Pressable
+            onPress={handleSubmit}
             style={styles.btnSubmit}
             pressEffect='ripple'
             pressEffectColor='#4c5e75'
-            onPress={handleSubmit}
           >
             <Text style={styles.btnText}>Submit</Text>
           </Pressable>
@@ -204,48 +207,10 @@ const AddToOnlineQueue = ({ route }) => {
             <Text style={styles.btnText}>Cancel</Text>
           </Pressable>
         </View>
-        <Dialog visible={visible} onDismiss={() => setVisible(false)}>
-          <DialogHeader title='Added to Queue Successully!' />
-          <DialogContent>
-            <Text>New ID: {patient.id}</Text>
-            {fields.map((field) => {
-              if (
-                patient.data[field] === true ||
-                patient.data[field] === false
-              ) {
-                return (
-                  <Text key={field.key}>
-                    {station.fields.find(({ key }) => key === field)?.name}:{' '}
-                    {patient.data[field].toString()}
-                  </Text>
-                );
-              } else {
-                return (
-                  <Text key={field.key}>
-                    {station.fields.find(({ key }) => key === field)?.name}:{' '}
-                    {patient.data[field]}
-                  </Text>
-                );
-              }
-            })}
-          </DialogContent>
-          <DialogActions>
-            <Button
-              title='Ok'
-              compact
-              variant='text'
-              onPress={() => {
-                setVisible(false);
-                navigation.navigate('Current Session Queue');
-              }}
-            />
-          </DialogActions>
-        </Dialog>
       </View>
     </Provider>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     height: '100%',
@@ -256,12 +221,6 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-start',
     marginBottom: 5,
     fontSize: 22,
-  },
-  pageDirection: {
-    marginTop: 30,
-    margin: 10,
-    fontSize: 34,
-    alignSelf: 'start',
   },
   fieldInput: {
     width: 200,
@@ -275,6 +234,24 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'flex-start',
+  },
+  pageDirection: {
+    margin: 16,
+    marginTop: 20,
+    fontSize: 34,
+    alignSelf: 'start',
+  },
+  patientInfoWrapper: {
+    backgroundColor: '#EDEDED',
+    padding: 20,
+    marginVertical: 8,
+    marginHorizontal: 16,
+    borderRadius: 10,
+    overflow: 'hidden',
+  },
+  patientInfoItem: {
+    fontSize: 24,
+    margin: 5,
   },
   wrapper: {
     marginTop: 30,
@@ -309,4 +286,5 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
 });
-export default AddToOnlineQueue;
+
+export default UpdateRecordScreen;

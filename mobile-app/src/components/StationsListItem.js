@@ -13,7 +13,7 @@ const StationsListItem = (props) => {
       <View style={styles.row}>
         <Text style={styles.label}>{station.label}</Text>
         <View style={styles.TitleAndFields}>
-        <Text style={styles.title}>{station.title}</Text>
+        <Text style={styles.title}>{station.name}</Text>
         {station.fields.map((item) => {
           return (
             <View key={item.name} style={styles.fieldsView}>

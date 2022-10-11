@@ -24,20 +24,22 @@ export const useSessionContext = () => useContext(SessionContext);
 
 export default function SessionProvider({ children }) {
 
-    // Connected to server
+    // SERVER
+    const [serverIp, setServerIp] = useState();
+    const [socket, setSocket] = useState();
     const [isConnected, setIsConnected] = useState(false);
-    const [loading, setLoading] = useState(false);
     const [serverLoading, setServerLoading] = useState(false);
+
+    // SESSION
+    const [loading, setLoading] = useState(false);
     const [sessionInfo, setSessionInfo] = useState();
     const [selectedStationId, setSelectedStationId] = useState();
     const selectedStation = sessionInfo?.stations?.find(({ id }) => id === selectedStationId);
-    const [socket, setSocket] = useState();
-    const [serverIp, setServerIp] = useState();
 
     useEffect(() => {
         console.log('Finding Server');
         tryFindingServer();
-    }, [])
+    }, []);
 
     useEffect(() => {
         console.log('socket changed')
@@ -68,7 +70,7 @@ export default function SessionProvider({ children }) {
     }, [socket]);
 
     async function tryFindingServer() {
-        // const serverIp =  'http://10.75.167.190:3333';
+        // const serverIp =  'http://10.75.179.46:3333';
         if (!isConnected) {
             setServerLoading(true);
 
@@ -119,7 +121,7 @@ export default function SessionProvider({ children }) {
 
     async function sendRecord(recordPayload) {
         console.log('Sending record...', recordPayload);
-        const createRecord = !recordPayload._id;
+        const createRecord = !recordPayload.id;
         const createOrUpdate = createRecord ? 'create' : 'update';
         const url = `${serverIp}/api/v1/patients/${createOrUpdate}`;
         try {

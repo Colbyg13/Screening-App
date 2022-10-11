@@ -7,6 +7,31 @@ module.exports = APP => {
         res.json({ name: 'Test Computer' });
     });
 
+    APP.get('/api/v1/sessions', (req, res) => {
+        APP.db.collection("sessions").find().toArray((err, patients) => {
+            if (err) {
+                console.error(err);
+                res.status(400).send("Error finding sessions");
+            }
+            res.status(200).json({ patients });
+        });
+    })
+
+    APP.get('/api/v1/sessions/:sessionId', (req, res) => {
+        const sessionId = req.params.sessionId;
+        APP.db.collection("sessions").findOne(
+            { _id: ObjectId(sessionId) }
+        ).then(result => {
+            if (result) res.json(result);
+
+            res.status(400).send("Error finding session");
+        })
+            .catch(err => {
+                console.error(err);
+                res.status(400).send("Error finding session");
+            })
+    })
+
     // PATIENT RECORDS
     APP.get('/api/v1/patients', (req, res) => {
         APP.db.collection("patients").find().toArray((err, patients) => {
@@ -27,15 +52,21 @@ module.exports = APP => {
                     { $inc: { "latestID": 1 } },
                 )
                 .then(({ value: { latestID } = {} } = {}) => {
-                    
+
+                    const generalInfo = APP.sessionInfo.generalFields.reduce((all, { key, value }) => ({
+                        ...all,
+                        [key]: value,
+                    }), {});
+
                     const newUser = {
                         id: latestID,
-                        created_at: new Date(),
-                        last_modified: new Date(),
-                        session_id: APP.sessionInfo.session_id,
+                        createdAt: new Date(),
+                        lastModified: new Date(),
+                        sessionId: APP.sessionInfo.sessionId,
+                        ...generalInfo,
                         ...record,
                     };
-                    console.log('session ID', newUser.session_id, typeof(newUser.session_id));
+                    console.log('session ID', newUser.sessionId, typeof (newUser.sessionId));
 
                     APP.db.collection("patients")
                         .insertOne(newUser)
@@ -45,8 +76,6 @@ module.exports = APP => {
                                 ...APP.sessionInfo,
                                 records: [...APP.sessionInfo.records, { _id: result.insertedId, ...newUser }]
                             }
-
-                            req.app.set('sessionInfo', APP.sessionInfo);
 
                             APP.io.sockets.emit('session-info-update', APP.sessionInfo);
 
@@ -64,20 +93,19 @@ module.exports = APP => {
     });
 
     APP.post('/api/v1/patients/update', (req, res) => {
-        const { _id: recordId, ...record } = req.body;
-        const patient = { last_modified: new Date(), ...record, };
+        const record = req.body;
 
         APP.db.collection("patients")
             .findOneAndUpdate(
-                { _id: ObjectId(recordId) },
-                { $set: patient },
-                { returnNewDocument: true }
+                { id: record.id },
+                { $set:  { lastModified: new Date(), ...record, } },
+                { returnDocument: 'after' }
             )
-            .then(updatedRecord => {
+            .then(({ value: updatedRecord }) => {
 
                 if (APP.sessionIsRunning) {
 
-                    const oldRecord = APP.sessionInfo.records.find(({ _id }) => _id === recordId);
+                    const oldRecord = APP.sessionInfo.records.find(({ id }) => id === updatedRecord.id);
 
                     if (oldRecord) {
                         APP.sessionInfo = {
@@ -94,8 +122,6 @@ module.exports = APP => {
                             records: [...APP.sessionInfo.records, updatedRecord],
                         }
                     }
-
-                    req.app.set('sessionInfo', APP.sessionInfo);
 
                     APP.io.sockets.emit('session-info-update', APP.sessionInfo);
                 }

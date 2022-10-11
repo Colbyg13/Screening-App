@@ -1,49 +1,36 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import replace from "../utils/replace";
 
 const SessionContext = createContext({
     sessionIsRunning: false,
-    generalFields: {},
-    stations: [],
+    sessionInfo: {},
     sessionRecords: [],
-    createOrUpdateRecord: () => { },
     startSession: () => { },
     stopSession: () => { },
+    addStation: () => { },
+    deleteStation: () => { },
+    addField: () => { },
+    updateField: () => { },
+    deleteField: () => { },
 });
 
 export const useSessionContext = () => useContext(SessionContext);
 
+const sessionInfoStorageKey = 'sessionInfo';
 
-const testGeneralFields = [{
-    name: 'Village',
-    value: 'UVU test labs'
-},
-{
-    name: 'School',
-    value: 'Utah Valley University'
-}]
-
-const testStations = [{
-    id: 1,
-    title: 'Station 1',
-    fields: [{
-        name: 'Name',
-        type: 'text'
-    }, {
-        name: 'Birthday',
-        type: 'date'
-    }]
-}, {
-    id: 2,
-    title: 'Station 2',
-    fields: [{
-        name: 'Height',
-        type: 'number'
-    }, {
-        name: 'Weight',
-        type: 'number'
-    }]
-}]
+const initialSystemInfo = {
+    generalFields: [{
+        name: '',
+        value: '',
+    }],
+    stations: [{
+        name: 'Station 1',
+        fields: [{
+            name: '',
+            type: '',
+        }]
+    }],
+}
 
 export default function SessionProvider({ children }) {
 
@@ -53,41 +40,120 @@ export default function SessionProvider({ children }) {
      * (it should not cut the session when the view leaves)
      */
 
-    // TODO: update this to get the correct value from db
-    let recordId = 0;
+    // // TODO: implement this later
+    // let offlineRecordId = 0;
 
     const [sessionIsRunning, setSessionIsRunning] = useState(window.api.getIsSessionRunning());
 
-    const [generalFields, setGeneralFields] = useState(testGeneralFields);
-
-    const [stations, setStations] = useState(testStations);
-
+    const [sessionInfo, setSessionInfo] = useState(JSON.parse(localStorage.getItem(sessionInfoStorageKey)) || initialSystemInfo);
+    const [sessionLogs, setSessionLogs] = useState([]);
     const [sessionRecords, setSessionRecords] = useState([]);
 
-    function startSession() {
-        // TODO: get current session records for initial state based on generalInformation and date?
-        // const sessionRecords = await getRecordsFromDB() // Make sure to pass in this value down below
-        const response = window.api.startSession({generalFields, stations});
-        console.log({ response });
-        setSessionIsRunning(true);
-        // setSessionRecords(sessionRecords);
+    // Updates local storage when sessionInfo is updated
+    useEffect(() => {
+        localStorage.setItem(sessionInfoStorageKey, JSON.stringify(sessionInfo));
+    }, [sessionInfo]);
+
+    const addStation = () => setSessionInfo(sessionInfo => ({
+        ...sessionInfo,
+        stations: [...sessionInfo.stations, { name: `Station ${sessionInfo.stations.length + 1}`, fields: [{ name: '', type: '' }] }]
+    }));
+
+    const deleteStation = index => {
+        //General Fields
+        if (index === undefined) throw new Error('Cannot delete general fields');
+
+        //Stations
+        else setSessionInfo(sessionInfo => ({
+            ...sessionInfo,
+            stations: sessionInfo.stations
+                .filter((_, i) => i !== index)
+                .map((station, i) => ({
+                    ...station,
+                    name: `Station ${i + 1}`
+                })),
+        }));
+    }
+
+    const addField = stationIndex => {
+        // General Field
+        if (stationIndex === undefined) setSessionInfo(sessionInfo => ({
+            ...sessionInfo,
+            generalFields: [...sessionInfo.generalFields, { name: '', value: '' }]
+        }));
+
+        // Station Field
+        else setSessionInfo(sessionInfo => ({
+            ...sessionInfo,
+            stations: replace(sessionInfo.stations, stationIndex, {
+                ...sessionInfo.stations[stationIndex],
+                fields: [...sessionInfo.stations[stationIndex].fields, { name: '', type: '' }]
+            })
+        }));
+    }
+
+    const updateField = (stationIndex, fieldIndex, update) => {
+        // General Field
+        if (stationIndex === undefined) setSessionInfo(sessionInfo => ({
+            ...sessionInfo,
+            generalFields: replace(sessionInfo.generalFields, fieldIndex, update),
+        }))
+
+        // Station Field
+        else setSessionInfo(sessionInfo => ({
+            ...sessionInfo,
+            stations: replace(sessionInfo.stations, stationIndex, {
+                ...sessionInfo.stations[stationIndex],
+                fields: replace(sessionInfo.stations[stationIndex].fields, fieldIndex, update),
+            })
+        }));
+    }
+
+    const deleteField = (stationIndex, fieldIndex) => {
+        if (stationIndex === undefined) setSessionInfo(sessionInfo => ({
+            ...sessionInfo,
+            generalFields: sessionInfo.generalFields.filter((_, i) => fieldIndex !== i),
+        }))
+
+        else setSessionInfo(sessionInfo => ({
+            ...sessionInfo,
+            stations: replace(sessionInfo.stations, stationIndex, {
+                ...sessionInfo.stations[stationIndex],
+                fields: sessionInfo.stations[stationIndex].fields.filter((_, i) => i !== fieldIndex),
+            })
+        }));
+    }
+
+    async function startSession() {
+        try {
+            const response = await window.api.startSession(sessionInfo);
+            console.log({ response });
+        } catch (error) {
+
+        }
+        setSessionIsRunning(window.api.getIsSessionRunning());
     }
 
     function stopSession() {
         const response = window.api.stopSession();
         console.log({ response });
-        setSessionIsRunning(false);
+        setSessionIsRunning(window.api.getIsSessionRunning());
     }
 
     return (
         <SessionContext.Provider
             value={{
                 sessionIsRunning,
+                sessionInfo,
+                sessionLogs,
+                sessionRecords,
                 startSession,
                 stopSession,
-                generalFields,
-                stations,
-                sessionRecords,
+                addStation,
+                deleteStation,
+                addField,
+                updateField,
+                deleteField,
             }}
         >
             {children}
