@@ -10,7 +10,7 @@ import {
 } from '@react-native-material/core';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, StatusBar} from 'react-native';
+import { View, StyleSheet, StatusBar, Switch } from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
@@ -19,6 +19,7 @@ const AddToOnlineQueue = ({ route }) => {
   const { sendRecord, selectedStation: station } = useSessionContext();
   const [formState, setFormState] = useState({}); //used to keep track of inputs.
   const [dateStates, setDateStates] = useState({});
+  const [boolStates, setBoolStates] = useState({});
   const [fields, setFields] = useState([]); //used to keep track of inputs and match them to the patient.
   const [visible, setVisible] = useState(false); //opens the dialog/modal.
   const [patient, setPatient] = useState({});
@@ -33,7 +34,11 @@ const AddToOnlineQueue = ({ route }) => {
         let showname = `show${varName}`;
         setDateStates((prevState) => ({ ...prevState, [showname]: false }));
       }
-      setFormState((prevState) => ({ ...prevState, [varName]: '' }));
+      if (station.fields[i].type === 'bool') {
+        setFormState((prevState) => ({ ...prevState, [varName]: false }));
+      } else {
+        setFormState((prevState) => ({ ...prevState, [varName]: '' }));
+      }
       newFields.push(varName);
     }
     setFields(newFields);
@@ -69,15 +74,13 @@ const AddToOnlineQueue = ({ route }) => {
   };
 
   const renderInput = (field) => {
-    console.log('input type', field.type);
-
     if (field.type === 'date') {
       let showname = `show${field.key}`;
-      console.log(showname);
       return (
         <View key={field.name} style={styles.row}>
           <Text style={styles.fieldName}>{field.name}:</Text>
           <Button
+            color={'#C7E1FF'}
             title={`Select ${field.name}`}
             onPress={() => {
               setDateStates((prevState) => ({
@@ -90,7 +93,7 @@ const AddToOnlineQueue = ({ route }) => {
             isVisible={dateStates[showname]}
             mode='date'
             display='spinner'
-            themeVariant='light'
+            themeVariant='light' //important do not remove
             onConfirm={(newDate) => {
               setFormState((prevState) => ({
                 ...prevState,
@@ -99,25 +102,46 @@ const AddToOnlineQueue = ({ route }) => {
               setDateStates((prevState) => ({
                 ...prevState,
                 [showname]: false, //should set dob or whatever date to the date text.
-              }))
+              }));
             }}
             onCancel={() => {
               //should hide the date picker.
               setDateStates((prevState) => ({
                 ...prevState,
                 [showname]: false, //should set dob or whatever date to the date text.
-              }))
+              }));
             }}
             maximumDate={new Date(2100, 12, 30)}
           ></DateTimePickerModal>
         </View>
       );
-    } else {
+    } else if (field.type === 'string') {
       return (
         <View key={field.name} style={styles.row}>
           <Text style={styles.fieldName}>{field.name}:</Text>
           <View>
             <TextInput
+              onChangeText={(newText) => {
+                setFormState((prevState) => ({
+                  ...prevState,
+                  [field.key]: newText,
+                }));
+              }}
+              style={styles.fieldInput}
+              required={field.required}
+            ></TextInput>
+          </View>
+        </View>
+      );
+    } else if (field.type === 'number') {
+      return (
+        <View key={field.name} style={styles.row}>
+          <Text style={styles.fieldName}>{field.name}:</Text>
+          <View>
+            <TextInput
+              keyboardType='number-pad'
+              returnKeyType='done'
+              onSubmitEditing={Keyboard.dismiss}
               onChangeText={(newText) => {
                 console.log(newText);
                 setFormState((prevState) => ({
@@ -131,15 +155,31 @@ const AddToOnlineQueue = ({ route }) => {
           </View>
         </View>
       );
+    } else if (field.type === 'bool') {
+      return (
+        <View key={field.name} style={styles.row}>
+          <Text style={styles.fieldName}>{field.name}:</Text>
+          <View>
+            <Switch
+              ios_backgroundColor={'#FF3131'}
+              onValueChange={() => {
+                const oldState = formState[field.key];
+                setFormState((prevState) => ({
+                  ...prevState,
+                  [field.key]: !oldState,
+                }));
+              }}
+              value={formState[field.key]}
+            ></Switch>
+          </View>
+        </View>
+      );
     }
   };
   return (
     // must be wrapped in this to use dialog/modal
     <Provider>
       <View style={styles.container}>
-        <Text style={{ fontSize: 24, textAlign: 'center', marginTop: 30 }}>
-          AddToOnlineQueue
-        </Text>
         <Text style={styles.pageDirection}>Patient Information</Text>
         <View>
           {station.fields.map((field) => {
@@ -169,12 +209,24 @@ const AddToOnlineQueue = ({ route }) => {
           <DialogContent>
             <Text>New ID: {patient.id}</Text>
             {fields.map((field) => {
-              return (
-                <Text key={field.key}>
-                  {station.fields.find(({ key }) => key === field)?.name}:{' '}
-                  {patient.data[field]}
-                </Text>
-              );
+              if (
+                patient.data[field] === true ||
+                patient.data[field] === false
+              ) {
+                return (
+                  <Text key={field.key}>
+                    {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                    {patient.data[field].toString()}
+                  </Text>
+                );
+              } else {
+                return (
+                  <Text key={field.key}>
+                    {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                    {patient.data[field]}
+                  </Text>
+                );
+              }
             })}
           </DialogContent>
           <DialogActions>
@@ -206,6 +258,7 @@ const styles = StyleSheet.create({
     fontSize: 22,
   },
   pageDirection: {
+    marginTop: 30,
     margin: 10,
     fontSize: 34,
     alignSelf: 'start',

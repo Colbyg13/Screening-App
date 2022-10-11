@@ -121,7 +121,7 @@ export default function SessionProvider({ children }) {
 
     async function sendRecord(recordPayload) {
         console.log('Sending record...', recordPayload);
-        const createRecord = !recordPayload._id;
+        const createRecord = !recordPayload.id;
         const createOrUpdate = createRecord ? 'create' : 'update';
         const url = `${serverIp}/api/v1/patients/${createOrUpdate}`;
         try {
