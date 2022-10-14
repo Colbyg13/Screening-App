@@ -1,36 +1,18 @@
-import React from 'react'
+import React from 'react';
 import { StyleSheet, View } from 'react-native';
-import { useSessionContext } from '../contexts/SessionContext';
-
-const STATS = {
-    COMPLETE: 'complete',
-    PARTIAL: 'partial',
-    NONE: 'none',
-}
+import { PATIENT_RECORD_STATUS } from '../classes/patient-record';
 
 export default function SessionQueueItemStatus(props) {
     const person = props.person;
-    const { sessionInfo: { stations = [] } } = useSessionContext();
 
     return (
         <View style={styles.statusWrapper}>
-            {stations.map(({ fields }, i, { length }) => {
-
-                const status = fields.every(({ key }) => person[key] !== undefined) ?
-                    STATS.COMPLETE
-                    :
-                    fields.some(({ key }) => person[key] !== undefined) ?
-                        STATS.PARTIAL
-                        :
-                        STATS.NONE;
-
-                return (
-                    <>
-                        <View style={[styles.progressCircle, styles[status]]} />
-                        {i !== length - 1 ? <View style={[styles.spacer, styles[status]]} /> : null}
-                    </>
-                )
-            })}
+            {person.progress.map((status, i, {length}) => (
+                <>
+                    <View style={[styles.progressCircle, styles[status]]} />
+                    {i !== length - 1 ? <View style={[styles.spacer, styles[status]]} /> : null}
+                </>
+            ))}
         </View>
     )
 }
@@ -40,10 +22,11 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         alignItems: 'center',
+        justifyContent: 'center'
     },
     progressCircle: {
-        height: 25,
-        width: 25,
+        aspectRatio: 1,
+        height: '50%',
         borderWidth: 2,
         borderColor: 'black',
         borderRadius: 100,
@@ -53,13 +36,13 @@ const styles = StyleSheet.create({
         width: 25,
         backgroundColor: 'black',
     },
-    [STATS.COMPLETE]: {
+    [PATIENT_RECORD_STATUS.COMPLETE]: {
         backgroundColor: 'green',
         borderColor: 'green',
     },
-    [STATS.PARTIAL]: {
+    [PATIENT_RECORD_STATUS.PARTIAL]: {
         backgroundColor: 'orange',
         borderColor: 'orange',
     },
-    [STATS.NONE]: {},
+    [PATIENT_RECORD_STATUS.NONE]: {},
 })

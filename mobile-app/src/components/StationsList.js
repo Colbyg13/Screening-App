@@ -16,9 +16,9 @@ const StationsList = (props) => {
     sessionInfo: {
       stations = [],
     } = {},
-    setSelectedStationId,
+    joinStation,
   } = useSessionContext();
-  console.log('Session info in Ipad', { sessionInfo })
+  // console.log('Session info in Ipad', { sessionInfo })
   const navigation = useNavigation();
   const createLabels = () => {
     for(let i = 0; i < sessionInfo.stations.length; i++) {
@@ -32,7 +32,7 @@ const StationsList = (props) => {
   }
   createLabels();
   const handlePress = (item) => {
-    setSelectedStationId(item.id)
+    joinStation(item.id);
     console.log('you pressed me', item);
     navigation.navigate('Current Session Queue');
   }

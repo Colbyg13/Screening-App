@@ -28,6 +28,7 @@ export default function StationFields({
             </div>
             {fields.map((field, i) => (
                 <StationField
+                    key={i}
                     isGeneral={isGeneral}
                     stationIndex={stationIndex}
                     fieldIndex={i}

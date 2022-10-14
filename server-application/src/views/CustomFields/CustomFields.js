@@ -12,6 +12,7 @@ export default function CustomFields() {
             <div className='flex flex-col space-y-2'>
                 {ALL_SESSION_DATA_TYPES.map(baseType => (
                     <TextField
+                        key={baseType}
                         className='w-52'
                         disabled
                         size='small'

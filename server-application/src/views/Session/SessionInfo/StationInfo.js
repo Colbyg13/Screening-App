@@ -7,8 +7,8 @@ export default function StationInfo({
     station: {
         name,
         fields,
-        users = [],
-    }
+    },
+    users = [],
 }) {
 
     return (
@@ -22,9 +22,9 @@ export default function StationInfo({
                     ))}
                     {users.length ? (
                         <>
-                            <div className='text-lg'>users</div>
-                            {users.map(({ name }) => (
-                                <Chip label={name} variant="outlined" />
+                            <div className='text-lg'>Connected Devices:</div>
+                            {users.map(({ username }) => (
+                                <Chip label={username} variant="outlined" />
                             ))}
                         </>
                     ) : null}

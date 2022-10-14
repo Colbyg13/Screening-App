@@ -1,0 +1,24 @@
+
+const GENERAL = 'GENERAL';
+const CONNECTED = 'CONNECTED';
+const DISCONNECTED = 'DISCONNECTED';
+const JOIN_STATION = 'JOIN_STATION';
+const LEAVE_STATION = 'LEAVE_STATION';
+
+const LOG_TYPES = {
+    GENERAL,
+    CONNECTED,
+    DISCONNECTED,
+    JOIN_STATION,
+    LEAVE_STATION,
+}
+
+export const USER_LOG_COLORS = {
+    [LOG_TYPES.GENERAL]: 'text-gray-500',
+    [LOG_TYPES.CONNECTED]: 'text-green-500',
+    [LOG_TYPES.DISCONNECTED]: 'text-red-500',
+    [LOG_TYPES.JOIN_STATION]: 'text-purple-500',
+    [LOG_TYPES.LEAVE_STATION]: 'text-purple-400',
+}
+
+export default LOG_TYPES;

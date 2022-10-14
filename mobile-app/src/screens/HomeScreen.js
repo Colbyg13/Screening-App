@@ -71,11 +71,11 @@ const sessionData = {
 const HomeScreen = ({ navigation }) => {
   // console.log('navigation', navigation);
   // const [loading, setLoading] = useState(false);
-  const { connectToSession, loading } = useSessionContext();
+  const { getSessionInfo, loading } = useSessionContext();
   const handleOnPress = async () => {
     // setLoading(!loading);
     try {
-      await connectToSession();
+      await getSessionInfo();
       // setLoading(false);
       navigation.navigate('Station Selection');
     } catch (e) {
