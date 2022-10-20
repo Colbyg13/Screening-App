@@ -1,6 +1,5 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {
-  View,
   Text,
   SafeAreaView,
   FlatList,
@@ -32,7 +31,7 @@ const StationsList = (props) => {
   }
   createLabels();
   const handlePress = (item) => {
-    joinStation(item.id);
+    joinStation(item.name);
     console.log('you pressed me', item);
     navigation.navigate('Current Session Queue');
   }
