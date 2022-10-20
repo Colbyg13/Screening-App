@@ -42,6 +42,16 @@ export default function App() {
           component={UpdateRecordScreen}
           options={{ title: 'Update Record' }}
           />
+          <Stack.Screen
+          name="Offline Mode"
+          component={IpadOfflineMode}
+          options={{ title: 'Offline Collection' }}
+          />
+          {/* <Stack.Screen
+          name="Ipad Offline Queue"
+          component={IpadOfflineMode}
+          options={{ title: 'Offline Queue' }}
+          /> */}
         </Stack.Navigator>
       </NavigationContainer>
     </SessionProvider>
