@@ -35,7 +35,7 @@ export default function SessionProvider({ children }) {
     const [loading, setLoading] = useState(false);
     const [sessionInfo, setSessionInfo] = useState();
     const [selectedStationId, setSelectedStationId] = useState();
-    const selectedStation = sessionInfo?.stations?.find(({ id }) => id === selectedStationId);
+    const selectedStation = sessionInfo?.stations?.find(({ name }) => name === selectedStationId);
 
     useEffect(() => {
         console.log('Finding Server');
@@ -131,10 +131,10 @@ export default function SessionProvider({ children }) {
         }
     }
 
-    async function joinStation(stationId) {
-        console.log('join station');
-        setSelectedStationId(stationId);
-        socket.emit('connect-to-station', { stationId });
+    async function joinStation(stationName) {
+        console.log('join station', stationName);
+        setSelectedStationId(stationName);
+        socket.emit('connect-to-station', { stationName });
     }
 
     async function leaveStation() {
@@ -154,10 +154,11 @@ export default function SessionProvider({ children }) {
         console.log('Sending record...', recordPayload);
         const createRecord = !recordPayload.id;
         const createOrUpdate = createRecord ? 'create' : 'update';
+        console.log(createRecord, createOrUpdate)
         const url = `${serverIp}/api/v1/patients/${createOrUpdate}`;
         try {
             const result = await axios.post(url, recordPayload);
-            // console.log({ result });
+            console.log({ result });
             return result.data.newId;
         } catch (error) {
             console.error(error)
