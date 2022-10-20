@@ -7,24 +7,33 @@ import {
   DialogContent,
   DialogActions,
   Text,
-  SafeAreaView,
 } from '@react-native-material/core';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, StatusBar, Keyboard, Switch} from 'react-native';
+import {
+  View,
+  StyleSheet,
+  StatusBar,
+  Keyboard,
+  Switch,
+  ScrollView,
+  SafeAreaView,
+} from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 const UpdateRecordScreen = ({ route }) => {
   const navigation = useNavigation();
+  const record = route.params.item;
+  const isStationOne = route.params.isStationOne;
+  console.log('update screen', isStationOne);
   const { sendRecord, selectedStation: station } = useSessionContext();
   const [formState, setFormState] = useState({}); //used to keep track of inputs.
   const [dateStates, setDateStates] = useState({});
   const [fields, setFields] = useState([]);
-  record = route.params.item;
   const numFields = station.fields.length;
-  console.log('selected record', record);
-  console.log('selected station', station);
+  const [visible, setVisible] = useState(false); //opens the dialog/modal.
+  const [hasStationInfo, setHasStationInfo] = useState(false); //displays current data for station in patient record section if available
 
   const defaultState = () => {
     let newFields = [];
@@ -40,6 +49,17 @@ const UpdateRecordScreen = ({ route }) => {
     setFields(newFields);
   };
 
+  const checkForStationInfo = () => {
+    fields.forEach((field) => {
+      if (record.hasOwnProperty(field)) {
+        console.log('field', field, 'exists in record', record);
+        setHasStationInfo(true);
+      } else {
+        console.log('field', field, 'does not exist');
+      }
+    });
+  };
+
   useEffect(() => {
     //sets the state for the form dynamically. I have not implemented validation yet.
     defaultState();
@@ -52,6 +72,7 @@ const UpdateRecordScreen = ({ route }) => {
 
   useEffect(() => {
     console.log('Fields after default state was called', fields);
+    checkForStationInfo();
   }, [fields]);
 
   const handleSubmit = async () => {
@@ -62,7 +83,8 @@ const UpdateRecordScreen = ({ route }) => {
     //On success open dialog with new ID, name, and DOB
     //On dialog close go back to session and update list of patients
     const result = await sendRecord(formState);
-    console.log(result);
+    console.log('update result', result);
+    setVisible(true);
   };
   const renderInput = (field) => {
     console.log('input type', field.type);
@@ -174,52 +196,113 @@ const UpdateRecordScreen = ({ route }) => {
 
   return (
     <Provider>
-      <View style={styles.container}>
-        <Text style={styles.pageDirection}>Patient Information</Text>
-        <View style={styles.patientInfoWrapper}>
-          <Text style={styles.patientInfoItem}>ID: {record.id}</Text>
-          <Text style={styles.patientInfoItem}>Name: {record.name}</Text>
-          <Text style={styles.patientInfoItem}>DOB: {record.dob}</Text>
-        </View>
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scrollView}>
+          <View style={styles.container}>
+            <Text style={styles.pageDirection}>Patient Information</Text>
+            <View style={styles.patientInfoWrapper}>
+              <Text style={styles.patientInfoItem}>ID: {record.id}</Text>
+              <Text style={styles.patientInfoItem}>Name: {record.name}</Text>
+              <Text style={styles.patientInfoItem}>DOB: {record.dob}</Text>
+              {hasStationInfo && (
+                <>
+                  {station.fields.map((field) => {
+                    console.log('hello', field, record[field]);
+                    return (
+                      <Text style={styles.patientInfoItem}>
+                        {field.name}: {record[field.key].toString()}
+                      </Text>
+                    );
+                  })}
+                </>
+              )}
+            </View>
 
-        <View>
-          <Text style={styles.pageDirection}>{station.name} Data:</Text>
-        </View>
-        <View>
-          {station.fields.map((field) => {
-            return renderInput(field);
-          })}
-        </View>
-        <View style={styles.wrapper}>
-          <Pressable
-            onPress={handleSubmit}
-            style={styles.btnSubmit}
-            pressEffect='ripple'
-            pressEffectColor='#4c5e75'
+            <View>
+              <Text style={styles.pageDirection}>{station.name} Data:</Text>
+            </View>
+            <View>
+              {station.fields.map((field) => {
+                return renderInput(field);
+              })}
+            </View>
+            <View style={styles.wrapper}>
+              <Pressable
+                onPress={handleSubmit}
+                style={styles.btnSubmit}
+                pressEffect='ripple'
+                pressEffectColor='#4c5e75'
+              >
+                <Text style={styles.btnText}>Submit</Text>
+              </Pressable>
+              <Pressable
+                style={styles.btnCancel}
+                pressEffect='ripple'
+                pressEffectColor='#FCB8B8'
+              >
+                <Text style={styles.btnText}>Cancel</Text>
+              </Pressable>
+            </View>
+          </View>
+          <Dialog
+            visible={visible}
+            onDismiss={() => {
+              setVisible(false);
+              navigation.navigate('Current Session Queue');
+            }}
           >
-            <Text style={styles.btnText}>Submit</Text>
-          </Pressable>
-          <Pressable
-            style={styles.btnCancel}
-            pressEffect='ripple'
-            pressEffectColor='#FCB8B8'
-          >
-            <Text style={styles.btnText}>Cancel</Text>
-          </Pressable>
-        </View>
-      </View>
+            <DialogHeader title='Information successfully updated!' />
+            <DialogContent>
+              <Text>Updated Info for {record.name}</Text>
+              <Text>ID:{record.id}</Text>
+              {fields.map((field) => {
+                if (formState[field] === true || formState[field] === false) {
+                  return (
+                    <Text key={field.key}>
+                      {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                      {formState[field].toString()}
+                    </Text>
+                  );
+                } else {
+                  return (
+                    <Text key={field.key}>
+                      {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                      {formState[field]}
+                    </Text>
+                  );
+                }
+              })}
+            </DialogContent>
+            <DialogActions>
+              <Button
+                title='Ok'
+                compact
+                variant='text'
+                onPress={() => {
+                  setVisible(false);
+                  navigation.navigate('Current Session Queue');
+                }}
+              />
+            </DialogActions>
+          </Dialog>
+        </ScrollView>
+      </SafeAreaView>
     </Provider>
   );
 };
 const styles = StyleSheet.create({
   container: {
-    height: '100%',
-    marginTop: StatusBar.currentHeight || 0,
+    flex: 1,
+    paddingTop: StatusBar.currentHeight,
+    paddingBottom: 20,
     backgroundColor: '#ffffff',
+  },
+  scrollView: {
+    marginHorizontal: 10,
   },
   fieldName: {
     alignSelf: 'flex-start',
-    marginBottom: 5,
+    marginBottom: 10,
     fontSize: 22,
   },
   fieldInput: {
@@ -275,12 +358,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 10,
+    marginRight: 20,
     backgroundColor: '#FF6464',
     height: 50,
     width: 100,
     borderRadius: 10,
     overflow: 'hidden',
-    marginRight: 20,
   },
   btnText: {
     fontSize: 22,
