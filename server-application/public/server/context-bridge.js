@@ -32,24 +32,29 @@ module.exports = APP => {
 
             APP.sessionIsRunning = true;
 
-            if (sessionId) APP.db.collection("sessions").findOne({
-                _id: ObjectId(sessionId),
-            }).then(result => {
-                APP.sessionInfo = result;
-            }).then(() => APP.db.collection("patients").find({
-                sessionId: ObjectId(sessionId),
-            }).toArray((err, patients = []) => {
-                console.log({patients})
-                if (err) {
-                    console.error(err);
-                    rej("Error finding patient records");
-                }
-                APP.sessionInfo = {
-                    ...APP.sessionInfo,
-                    records: patients,
-                }
-                resolve(APP.sessionInfo);
-            }));
+            if (sessionId) APP.db.collection("sessions")
+                .findOne({ _id: ObjectId(sessionId) })
+                .then(sessionInfo => {
+                    APP.sessionInfo = sessionInfo;
+                })
+                .then(() => APP.db.collection("patients")
+                    .find({ sessionId: ObjectId(sessionId) })
+                    .toArray((err, sessionRecords = []) => {
+                        console.log({ sessionRecords })
+
+                        if (err) {
+                            console.error(err);
+                            rej("Error finding patient records");
+                        }
+
+                        APP.sessionRecords = sessionRecords;
+
+                        resolve({
+                            sessionInfo: APP.sessionInfo,
+                            sessionRecords: APP.sessionRecords,
+                        });
+
+                    }));
 
             else APP.db.collection("sessions")
                 .insertOne({
@@ -57,23 +62,29 @@ module.exports = APP => {
                     stations,
                     createdAt: new Date(),
                 }).then(result => {
+
                     APP.sessionInfo = {
-                        // id from db
-                        // sessionId: result.insertedId,
+                        _id: result.insertedId,
                         generalFields: normalizeFields(generalFields),
                         stations: stations.map((station, i) => ({
                             ...station,
                             fields: normalizeFields(station.fields),
                         })),
-                        records: [],
                     };
-                    resolve(APP.sessionInfo);
+
+                    APP.sessionRecords = [];
+
+                    resolve({
+                        sessionInfo: APP.sessionInfo,
+                        sessionRecords: APP.sessionRecords,
+                    });
                 });
         }),
         stopSession: () => {
             console.log('Stopping session...')
             if (APP.sessionIsRunning) {
                 APP.sessionInfo = undefined;
+                APP.sessionRecords = undefined;
                 APP.sessionIsRunning = false;
                 return 'Successfully stopped session';
             }

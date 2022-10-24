@@ -7,7 +7,7 @@ export default function StationInfoList() {
     const {
         sessionInfo: {
             generalFields,
-            stations,
+            stations = [],
         },
         connectedUsersByStation,
     } = useSessionContext();

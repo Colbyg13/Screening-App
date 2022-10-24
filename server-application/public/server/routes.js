@@ -1,4 +1,3 @@
-const { ObjectId } = require("mongodb");
 
 module.exports = APP => {
 
@@ -7,10 +6,10 @@ module.exports = APP => {
         res.json({ name: 'Test Computer' });
     });
 
-    APP.get('/api/v1/sessions/current', (req, res) => {
-        console.log({ sessionInfo: APP.sessionInfo })
-        res.json(APP.sessionInfo);
-    })
+    APP.get('/api/v1/sessions/current', (req, res) => res.json({
+        sessionInfo: APP.sessionInfo,
+        sessionRecords: APP.sessionRecords,
+    }));
 
     // PATIENT RECORDS
     APP.get('/api/v1/patients', (req, res) => {
@@ -52,15 +51,16 @@ module.exports = APP => {
                         .then(result => {
 
                             console.log({ result })
-                            // update local state
-                            APP.sessionInfo = {
-                                ...APP.sessionInfo,
-                                records: [...APP.sessionInfo.records, { _id: result.insertedId, ...newUser }]
-                            }
 
-                            APP.io.sockets.emit('session-info-update', APP.sessionInfo);
+                            const newUserWithId = {
+                                _id: result.insertedId,
+                                ...newUser,
+                            };
 
-                            // io.sockets.emit('session-info-update', sessionInfo);
+                            console.log('Emitting record-created', newUserWithId);
+                            APP.io.sockets.emit('record-created', newUserWithId);
+
+                            APP.sessionRecords = [...APP.sessionRecords, newUserWithId];
 
                             res.json({ newId: latestID });
                         })
@@ -85,27 +85,11 @@ module.exports = APP => {
             .then(({ value: updatedRecord }) => {
 
                 if (APP.sessionIsRunning) {
-
-                    const oldRecord = APP.sessionInfo.records.find(({ id }) => id === updatedRecord.id);
-
-                    if (oldRecord) {
-                        APP.sessionInfo = {
-                            ...APP.sessionInfo,
-                            records: replace(
-                                APP.sessionInfo.records,
-                                APP.sessionInfo.records.indexOf(oldRecord),
-                                updatedRecord,
-                            ),
-                        }
-                    } else {
-                        APP.sessionInfo = {
-                            ...APP.sessionInfo,
-                            records: [...APP.sessionInfo.records, updatedRecord],
-                        }
-                    }
-
-                    APP.io.sockets.emit('session-info-update', APP.sessionInfo);
+                    const oldRecord = APP.sessionRecords.find(({ id }) => id === record.id);
+                    if (oldRecord) APP.sessionRecords = replace(APP.sessionRecords, APP.sessionRecords.indexOf(oldRecord), updatedRecord);
+                    APP.io.sockets.emit('record-updated', updatedRecord);
                 }
+
                 res.json({ record: updatedRecord });
             })
             .catch(err => {
@@ -114,7 +98,7 @@ module.exports = APP => {
             });
     });
 
-    console.log('-- completed seeing up routes --');
+    console.log('-- completed setting up routes --');
 
     return APP;
 };

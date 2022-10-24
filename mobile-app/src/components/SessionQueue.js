@@ -9,11 +9,11 @@ import SessionQueueItem from './SessionQueueItem';
 
 const SessionQueue = (props) => {
 
-  const { sessionInfo: { stations, records }, selectedStation: station } = useSessionContext();
+  const { sessionInfo: { stations }, sessionRecords,  selectedStation: station } = useSessionContext();
   const stationIndex = stations.indexOf(station);
   const isStationOne = stations[0] === station;
 
-  const sortedRecords = [...records].sort((recordA, recordB) => {
+  const sortedRecords = [...sessionRecords].sort((recordA, recordB) => {
     // secondary sorting
     if (recordA.nextStationIndex === recordB.nextStationIndex) return recordA.lastModified <= recordB.lastModified ? 1 : -1;
     // Puts our station next as first ones in the list

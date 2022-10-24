@@ -4,6 +4,8 @@ const CONNECTED = 'CONNECTED';
 const DISCONNECTED = 'DISCONNECTED';
 const JOIN_STATION = 'JOIN_STATION';
 const LEAVE_STATION = 'LEAVE_STATION';
+const RECORD_CREATED = 'RECORD_CREATED';
+const RECORD_UPDATED = 'RECORD_UPDATED';
 
 const LOG_TYPES = {
     GENERAL,
@@ -11,6 +13,8 @@ const LOG_TYPES = {
     DISCONNECTED,
     JOIN_STATION,
     LEAVE_STATION,
+    RECORD_CREATED,
+    RECORD_UPDATED,
 }
 
 export const USER_LOG_COLORS = {
@@ -19,6 +23,8 @@ export const USER_LOG_COLORS = {
     [LOG_TYPES.DISCONNECTED]: 'text-red-500',
     [LOG_TYPES.JOIN_STATION]: 'text-purple-500',
     [LOG_TYPES.LEAVE_STATION]: 'text-purple-400',
+    [LOG_TYPES.RECORD_CREATED]: 'text-green-600',
+    [LOG_TYPES.RECORD_UPDATED]: 'text-orange-600',
 }
 
 export default LOG_TYPES;

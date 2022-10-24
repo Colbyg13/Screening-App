@@ -76,6 +76,17 @@ export default function SessionProvider({ children }) {
                 // console.log('Connected to server');
                 addSessionLog('You are connected to the session');
 
+                socket.on('record-created', createdRecord => {
+                    addSessionLog(`record created with id: ${createdRecord.id}, name: ${createdRecord.name}, dob: ${createdRecord.dob}`, LOG_TYPES.RECORD_CREATED);
+                    setSessionRecords((records = []) => [...records, createdRecord]);
+                });
+                socket.on('record-updated', updatedRecord => {
+                    addSessionLog(`updated record id: ${updatedRecord.id}`, LOG_TYPES.RECORD_UPDATED);
+                    setSessionRecords(records => {
+                        const oldRecord = records.find(({ id }) => id === updatedRecord.id);
+                        return replace(records, records.indexOf(oldRecord), updatedRecord);
+                    });
+                });
                 socket.on('join-station', data => {
                     // console.log('join-station', data);
                     addSessionLog(`User ${data.username} joined station ${data.stationId}`, LOG_TYPES.JOIN_STATION);
@@ -83,7 +94,7 @@ export default function SessionProvider({ children }) {
                         ...user,
                         stationId: data.stationId,
                     } : user));
-                })
+                });
                 socket.on('leave-station', data => {
                     console.log('leave-station', data);
                     addSessionLog(`User ${data.username} left their station`, LOG_TYPES.LEAVE_STATION);
@@ -91,30 +102,32 @@ export default function SessionProvider({ children }) {
                         ...user,
                         stationId: undefined,
                     } : user));
-                })
+                });
                 socket.on('user-connected', newUser => {
                     addSessionLog(`User ${newUser.username} connected to server`, LOG_TYPES.CONNECTED);
                     console.log('user-connected', newUser);
                     setConnectedUsers(users => [...users, newUser])
-                })
+                });
                 socket.on('user-disconnect', user => {
                     addSessionLog(`User ${user.username} disconnected server`, LOG_TYPES.DISCONNECTED);
                     console.log('user-disconnect', user);
                     setConnectedUsers(users => users.filter(({ username }) => user.username !== username))
-                })
+                });
                 socket.on('users', data => {
                     console.log('users', data);
                     setConnectedUsers(data);
-                })
+                });
             });
 
             socket.on('disconnect', () => {
                 console.log('Disconnected from server');
-                socket.off('join-station')
-                socket.off('leave-station')
-                socket.off('user-connected')
-                socket.off('user-disconnect')
-                socket.off('users')
+                socket.off('join-station');
+                socket.off('leave-station');
+                socket.off('user-connected');
+                socket.off('user-disconnect');
+                socket.off('users');
+                socket.off('record-created');
+                socket.off('record-updated');
             });
 
             socket.connect();
@@ -122,10 +135,12 @@ export default function SessionProvider({ children }) {
             return () => {
                 socket.off('connect');
                 socket.off('disconnect');
-                socket.off('join-station')
-                socket.off('leave-station')
-                socket.off('user-connected')
-                socket.off('users')
+                socket.off('join-station');
+                socket.off('leave-station');
+                socket.off('user-connected');
+                socket.off('users');
+                socket.off('record-created');
+                socket.off('record-updated');
             };
         }
     }, [sessionIsRunning])
@@ -202,7 +217,7 @@ export default function SessionProvider({ children }) {
         }));
     }
 
-    async function getSessionList() {
+    const getSessionList = async () => {
         try {
             const response = await window.api.getSessionList();
             return response;
@@ -211,13 +226,15 @@ export default function SessionProvider({ children }) {
         }
     }
 
-    async function startSession(sessionId) {
+    const startSession = async (sessionId) => {
         try {
             const response = await window.api.startSession({
                 ...sessionInfo,
                 id: sessionId,
             });
-            setSessionInfo(response);
+            console.log({ response })
+            setSessionInfo(response.sessionInfo);
+            setSessionRecords(response.sessionRecords);
             setSessionIsRunning(window.api.getIsSessionRunning());
         } catch (err) {
             console.error(err)
@@ -225,7 +242,7 @@ export default function SessionProvider({ children }) {
         }
     }
 
-    function stopSession() {
+    const stopSession = () => {
         window.api.stopSession();
         setSessionIsRunning(window.api.getIsSessionRunning());
         setSessionLogs([]);
