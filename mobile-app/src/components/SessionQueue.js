@@ -15,7 +15,7 @@ const SessionQueue = (props) => {
 
   const sortedRecords = [...sessionRecords].sort((recordA, recordB) => {
     // secondary sorting
-    if (recordA.nextStationIndex === recordB.nextStationIndex) return recordA.lastModified <= recordB.lastModified ? 1 : -1;
+    if (recordA.nextStationIndex === recordB.nextStationIndex) return recordA.lastModified <= recordB.lastModified ? -1 : 1;
     // Puts our station next as first ones in the list
     if (recordA.nextStationIndex === stationIndex) return -1;
     if (recordB.nextStationIndex === stationIndex) return 1;

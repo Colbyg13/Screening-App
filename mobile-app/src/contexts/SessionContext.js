@@ -1,8 +1,9 @@
 import axios from "axios";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { io } from "socket.io-client";
 import PatientRecord from "../classes/patient-record";
 import findServer from "../utils/find-server";
+import replace from "../utils/replace";
 
 export const SERVER_PORT = 3333;
 export const MAX_TRIES = 5;
@@ -35,9 +36,12 @@ export default function SessionProvider({ children }) {
     // SESSION
     const [loading, setLoading] = useState(false);
     const [sessionInfo, setSessionInfo] = useState();
-    const [sessionRecords, setSessionRecords] = useState();
+    const [sessionRecords, setSessionRecords] = useState([]);
+    const patientRecords = useMemo(() => sessionRecords.map(record => new PatientRecord(record, sessionInfo.stations)), [sessionRecords, sessionInfo])
     const [selectedStationId, setSelectedStationId] = useState();
     const selectedStation = sessionInfo?.stations?.find(({ id }) => id === selectedStationId);
+
+
 
     useEffect(() => {
         console.log('Finding Server');
@@ -51,15 +55,13 @@ export default function SessionProvider({ children }) {
             socket.on('connect', () => {
                 console.log('Connected to server');
                 socket.on('record-created', createdRecord => {
-                    console.log({createdRecord});
-                    setSessionRecords(records => [...records, new PatientRecord(createdRecord, sessionInfo.stations)]);
+                    setSessionRecords(records => [...records, createdRecord]);
                 });
                 socket.on('record-updated', updatedRecord => {
-                    console.log({updatedRecord});
                     setSessionRecords(records => {
                         const oldRecord = records.find(({ id }) => id === updatedRecord.id);
                         return oldRecord ?
-                            replace(records, records.indexOf(oldRecord), new PatientRecord(updatedRecord, sessionInfo.stations))
+                            replace(records, records.indexOf(oldRecord), updatedRecord)
                             :
                             records;
                     });
@@ -83,7 +85,7 @@ export default function SessionProvider({ children }) {
                 socket.off('record-updated');
             };
         }
-    }, [socket, sessionInfo]);
+    }, [socket]);
 
     async function tryFindingServer() {
         // const serverIp = 'http://10.75.169.155:3333';
@@ -180,7 +182,7 @@ export default function SessionProvider({ children }) {
                 isConnected,
                 loading,
                 sessionInfo,
-                sessionRecords,
+                sessionRecords: patientRecords,
                 selectedStation,
                 serverLoading,
                 tryFindingServer,
