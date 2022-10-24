@@ -261,7 +261,7 @@ const styles = StyleSheet.create({
     marginTop: 30,
     margin: 10,
     fontSize: 34,
-    alignSelf: 'start',
+    alignSelf: 'flex-start',
   },
   fieldInput: {
     width: 200,

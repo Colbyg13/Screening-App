@@ -239,7 +239,7 @@ const styles = StyleSheet.create({
     margin: 16,
     marginTop: 20,
     fontSize: 34,
-    alignSelf: 'start',
+    alignSelf: 'flex-start',
   },
   patientInfoWrapper: {
     backgroundColor: '#EDEDED',
