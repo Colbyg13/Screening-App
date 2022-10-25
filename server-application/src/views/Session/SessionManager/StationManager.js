@@ -36,7 +36,7 @@ export default function StationManager() {
               addField={addField}
               updateField={updateField}
               deleteField={deleteField}
-              deleteStation={deleteStation}
+              deleteStation={sessionInfo.stations.length > 1 && deleteStation}
             />
           ))}
           <Button

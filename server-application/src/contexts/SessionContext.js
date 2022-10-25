@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import replace from "../utils/replace";
 import { io } from "socket.io-client";
 import LOG_TYPES from "../constants/log-types";
+import { ALL_REQUIRED_STATION_FIELDS, REQUIRED_STATION_FIELDS } from "../constants/required-station-fields";
 
 export const SERVER_PORT = 3333;
 
@@ -230,11 +231,33 @@ export default function SessionProvider({ children }) {
         try {
             const response = await window.api.startSession({
                 ...sessionInfo,
+                stations: sessionInfo.stations.map((station, i) => ({
+                    ...station,
+                    fields: i ?
+                        station.fields
+                        :
+                        [
+                            ...ALL_REQUIRED_STATION_FIELDS,
+                            ...station.fields,
+                        ]
+                })),
                 id: sessionId,
             });
             console.log({ response })
-            setSessionInfo(response.sessionInfo);
-            setSessionRecords(response.sessionRecords);
+            const {
+                sessionRecords: newSessionRecords,
+                sessionInfo: newSessionInfo,
+            } = response;
+
+            // filtering out required fields
+            setSessionInfo({
+                ...newSessionInfo,
+                stations: newSessionInfo.stations.map(station => ({
+                    ...station,
+                    fields: station.fields.filter(f => !REQUIRED_STATION_FIELDS[f.name])
+                })),
+            });
+            setSessionRecords(newSessionRecords);
             setSessionIsRunning(window.api.getIsSessionRunning());
         } catch (err) {
             console.error(err)

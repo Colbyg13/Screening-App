@@ -21,8 +21,10 @@ export default function StationInfoList() {
                     fields: generalFields,
                 }}
             />
-            {stations.map(station => (
+            {stations.map((station, i) => (
                 <StationInfo
+                    key={i}
+                    stationIndex={i}
                     station={station}
                     users={connectedUsersByStation[station.id]}
                 />

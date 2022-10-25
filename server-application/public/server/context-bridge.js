@@ -30,6 +30,8 @@ module.exports = APP => {
         }) => new Promise((resolve, rej) => {
             if (APP.sessionIsRunning) rej('Session already started');
 
+            console.log({ stations, generalFields, sessionId })
+
             APP.sessionIsRunning = true;
 
             if (sessionId) APP.db.collection("sessions")
@@ -55,13 +57,14 @@ module.exports = APP => {
                         });
 
                     }));
-
             else APP.db.collection("sessions")
                 .insertOne({
                     generalFields,
                     stations,
                     createdAt: new Date(),
                 }).then(result => {
+
+                    console.log({ result });
 
                     APP.sessionInfo = {
                         _id: result.insertedId,

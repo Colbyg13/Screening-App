@@ -10,7 +10,9 @@ export default function SessionManager() {
     const [openSessionModal, setOpenSessionModal] = useState(false);
 
     return (
-        <>
+        <form
+            onSubmit={() => startSession()}
+        >
             <SessionSelectionModal
                 open={openSessionModal}
                 onClose={() => setOpenSessionModal(false)}
@@ -31,12 +33,11 @@ export default function SessionManager() {
                     size="large"
                     color="success"
                     variant="contained"
-                    onClick={() => startSession()}
                 >
                     Start Session
                 </Button>
             </div>
             <div className="absolute bottom-2 left-4 text-sm">IPv4: {window.api.getIP()}</div>
-        </>
+        </form>
     )
 }
