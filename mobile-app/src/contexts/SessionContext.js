@@ -39,7 +39,7 @@ export default function SessionProvider({ children }) {
     const [sessionRecords, setSessionRecords] = useState([]);
     const patientRecords = useMemo(() => sessionRecords.map(record => new PatientRecord(record, sessionInfo.stations)), [sessionRecords, sessionInfo])
     const [selectedStationId, setSelectedStationId] = useState();
-    const selectedStation = sessionInfo?.stations?.find(({ name }) => name === selectedStationId);
+    const selectedStation = sessionInfo?.stations?.find(({ id }) => id === selectedStationId);
 
 
 
@@ -142,10 +142,10 @@ export default function SessionProvider({ children }) {
         }
     }
 
-    async function joinStation(stationName) {
-        console.log('join station', stationName);
-        setSelectedStationId(stationName);
-        socket.emit('connect-to-station', { stationName });
+    async function joinStation(stationId) {
+        console.log('join station', stationId);
+        setSelectedStationId(stationId);
+        socket.emit('connect-to-station', { stationId });
     }
 
     async function leaveStation() {
