@@ -1,9 +1,13 @@
-import React from 'react'
-import { View, SafeAreaView } from 'react-native'
+import React from 'react';
+import { SafeAreaView, Text } from 'react-native';
 const IpadOfflineMode = ({ route, navigation }) => {
   return (
-    <SafeAreaView>IpadOfflineMode</SafeAreaView>
-  )
-}
+    <SafeAreaView>
+      <Text>What data are you collecting?</Text>
+    </SafeAreaView>
+  );
+};
 
-export default IpadOfflineMode
+export default IpadOfflineMode;
+
+//set up async storage for fields

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, SafeAreaView } from 'react-native';
 import { Stack, Button } from '@react-native-material/core';
 import { useSessionContext } from '../contexts/SessionContext';
 
