@@ -60,7 +60,13 @@ module.exports = APP => {
         }) => new Promise((resolve, rej) => {
             if (APP.sessionIsRunning) rej('Session already started');
 
-            console.log({ stations, generalFields, sessionId })
+            const normalizedGeneralFields = normalizeFields(generalFields);
+            const normalizedStations = stations.map((station, i) => ({
+                id: i + 1,
+                ...station,
+                fields: normalizeFields(station.fields),
+            }));
+            console.log({ normalizedStations, normalizedGeneralFields, sessionId })
 
             APP.sessionIsRunning = true;
 
@@ -89,18 +95,15 @@ module.exports = APP => {
                     }));
             else APP.db.collection("sessions")
                 .insertOne({
-                    generalFields,
-                    stations,
+                    generalFields: normalizedGeneralFields,
+                    stations: normalizedStations,
                     createdAt: new Date(),
                 }).then(result => {
 
                     APP.sessionInfo = {
                         _id: result.insertedId,
-                        generalFields: normalizeFields(generalFields),
-                        stations: stations.map((station, i) => ({
-                            ...station,
-                            fields: normalizeFields(station.fields),
-                        })),
+                        generalFields: normalizedGeneralFields,
+                        stations: normalizedStations,
                     };
 
                     APP.sessionRecords = [];
