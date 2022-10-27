@@ -3,8 +3,6 @@ import StationsList from '../components/StationsList';
 import { useSessionContext } from '../contexts/SessionContext';
 import { useIsFocused } from '@react-navigation/native';
 const StationSelectionScreen = ({ route, navigation }) => {
-  // const sessions = route.params.sessionData;
-  // console.log("Session Info: ", sessions);
 
   const isFocused = useIsFocused();
   const { selectedStation, leaveStation } = useSessionContext();
@@ -16,7 +14,6 @@ const StationSelectionScreen = ({ route, navigation }) => {
 
   return (
     <>
-      {/* <StationsList data={sessions}>StationSelectionScreen</StationsList> */}
       <StationsList>StationSelectionScreen</StationsList>
     </>
   );
