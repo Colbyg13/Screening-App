@@ -6,6 +6,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import StationSelectionScreen from './src/screens/StationSelectionScreen';
 import QueueScreen from './src/screens/QueueScreen';
 import AddToOnlineQueue from './src/screens/AddToOnlineQueue';
+import IpadOfflineMode from './src/screens/IpadOfflineMode'
 import ServerStatus from './src/components/ServerStatus';
 import UpdateRecordScreen from './src/screens/UpdateRecordScreen';
 const Stack = createNativeStackNavigator();
@@ -47,11 +48,6 @@ export default function App() {
           component={IpadOfflineMode}
           options={{ title: 'Offline Collection' }}
           />
-          {/* <Stack.Screen
-          name="Ipad Offline Queue"
-          component={IpadOfflineMode}
-          options={{ title: 'Offline Queue' }}
-          /> */}
         </Stack.Navigator>
       </NavigationContainer>
     </SessionProvider>
