@@ -11,16 +11,25 @@ module.exports = APP => {
         sessionRecords: APP.sessionRecords,
     }));
 
+    // CUSTOM DATA TYPES
+    APP.get('/api/v1/custom-data-types', (req, res) => console.log('hit custom data type') ||  APP.db.collection("customDataTypes")
+        .find().toArray((err, customDataTypes) => {
+            if (err) {
+                console.error(err);
+                res.status(400).send("Error finding patient records");
+            }
+            res.status(200).json(customDataTypes);
+        }));
+
     // PATIENT RECORDS
-    APP.get('/api/v1/patients', (req, res) => {
-        APP.db.collection("patients").find().toArray((err, patients) => {
+    APP.get('/api/v1/patients', (req, res) => APP.db.collection("patients")
+        .find().toArray((err, patients) => {
             if (err) {
                 console.error(err);
                 res.status(400).send("Error finding patient records");
             }
             res.status(200).json({ patients });
-        });
-    })
+        }))
 
     APP.post('/api/v1/patients/create', (req, res) => {
         if (APP.sessionIsRunning) {

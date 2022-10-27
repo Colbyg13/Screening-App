@@ -88,12 +88,12 @@ export default function SessionProvider({ children }) {
     }, [socket]);
 
     async function tryFindingServer() {
-        // const serverIp = 'http://10.75.169.155:3333';
+        const serverIp = 'http://10.75.170.196:3333';
         if (!isConnected) {
             setServerLoading(true);
 
             try {
-                const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
+                // const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
                 if (serverIp) {
                     console.log(`Server found on: ${serverIp}`);
                     const socket = io(serverIp);
@@ -180,6 +180,7 @@ export default function SessionProvider({ children }) {
         <SessionContext.Provider
             value={{
                 isConnected,
+                serverIp,
                 loading,
                 sessionInfo,
                 sessionRecords: patientRecords,
