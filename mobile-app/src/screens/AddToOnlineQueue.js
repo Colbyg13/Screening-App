@@ -84,7 +84,7 @@ const AddToOnlineQueue = ({ route }) => {
       let showname = `show${field.key}`;
       return (
         <View key={field.name} style={styles.row}>
-          <Text style={styles.fieldName}>{field.name}:</Text>
+          <Text style={styles.fieldName}>{field.name}: {formState[field.key]}</Text>
           <Button
             color={'#C7E1FF'}
             title={`Select ${field.name}`}
@@ -167,7 +167,7 @@ const AddToOnlineQueue = ({ route }) => {
           <Text style={styles.fieldName}>{field.name}:</Text>
           <View>
             <Switch
-              ios_backgroundColor={'#FF3131'}
+              ios_backgroundColor={'grey'}
               onValueChange={() => {
                 const oldState = formState[field.key];
                 setFormState((prevState) => ({

@@ -94,8 +94,11 @@ const UpdateRecordScreen = ({ route }) => {
       console.log(showname);
       return (
         <View key={field.name} style={styles.row}>
-          <Text style={styles.fieldName}>{field.name}:</Text>
+          <Text style={styles.fieldName}>
+            {field.name}: {formState[field.key]}
+          </Text>
           <Button
+            color={'#C7E1FF'}
             title={`Select ${field.name}`}
             onPress={() => {
               setDateStates((prevState) => ({
@@ -108,7 +111,7 @@ const UpdateRecordScreen = ({ route }) => {
             isVisible={dateStates[showname]}
             mode='date'
             display='spinner'
-            themeVariant='light'
+            themeVariant='light' //important do not remove
             onConfirm={(newDate) => {
               console.log('heyo', newDate);
               setFormState((prevState) => ({
@@ -178,7 +181,7 @@ const UpdateRecordScreen = ({ route }) => {
           <Text style={styles.fieldName}>{field.name}:</Text>
           <View>
             <Switch
-              ios_backgroundColor={'#FF3131'}
+              ios_backgroundColor={'grey'}
               onValueChange={() => {
                 const oldState = formState[field.key];
                 setFormState((prevState) => ({
@@ -302,7 +305,7 @@ const styles = StyleSheet.create({
   },
   fieldName: {
     alignSelf: 'flex-start',
-    marginBottom: 10,
+    marginBottom: 5,
     fontSize: 22,
   },
   fieldInput: {
