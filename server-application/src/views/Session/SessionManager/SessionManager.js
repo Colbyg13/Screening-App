@@ -11,7 +11,10 @@ export default function SessionManager() {
 
     return (
         <form
-            onSubmit={() => startSession()}
+            onSubmit={e => {
+                e.preventDefault();
+                startSession();
+            }}
         >
             <SessionSelectionModal
                 open={openSessionModal}
