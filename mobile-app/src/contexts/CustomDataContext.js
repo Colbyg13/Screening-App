@@ -15,6 +15,7 @@ export default function CustomDataTypesProvider({ children }) {
 
     const { serverIp } = useSessionContext()
 
+    // TODO: update initial value to get async storage value first (prob needs useEffect because async)
     const [customDataTypes, setCustomDataTypes] = useState([]);
     const [loading, setLoading] = useState(false);
 
