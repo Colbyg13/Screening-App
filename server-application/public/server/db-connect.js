@@ -17,7 +17,6 @@ module.exports = async APP => {
         const result = await lastRecord.countDocuments();
         console.log("RESULT", result, typeof (result));
         if (result === 0) lastRecord.insertOne({ latestID: 1 });
-
     } catch (err) {
         console.error(err)
     }

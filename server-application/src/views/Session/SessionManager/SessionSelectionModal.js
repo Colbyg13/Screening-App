@@ -60,14 +60,14 @@ export default function SessionSelectionModal({
                 <div className='w-full space-y-2'>
                     {sessionList.map(({ _id, createdAt, generalFields }, i) => (
                         <div
+                            key={_id}
                             className='relative w-full p-3 border rounded-lg cursor-pointer hover:bg-gray-100'
-                            key={i}
                             onClick={() => startSession(_id)}
                         >
                             <div>Session: {createdAt.toLocaleString()}</div>
                             <div className='flex'>
                                 {generalFields.map(({ name, value }) => (
-                                    <Chip label={`${name}: ${value}`} variant="outlined" />
+                                    <Chip key={name} label={`${name}: ${value}`} variant="outlined" />
                                 ))}
                             </div>
                         </div>

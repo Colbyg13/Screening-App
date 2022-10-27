@@ -7,7 +7,7 @@ export default function StationInfoList() {
     const {
         sessionInfo: {
             generalFields,
-            stations,
+            stations = [],
         },
         connectedUsersByStation,
     } = useSessionContext();
@@ -21,8 +21,10 @@ export default function StationInfoList() {
                     fields: generalFields,
                 }}
             />
-            {stations.map(station => (
+            {stations.map((station, i) => (
                 <StationInfo
+                    key={i}
+                    stationIndex={i}
                     station={station}
                     users={connectedUsersByStation[station.id]}
                 />

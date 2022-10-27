@@ -4,7 +4,7 @@ import { Pressable } from '@react-native-material/core';
 
 
 const StationsListItem = (props) => {
-  station = props.item;
+  const station = props.item;
   // console.log(typeof(station));
   // console.log(station);
   return (
@@ -51,7 +51,7 @@ const styles = StyleSheet.create({
     flex: 3,
   },
   label: {
-    textAlign: 'start',
+    // textAlign: 'start', // This is breaking on Android 
     fontSize: 65,
     fontWeight: '600',
     flex: 1,

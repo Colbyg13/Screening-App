@@ -1,4 +1,3 @@
-const { ObjectId } = require("mongodb");
 
 module.exports = APP => {
 
@@ -7,21 +6,30 @@ module.exports = APP => {
         res.json({ name: 'Test Computer' });
     });
 
-    APP.get('/api/v1/sessions/current', (req, res) => {
-        console.log({ sessionInfo: APP.sessionInfo })
-        res.json(APP.sessionInfo);
-    })
+    APP.get('/api/v1/sessions/current', (req, res) => res.json({
+        sessionInfo: APP.sessionInfo,
+        sessionRecords: APP.sessionRecords,
+    }));
+
+    // CUSTOM DATA TYPES
+    APP.get('/api/v1/custom-data-types', (req, res) => console.log('hit custom data type') ||  APP.db.collection("customDataTypes")
+        .find().toArray((err, customDataTypes) => {
+            if (err) {
+                console.error(err);
+                res.status(400).send("Error finding patient records");
+            }
+            res.status(200).json(customDataTypes);
+        }));
 
     // PATIENT RECORDS
-    APP.get('/api/v1/patients', (req, res) => {
-        APP.db.collection("patients").find().toArray((err, patients) => {
+    APP.get('/api/v1/patients', (req, res) => APP.db.collection("patients")
+        .find().toArray((err, patients) => {
             if (err) {
                 console.error(err);
                 res.status(400).send("Error finding patient records");
             }
             res.status(200).json({ patients });
-        });
-    })
+        }))
 
     APP.post('/api/v1/patients/create', (req, res) => {
         if (APP.sessionIsRunning) {
@@ -52,15 +60,16 @@ module.exports = APP => {
                         .then(result => {
 
                             console.log({ result })
-                            // update local state
-                            APP.sessionInfo = {
-                                ...APP.sessionInfo,
-                                records: [...APP.sessionInfo.records, { _id: result.insertedId, ...newUser }]
-                            }
 
-                            APP.io.sockets.emit('session-info-update', APP.sessionInfo);
+                            const newUserWithId = {
+                                _id: result.insertedId,
+                                ...newUser,
+                            };
 
-                            // io.sockets.emit('session-info-update', sessionInfo);
+                            console.log('Emitting record-created', newUserWithId);
+                            APP.io.sockets.emit('record-created', newUserWithId);
+
+                            APP.sessionRecords = [...APP.sessionRecords, newUserWithId];
 
                             res.json({ newId: latestID });
                         })
@@ -85,27 +94,11 @@ module.exports = APP => {
             .then(({ value: updatedRecord }) => {
 
                 if (APP.sessionIsRunning) {
-
-                    const oldRecord = APP.sessionInfo.records.find(({ id }) => id === updatedRecord.id);
-
-                    if (oldRecord) {
-                        APP.sessionInfo = {
-                            ...APP.sessionInfo,
-                            records: replace(
-                                APP.sessionInfo.records,
-                                APP.sessionInfo.records.indexOf(oldRecord),
-                                updatedRecord,
-                            ),
-                        }
-                    } else {
-                        APP.sessionInfo = {
-                            ...APP.sessionInfo,
-                            records: [...APP.sessionInfo.records, updatedRecord],
-                        }
-                    }
-
-                    APP.io.sockets.emit('session-info-update', APP.sessionInfo);
+                    const oldRecord = APP.sessionRecords.find(({ id }) => id === record.id);
+                    if (oldRecord) APP.sessionRecords = replace(APP.sessionRecords, APP.sessionRecords.indexOf(oldRecord), updatedRecord);
+                    APP.io.sockets.emit('record-updated', updatedRecord);
                 }
+
                 res.json({ record: updatedRecord });
             })
             .catch(err => {
@@ -114,7 +107,7 @@ module.exports = APP => {
             });
     });
 
-    console.log('-- completed seeing up routes --');
+    console.log('-- completed setting up routes --');
 
     return APP;
 };

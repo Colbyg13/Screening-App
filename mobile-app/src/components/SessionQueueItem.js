@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   fieldsView: {
-    alignItems: 'start',
+    alignItems: 'flex-start',
   },
   fieldsitem: {
     fontSize: 22,
