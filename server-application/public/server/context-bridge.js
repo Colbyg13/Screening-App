@@ -23,6 +23,36 @@ module.exports = APP => {
                 _id: session._id.toString(),
             })));
         })),
+        getCustomDataTypes: () => new Promise((resolve, reject) => APP.db.collection("customDataTypes").find().toArray((err, customDataTypes) => {
+            if (err) {
+                console.error(err);
+                reject("Error finding patient records");
+            }
+
+            resolve(customDataTypes.map(dataType => ({
+                ...dataType,
+                _id: dataType._id.toString(),
+            })));
+        })),
+        saveCustomDataTypes: ({
+            customDataTypes,
+            dataTypeIdsToDelete,
+        }) => APP.db.collection("customDataTypes").bulkWrite([
+            ...customDataTypes.map(({ _id = new ObjectId().toString(), ...dataType }) => ({
+                updateOne: {
+                    filter: { _id: new ObjectId(_id) },
+                    upsert: true,
+                    update: {
+                        $set: dataType,
+                    }
+                }
+            })),
+            ...dataTypeIdsToDelete.map(_id => ({
+                deleteOne: {
+                    filter: { _id: new ObjectId(_id) },
+                }
+            }))
+        ]),
         startSession: async ({
             id: sessionId,
             generalFields,
@@ -63,8 +93,6 @@ module.exports = APP => {
                     stations,
                     createdAt: new Date(),
                 }).then(result => {
-
-                    console.log({ result });
 
                     APP.sessionInfo = {
                         _id: result.insertedId,

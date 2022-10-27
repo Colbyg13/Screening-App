@@ -3,7 +3,6 @@ import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import { Button, IconButton, MenuItem, TextField } from '@mui/material';
 import convert from 'convert-units';
 import React from 'react';
-import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 
 export const CUSTOM_DATA_TYPE = 'Custom';
 
@@ -20,17 +19,15 @@ const allUnits = [
     ...convert().list(),
 ]
 
-export default function UserDefinedFields() {
-
-    const {
-        customDataTypes,
-        addCustomDataType,
-        updateCustomDataType,
-        deleteCustomDataType,
-        addCustomDataTypeValue,
-        updateCustomDataTypeValue,
-        deleteCustomDataTypeValue,
-    } = useCustomDataTypesContext();
+export default function UserDefinedFields({
+    customDataTypes,
+    addCustomDataType,
+    updateCustomDataType,
+    deleteCustomDataType,
+    addCustomDataTypeValue,
+    updateCustomDataTypeValue,
+    deleteCustomDataTypeValue,
+}) {
 
     return (
         <div className='pt-8 pb-16'>
@@ -50,8 +47,10 @@ export default function UserDefinedFields() {
                             </IconButton>
                         </div>
                         <TextField
+                            required
                             key={dataTypeIndex}
                             className='w-52'
+                            label="Type"
                             size='small'
                             value={type}
                             onChange={e => updateCustomDataType({ type: e.target.value }, dataTypeIndex)}
@@ -60,7 +59,7 @@ export default function UserDefinedFields() {
                             required
                             className='w-52'
                             select
-                            label="Type"
+                            label="Unit"
                             size='small'
                             value={unit}
                             onChange={({ target: { value: newUnit } }) => (newUnit !== unit) && updateCustomDataType(
@@ -86,6 +85,8 @@ export default function UserDefinedFields() {
                                 {values.map((dataTypeValue, valueIndex) => (
                                     <div key={valueIndex} className='flex'>
                                         <TextField
+                                            required
+                                            label="Value"
                                             key={valueIndex}
                                             className='w-52'
                                             size='small'

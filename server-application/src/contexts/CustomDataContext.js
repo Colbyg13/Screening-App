@@ -1,66 +1,43 @@
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import replace from "../utils/replace";
 
 const CustomDataTypesContext = createContext({
+    loading: false,
     customDataTypes: [],
     customDataTypeMap: {},
-    addCustomDataType: () => { },
-    updateCustomDataType: () => { },
-    deleteCustomDataType: () => { },
-    addCustomDataTypeValue: () => { },
-    updateCustomDataTypeValue: () => { },
-    deleteCustomDataTypeValue: () => { },
+    fetchData: () => { },
 });
 
 export const useCustomDataTypesContext = () => useContext(CustomDataTypesContext);
 
-const customDataTypesStorageKey = 'customDataTypes';
-
-const baseDataType = {
-    type: '',
-    unit: '',
-}
-
 export default function CustomDataTypesProvider({ children }) {
 
-    const [customDataTypes, setCustomDataTypes] = useState(JSON.parse(localStorage.getItem(customDataTypesStorageKey)) || []);
+    const [customDataTypes, setCustomDataTypes] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const customDataTypeMap = useMemo(() => customDataTypes.reduce((all, { type, unit }) => ({
         ...all,
         [type]: unit,
-    }), {}), [customDataTypes])
+    }), {}), [customDataTypes]);
 
-    const addCustomDataType = () => setCustomDataTypes(dataTypes => [...dataTypes, baseDataType]);
-    const updateCustomDataType = (update, index) => setCustomDataTypes(dataTypes => replace(dataTypes, index, { ...dataTypes[index], ...update }));
-    const deleteCustomDataType = index => setCustomDataTypes(dataTypes => dataTypes.filter((_, i) => i !== index));
-    const addCustomDataTypeValue = dataTypeIndex => setCustomDataTypes(dataTypes => replace(dataTypes, dataTypeIndex, {
-        ...dataTypes[dataTypeIndex],
-        values: [...dataTypes[dataTypeIndex].values, ''],
-    }));
-    const updateCustomDataTypeValue = (update, dataTypeIndex, valueIndex) => setCustomDataTypes(dataTypes => replace(dataTypes, dataTypeIndex, {
-        ...dataTypes[dataTypeIndex],
-        values: replace(dataTypes[dataTypeIndex].values, valueIndex, update),
-    }));
-    const deleteCustomDataTypeValue = (dataTypeIndex, valueIndex) => setCustomDataTypes(dataTypes => replace(dataTypes, dataTypeIndex, {
-        ...dataTypes[dataTypeIndex],
-        values: dataTypes[dataTypeIndex].values.filter((_, i) => i !== valueIndex),
-    }));
+    const fetchData = () => {
+        setLoading(true);
+        window.api.getCustomDataTypes().then(customDataTypes => {
+            setCustomDataTypes(customDataTypes);
+            setLoading(false);
+        });
+    }
 
     useEffect(() => {
-        localStorage.setItem(customDataTypesStorageKey, JSON.stringify(customDataTypes));
-    }, [customDataTypes]);
+        fetchData()
+    }, []);
 
     return (
         <CustomDataTypesContext.Provider
             value={{
+                loading,
                 customDataTypes,
                 customDataTypeMap,
-                addCustomDataType,
-                updateCustomDataType,
-                deleteCustomDataType,
-                addCustomDataTypeValue,
-                updateCustomDataTypeValue,
-                deleteCustomDataTypeValue,
+                fetchData,
             }}
         >
             {children}
