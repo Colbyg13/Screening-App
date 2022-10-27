@@ -31,7 +31,7 @@ const StationsList = (props) => {
   }
   createLabels();
   const handlePress = (item) => {
-    joinStation(item.name);
+    joinStation(item.id);
     console.log('you pressed me', item);
     navigation.navigate('Current Session Queue');
   }
