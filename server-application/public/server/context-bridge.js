@@ -12,28 +12,46 @@ module.exports = APP => {
         // SERVER FUNCTIONS
         getIP: ip.address,
         getIsSessionRunning: () => APP.sessionIsRunning,
-        getSessionList: () => new Promise((resolve, reject) => APP.db.collection("sessions").find().toArray((err, sessions) => {
-            if (err) {
-                console.error(err);
-                reject("Error finding patient records");
-            }
+        getRecords: (sort = {}, skip = 0) => new Promise((resolve, reject) => APP.db.collection("patients")
+            .find().sort(sort).limit(100).skip(skip).toArray((err, patients) => {
+                if (err) {
+                    console.error(err);
+                    reject("Error finding patient records");
+                }
+                resolve(patients);
+            })),
+        getFields: () => new Promise((resolve, reject) => APP.db.collection("fields")
+            .find().toArray((err, fields) => {
+                if (err) {
+                    console.error(err);
+                    reject("Error finding patient records");
+                }
+                resolve(fields);
+            })),
+        getSessionList: () => new Promise((resolve, reject) => APP.db.collection("sessions")
+            .find().toArray((err, sessions) => {
+                if (err) {
+                    console.error(err);
+                    reject("Error finding sessions");
+                }
 
-            resolve(sessions.map(session => ({
-                ...session,
-                _id: session._id.toString(),
-            })));
-        })),
-        getCustomDataTypes: () => new Promise((resolve, reject) => APP.db.collection("customDataTypes").find().toArray((err, customDataTypes) => {
-            if (err) {
-                console.error(err);
-                reject("Error finding patient records");
-            }
+                resolve(sessions.map(session => ({
+                    ...session,
+                    _id: session._id.toString(),
+                })));
+            })),
+        getCustomDataTypes: () => new Promise((resolve, reject) => APP.db.collection("customDataTypes")
+            .find().toArray((err, customDataTypes) => {
+                if (err) {
+                    console.error(err);
+                    reject("Error finding custom data types");
+                }
 
-            resolve(customDataTypes.map(dataType => ({
-                ...dataType,
-                _id: dataType._id.toString(),
-            })));
-        })),
+                resolve(customDataTypes.map(dataType => ({
+                    ...dataType,
+                    _id: dataType._id.toString(),
+                })));
+            })),
         saveCustomDataTypes: ({
             customDataTypes,
             dataTypeIdsToDelete,
@@ -107,6 +125,27 @@ module.exports = APP => {
 
                     APP.sessionRecords = [];
                     APP.sessionIsRunning = true;
+                }).then(() => {
+
+                    // keep track of all the fields for our records view
+                    const allFields = [
+                        ...normalizedGeneralFields,
+                        ...normalizedStations.reduce((all, { fields = [] }) => [
+                            ...all,
+                            ...fields,
+                        ], []),
+                    ]
+                    console.log({allFields})
+
+                    APP.db.collection("fields").bulkWrite(allFields.map(field => ({
+                        updateOne: {
+                            filter: { key: field.key },
+                            upsert: true,
+                            update: {
+                                $set: field,
+                            }
+                        }
+                    })));
 
                     resolve({
                         sessionInfo: APP.sessionInfo,

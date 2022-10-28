@@ -254,7 +254,7 @@ export default function SessionProvider({ children }) {
                 ...newSessionInfo,
                 stations: newSessionInfo.stations.map(station => ({
                     ...station,
-                    fields: station.fields.filter(f => !REQUIRED_STATION_FIELDS[f.name])
+                    fields: station.fields.filter(f => !REQUIRED_STATION_FIELDS[f.key])
                 })),
             });
             setSessionRecords(newSessionRecords);

@@ -29,7 +29,7 @@ module.exports = APP => {
                 res.status(400).send("Error finding patient records");
             }
             res.status(200).json({ patients });
-        }))
+        }));
 
     APP.post('/api/v1/patients/create', (req, res) => {
         if (APP.sessionIsRunning) {
