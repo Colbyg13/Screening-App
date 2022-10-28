@@ -68,8 +68,6 @@ module.exports = APP => {
             }));
             console.log({ normalizedStations, normalizedGeneralFields, sessionId })
 
-            APP.sessionIsRunning = true;
-
             if (sessionId) APP.db.collection("sessions")
                 .findOne({ _id: ObjectId(sessionId) })
                 .then(sessionInfo => {
@@ -86,6 +84,7 @@ module.exports = APP => {
                         }
 
                         APP.sessionRecords = sessionRecords;
+                        APP.sessionIsRunning = true;
 
                         resolve({
                             sessionInfo: APP.sessionInfo,
@@ -107,6 +106,7 @@ module.exports = APP => {
                     };
 
                     APP.sessionRecords = [];
+                    APP.sessionIsRunning = true;
 
                     resolve({
                         sessionInfo: APP.sessionInfo,
