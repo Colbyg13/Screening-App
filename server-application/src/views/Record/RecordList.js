@@ -9,7 +9,8 @@ export default function RecordList({
         <tbody className=''>
             {records.map((record, i) => (
                 <RecordItem
-                index={i}
+                    key={record.id}
+                    index={i}
                     record={record}
                     allFieldKeys={allFieldKeys}
                 />

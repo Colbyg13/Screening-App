@@ -11,7 +11,16 @@ export default function RecordItem({
     return (
         <tr className={even ? 'bg-gray-300' : ''}>
             {allFieldKeys.map(key => (
-                <td className='px-2'>{record[key] instanceof Date ? record[key].toLocaleDateString() : record[key] || ''}</td>
+                <td key={key} className='px-4'>
+                    {record[key] instanceof Date ?
+                        record[key].toLocaleDateString()
+                        :
+                        typeof record[key] === 'boolean' ?
+                            !!record[key] ? 'Yes' : 'No'
+                            :
+                            record[key] || ''
+                    }
+                </td>
             ))}
             <td className='w-full' />
         </tr>

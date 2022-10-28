@@ -12,8 +12,8 @@ module.exports = APP => {
         // SERVER FUNCTIONS
         getIP: ip.address,
         getIsSessionRunning: () => APP.sessionIsRunning,
-        getRecords: (sort = {}, skip = 0) => new Promise((resolve, reject) => APP.db.collection("patients")
-            .find().sort(sort).limit(100).skip(skip).toArray((err, patients) => {
+        getRecords: (sort = {}, skip = 0, pageSize = 50) => new Promise((resolve, reject) => APP.db.collection("patients")
+            .find().sort(sort).limit(pageSize).skip(skip).toArray((err, patients) => {
                 if (err) {
                     console.error(err);
                     reject("Error finding patient records");

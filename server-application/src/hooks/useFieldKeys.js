@@ -1,5 +1,6 @@
 
 import { useEffect, useMemo, useState } from 'react';
+import { ALL_REQUIRED_STATION_FIELD_KEYS, REQUIRED_STATION_FIELDS } from '../constants/required-station-fields';
 
 const fieldKeysStorageKey = 'fieldKeys';
 
@@ -13,6 +14,12 @@ export default function useFieldKeys() {
         [field.key]: field,
     }), {}), [allFields]);
 
+    const sortedFieldKeys = useMemo(() => [
+        'id',
+        ...ALL_REQUIRED_STATION_FIELD_KEYS,
+        ...allFieldKeys.filter(key => !REQUIRED_STATION_FIELDS[key] && (key !== 'id')),
+    ], [allFieldKeys]);
+
     useEffect(() => {
         localStorage.setItem(fieldKeysStorageKey, JSON.stringify(allFields));
     }, [allFields]);
@@ -25,6 +32,7 @@ export default function useFieldKeys() {
 
 
     return {
+        sortedFieldKeys,
         allFields,
         allFieldKeys,
         fieldKeyMap,
