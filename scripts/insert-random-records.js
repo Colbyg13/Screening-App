@@ -5,7 +5,7 @@ const NUM_RECORDS_TO_INSERT = 100;
 
 function main() {
 
-    const url = 'http://10.75.167.148:3333/api/v1/patients/create';
+    const url = 'http://192.168.86.245:3333/api/v1/patients/create';
 
     Promise.all(Array(NUM_RECORDS_TO_INSERT).fill().map(() => axios.post(url, {
         name: faker.name.firstName(),
