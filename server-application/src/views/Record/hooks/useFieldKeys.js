@@ -1,6 +1,6 @@
 
 import { useEffect, useMemo, useState } from 'react';
-import { ALL_REQUIRED_STATION_FIELD_KEYS, REQUIRED_STATION_FIELDS } from '../constants/required-station-fields';
+import { ALL_REQUIRED_STATION_FIELD_KEYS, REQUIRED_STATION_FIELDS } from '../../../constants/required-station-fields';
 
 const fieldKeysStorageKey = 'fieldKeys';
 
@@ -21,10 +21,12 @@ export default function useFieldKeys() {
     ], [allFieldKeys]);
 
     useEffect(() => {
+        // updates the local storage when allFields are updated
         localStorage.setItem(fieldKeysStorageKey, JSON.stringify(allFields));
     }, [allFields]);
 
     useEffect(() => {
+        // gets the most up to date fields from DB
         window.api.getFields().then(fields => {
             if (fields) setAllFields(fields);
         });

@@ -43,6 +43,10 @@ module.exports = async APP => {
             }
         })));
 
+        // creates index for searching
+        APP.db.collection('patients').createIndex({ "$**": "text" },{ name: "TextIndex" });
+
+
     } catch (err) {
         console.error(err)
     }

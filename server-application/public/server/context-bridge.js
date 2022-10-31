@@ -12,8 +12,8 @@ module.exports = APP => {
         // SERVER FUNCTIONS
         getIP: ip.address,
         getIsSessionRunning: () => APP.sessionIsRunning,
-        getRecords: (sort = {}, skip = 0, pageSize = 50) => new Promise((resolve, reject) => APP.db.collection("patients")
-            .find().sort(sort).limit(pageSize).skip(skip).toArray((err, patients) => {
+        getRecords: (search = '', sort = {}, skip = 0, pageSize = 50) => new Promise((resolve, reject) => APP.db.collection("patients")
+            .find({}).sort(sort).limit(pageSize).skip(skip).toArray((err, patients) => {
                 if (err) {
                     console.error(err);
                     reject("Error finding patient records");
@@ -135,7 +135,7 @@ module.exports = APP => {
                             ...fields,
                         ], []),
                     ]
-                    console.log({allFields})
+                    console.log({ allFields })
 
                     APP.db.collection("fields").bulkWrite(allFields.map(field => ({
                         updateOne: {
