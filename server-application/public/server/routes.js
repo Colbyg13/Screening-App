@@ -12,7 +12,7 @@ module.exports = APP => {
     }));
 
     // CUSTOM DATA TYPES
-    APP.get('/api/v1/custom-data-types', (req, res) => console.log('hit custom data type') ||  APP.db.collection("customDataTypes")
+    APP.get('/api/v1/custom-data-types', (req, res) => APP.db.collection("customDataTypes")
         .find().toArray((err, customDataTypes) => {
             if (err) {
                 console.error(err);
@@ -59,14 +59,14 @@ module.exports = APP => {
                         .insertOne(newUser)
                         .then(result => {
 
-                            console.log({ result })
+                            // console.log({ result })
 
                             const newUserWithId = {
                                 _id: result.insertedId,
                                 ...newUser,
                             };
 
-                            console.log('Emitting record-created', newUserWithId);
+                            // console.log('Emitting record-created', newUserWithId);
                             APP.io.sockets.emit('record-created', newUserWithId);
 
                             APP.sessionRecords = [...APP.sessionRecords, newUserWithId];

@@ -12,14 +12,44 @@ module.exports = APP => {
         // SERVER FUNCTIONS
         getIP: ip.address,
         getIsSessionRunning: () => APP.sessionIsRunning,
-        getRecords: (search = '', sort = {}, skip = 0, pageSize = 50) => new Promise((resolve, reject) => APP.db.collection("patients")
-            .find({}).sort(sort).limit(pageSize).skip(skip).toArray((err, patients) => {
+        getRecords: (search = '', sort = {}, skip = 0, pageSize = 50, allFieldKeys = []) => new Promise((resolve, reject) => APP.db.collection("patients")
+            .find(search ? {
+                $or: allFieldKeys.map(key => ({
+                    $expr: {
+                        $regexMatch: {
+                            input: { "$toString": `$${key}` },
+                            regex: new RegExp(search, 'i'),
+                        }
+                    }
+                })),
+            } : {}).sort(sort).limit(pageSize).skip(skip).toArray((err, patients) => {
                 if (err) {
                     console.error(err);
                     reject("Error finding patient records");
                 }
                 resolve(patients);
             })),
+        updateRecord: record => new Promise((resolve, reject) => APP.db.collection("patients")
+            .findOneAndUpdate(
+                { id: record.id },
+                { $set: { lastModified: new Date(), ...record, eyes: undefined } },
+                { returnDocument: 'after' }
+            )
+            .then(({ value: updatedRecord }) => {
+
+                if (APP.sessionIsRunning) {
+                    const oldRecord = APP.sessionRecords.find(({ id }) => id === record.id);
+                    if (oldRecord) APP.sessionRecords = replace(APP.sessionRecords, APP.sessionRecords.indexOf(oldRecord), updatedRecord);
+                    APP.io.sockets.emit('record-updated', updatedRecord);
+                }
+
+                resolve({ record: updatedRecord });
+            })
+            .catch(err => {
+                console.error(err);
+                reject("Error updating patient record");
+            })
+        ),
         getFields: () => new Promise((resolve, reject) => APP.db.collection("fields")
             .find().toArray((err, fields) => {
                 if (err) {
@@ -84,7 +114,6 @@ module.exports = APP => {
                 ...station,
                 fields: normalizeFields(station.fields),
             }));
-            console.log({ normalizedStations, normalizedGeneralFields, sessionId })
 
             if (sessionId) APP.db.collection("sessions")
                 .findOne({ _id: ObjectId(sessionId) })
@@ -94,7 +123,6 @@ module.exports = APP => {
                 .then(() => APP.db.collection("patients")
                     .find({ sessionId: ObjectId(sessionId) })
                     .toArray((err, sessionRecords = []) => {
-                        console.log({ sessionRecords })
 
                         if (err) {
                             console.error(err);
@@ -135,7 +163,6 @@ module.exports = APP => {
                             ...fields,
                         ], []),
                     ]
-                    console.log({ allFields })
 
                     APP.db.collection("fields").bulkWrite(allFields.map(field => ({
                         updateOne: {
@@ -169,3 +196,17 @@ module.exports = APP => {
 
     return APP;
 }
+
+function replace(arr, i, val) {
+    if (
+        (parseInt(i) !== i)
+        ||
+        (i < 0)
+    ) {
+        console.error(arguments);
+        throw new TypeError(`replace() index must be a positive integer, received ${i}`);
+    }
+    const newArr = arr.slice();
+    newArr[i] = val;
+    return newArr;
+};

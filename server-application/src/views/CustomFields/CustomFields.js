@@ -36,7 +36,6 @@ export default function CustomFields() {
     const addCustomDataType = () => setCustomDataTypes(dataTypes => [...dataTypes, baseDataType]);
     const updateCustomDataType = (update, index) => setCustomDataTypes(dataTypes => replace(dataTypes, index, { ...dataTypes[index], ...update }));
     const deleteCustomDataType = index => {
-        console.log({ type: customDataTypes[index] })
         setDataTypeIdsToDelete(idsToDelete => [...idsToDelete, customDataTypes[index]._id].filter(Boolean));
         setCustomDataTypes(dataTypes => dataTypes.filter((_, i) => i !== index));
     };
