@@ -39,7 +39,7 @@ const SessionQueue = (props) => {
 
     console.log('you pressed me', item);
 
-    navigation.navigate('Update Record', { item });
+    navigation.navigate('Update Record', { item, isStationOne });
   };
   const handleAddToQueuePress = () => {
     navigation.navigate('Add To Queue', { station });

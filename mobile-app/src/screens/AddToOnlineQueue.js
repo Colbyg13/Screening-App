@@ -10,7 +10,13 @@ import {
 } from '@react-native-material/core';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, StatusBar, Switch } from 'react-native';
+import {   View,
+  StyleSheet,
+  StatusBar,
+  Keyboard,
+  Switch,
+  ScrollView,
+  SafeAreaView, } from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
@@ -78,7 +84,7 @@ const AddToOnlineQueue = ({ route }) => {
       let showname = `show${field.key}`;
       return (
         <View key={field.name} style={styles.row}>
-          <Text style={styles.fieldName}>{field.name}:</Text>
+          <Text style={styles.fieldName}>{field.name}: {formState[field.key]}</Text>
           <Button
             color={'#C7E1FF'}
             title={`Select ${field.name}`}
@@ -161,7 +167,7 @@ const AddToOnlineQueue = ({ route }) => {
           <Text style={styles.fieldName}>{field.name}:</Text>
           <View>
             <Switch
-              ios_backgroundColor={'#FF3131'}
+              ios_backgroundColor={'grey'}
               onValueChange={() => {
                 const oldState = formState[field.key];
                 setFormState((prevState) => ({
@@ -179,7 +185,8 @@ const AddToOnlineQueue = ({ route }) => {
   return (
     // must be wrapped in this to use dialog/modal
     <Provider>
-      <View style={styles.container}>
+      <SafeAreaView style={styles.container}>
+        <ScrollView style={styles.scrollView}>
         <Text style={styles.pageDirection}>Patient Information</Text>
         <View>
           {station.fields.map((field) => {
@@ -241,7 +248,8 @@ const AddToOnlineQueue = ({ route }) => {
             />
           </DialogActions>
         </Dialog>
-      </View>
+      </ScrollView>
+      </SafeAreaView>
     </Provider>
   );
 };

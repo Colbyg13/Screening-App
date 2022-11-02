@@ -143,7 +143,7 @@ export default function SessionProvider({ children }) {
     }
 
     async function joinStation(stationId) {
-        console.log('join station');
+        console.log('join station', stationId);
         setSelectedStationId(stationId);
         socket.emit('connect-to-station', { stationId });
     }
@@ -166,10 +166,11 @@ export default function SessionProvider({ children }) {
         console.log('Sending record...', recordPayload);
         const createRecord = !recordPayload.id;
         const createOrUpdate = createRecord ? 'create' : 'update';
+        console.log(createRecord, createOrUpdate)
         const url = `${serverIp}/api/v1/patients/${createOrUpdate}`;
         try {
             const result = await axios.post(url, recordPayload);
-            // console.log({ result });
+            console.log({ result });
             return result.data.newId;
         } catch (error) {
             console.error(error)
