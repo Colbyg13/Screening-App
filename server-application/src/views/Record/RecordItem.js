@@ -26,7 +26,10 @@ export default function RecordItem({
                             typeof record[key] === 'boolean' ?
                                 !!record[key] ? 'Yes' : 'No'
                                 :
-                                record[key] || ''}
+                                record[key] instanceof Date ?
+                                    record[key].toLocaleDateString()
+                                    :
+                                    record[key] || ''}
                     />
                 </td>
             ))}

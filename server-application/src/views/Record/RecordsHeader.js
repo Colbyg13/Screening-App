@@ -1,6 +1,7 @@
 import React from 'react'
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 
 export default function RecordsHeader({
     mainSortKey,
@@ -9,6 +10,8 @@ export default function RecordsHeader({
     sort = {},
     updateSortArray = () => { },
 }) {
+
+    const { customDataTypeMap } = useCustomDataTypesContext();
 
     return (
         <thead className='py-2 h-10 min-h-fit sticky top-0 bg-white shadow-lg'>
@@ -19,6 +22,7 @@ export default function RecordsHeader({
                     >
                         <div className='flex space-x-1'>
                             <span>{fieldKeyMap[key]?.name || key}</span>
+                            <span>{customDataTypeMap[fieldKeyMap[key]?.type] && customDataTypeMap[fieldKeyMap[key]?.type] !== 'Custom' ? `(${customDataTypeMap[fieldKeyMap[key].type]})` : ''}</span>
                             {sort[key] < 0 ? (
                                 <ArrowDropDownIcon size={12} />
                             ) : (

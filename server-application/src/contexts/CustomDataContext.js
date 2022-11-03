@@ -19,6 +19,11 @@ export default function CustomDataTypesProvider({ children }) {
         [type]: unit,
     }), {}), [customDataTypes]);
 
+    const fullCustomDataTypeMap = useMemo(() => customDataTypes.reduce((all, dataType) => ({
+        ...all,
+        [dataType.type]: dataType,
+    }), {}), [customDataTypes]);
+
     const fetchData = () => {
         setLoading(true);
         window.api.getCustomDataTypes().then(customDataTypes => {
@@ -37,6 +42,7 @@ export default function CustomDataTypesProvider({ children }) {
                 loading,
                 customDataTypes,
                 customDataTypeMap,
+                fullCustomDataTypeMap,
                 fetchData,
             }}
         >

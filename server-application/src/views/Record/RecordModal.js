@@ -1,6 +1,7 @@
 import { Box, Button, Modal, TextField, Typography } from '@mui/material';
-import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
+import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
+import RecordModalInputRow from './RecordModalInputRow';
 
 export default function RecordModal({
     record,
@@ -8,6 +9,7 @@ export default function RecordModal({
         id,
     } = {},
     allFieldKeys = [],
+    fieldKeyMap = {},
     onClose,
 }) {
 
@@ -15,7 +17,7 @@ export default function RecordModal({
 
     useEffect(() => {
         setUpdate({});
-    }, [record])
+    }, [record]);
 
     return (
         <Modal
@@ -46,19 +48,14 @@ export default function RecordModal({
                 <div className='w-full p-4 space-y-2'>
                     <div className='text-xl'>id: {id}</div>
                     {allFieldKeys.filter(key => key !== 'id').map(key => (
-                        <div key={key} className="flex" >
-                            <span className='w-40'>{_.startCase(key)}:</span>
-                            <TextField
-                                className='w-68'
-                                size='small'
-                                placeholder='Search'
-                                style={{
-                                    background: 'white',
-                                }}
-                                value={update[key] === undefined ? record?.[key] : update[key]}
-                                onChange={({ target: { value } }) => setUpdate(update => ({ ...update, [key]: value }))}
-                            />
-                        </div>
+                        <RecordModalInputRow
+                            key={key}
+                            fieldKey={key}
+                            fieldKeyMap={fieldKeyMap}
+                            update={update}
+                            record={record}
+                            onChange={newValue => setUpdate(update => ({ ...update, [key]: newValue }))}
+                        />
                     ))}
                 </div>
                 <div className='w-full flex justify-between'>
@@ -74,11 +71,11 @@ export default function RecordModal({
                         size="small"
                         color="success"
                         variant="contained"
-                        disabled={allFieldKeys.every(key => !update[key] || (record?.[key] === update[key]))}
+                        disabled={allFieldKeys.every(key => update[key] === undefined || (record?.[key] === update[key]))}
                         onClick={async () => {
                             const result = await window.api.updateRecord({ id, ...update });
-                            console.log({result, update})
-                            onClose({id, ...update});
+                            console.log({ result, update })
+                            onClose({ id, ...update });
                         }}
                     >
                         Save

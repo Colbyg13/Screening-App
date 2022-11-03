@@ -73,6 +73,7 @@ export default function Records() {
       <RecordModal
         record={selectedRecord}
         allFieldKeys={sortedFieldKeys}
+        fieldKeyMap={fieldKeyMap}
         onClose={handleOnClose}
       />
       <div className='w-full h-full overflow-hidden'>

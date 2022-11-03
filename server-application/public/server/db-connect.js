@@ -27,7 +27,7 @@ module.exports = async APP => {
             key: 'id',
         },{
             name: 'Created',
-            type: 'Date',
+            type: 'date',
             key: 'createdAt',
             // }, {
             //     name: 'Last Modified',
