@@ -15,19 +15,23 @@ import {
   StyleSheet,
   StatusBar,
   Keyboard,
-  Switch,
   ScrollView,
   SafeAreaView,
 } from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import BoolInput from '../components/Inputs/BoolInput';
+import CustomDataPicker from '../components/Inputs/CustomDataPicker';
+import DatePicker from '../components/Inputs/DatePicker';
 
 const UpdateRecordScreen = ({ route }) => {
   const navigation = useNavigation();
   const record = route.params.item;
-  const isStationOne = route.params.isStationOne;
-  console.log('update screen', isStationOne);
-  const { sendRecord, selectedStation: station } = useSessionContext();
+  const {
+    sendRecord,
+    selectedStation: station,
+    stations,
+  } = useSessionContext();
+  const isStationOne = station.id === 1;
   const [formState, setFormState] = useState({}); //used to keep track of inputs.
   const [dateStates, setDateStates] = useState({});
   const [fields, setFields] = useState([]);
@@ -43,7 +47,11 @@ const UpdateRecordScreen = ({ route }) => {
         let showname = `show${varName}`;
         setDateStates((prevState) => ({ ...prevState, [showname]: false }));
       }
-      setFormState((prevState) => ({ ...prevState, [varName]: '' }));
+      if (station.fields[i].type === 'bool') {
+        setFormState((prevState) => ({ ...prevState, [varName]: false }));
+      } else {
+        setFormState((prevState) => ({ ...prevState, [varName]: undefined }));
+      }
       newFields.push(varName);
     }
     setFields(newFields);
@@ -75,9 +83,43 @@ const UpdateRecordScreen = ({ route }) => {
     checkForStationInfo();
   }, [fields]);
 
+  const handleFormUpdate = (field, selectedItem) => {
+    console.log('handling update', field, selectedItem);
+    setFormState((prevState) => ({
+      ...prevState,
+      [field.key]: selectedItem, //year/month/day
+    }));
+  };
+
+  const handleDateUpdate = (field, showname, newDate) => {
+    console.log('handling date update', field, showname, newDate);
+    setFormState((prevState) => ({
+      ...prevState,
+      [field.key]: newDate.toLocaleDateString(), //year/month/day
+    }));
+    setDateStates((prevState) => ({
+      ...prevState,
+      [showname]: false, //should set dob or whatever date to the date text.
+    }));
+  };
+
+  const toggleDateShow = (field, showname) => {
+    let curState = dateStates[showname];
+    setDateStates((prevState) => ({
+      ...prevState,
+      [showname]: !curState,
+    }));
+  };
+
+  const updateBool = (field) => {
+    const oldState = formState[field.key];
+    setFormState((prevState) => ({
+      ...prevState,
+      [field.key]: !oldState,
+    }));
+  };
+
   const handleSubmit = async () => {
-    console.log('You pressed submit');
-    console.log('Current State: ', formState);
     //Some validation function
     //call function to handle SOCKET EVENT TO ADD NEW RECORD TO SESSION/QUEUE
     //On success open dialog with new ID, name, and DOB
@@ -87,52 +129,16 @@ const UpdateRecordScreen = ({ route }) => {
     setVisible(true);
   };
   const renderInput = (field) => {
-    console.log('input type', field.type);
-
+    console.log('rendering input', field);
     if (field.type === 'date') {
       let showname = `show${field.key}`;
-      console.log(showname);
       return (
-        <View key={field.name} style={styles.row}>
-          <Text style={styles.fieldName}>
-            {field.name}: {formState[field.key]}
-          </Text>
-          <Button
-            color={'#C7E1FF'}
-            title={`Select ${field.name}`}
-            onPress={() => {
-              setDateStates((prevState) => ({
-                ...prevState,
-                [showname]: true,
-              }));
-            }}
-          ></Button>
-          <DateTimePickerModal
-            isVisible={dateStates[showname]}
-            mode='date'
-            display='spinner'
-            themeVariant='light' //important do not remove
-            onConfirm={(newDate) => {
-              console.log('heyo', newDate);
-              setFormState((prevState) => ({
-                ...prevState,
-                [field.key]: newDate.toLocaleDateString(), //year/month/day
-              }));
-              setDateStates((prevState) => ({
-                ...prevState,
-                [showname]: false, //should set dob or whatever date to the date text.
-              }));
-            }}
-            onCancel={() => {
-              //should hide the date picker.
-              setDateStates((prevState) => ({
-                ...prevState,
-                [showname]: false, //should set dob or whatever date to the date text.
-              }));
-            }}
-            maximumDate={new Date(2100, 12, 30)}
-          ></DateTimePickerModal>
-        </View>
+        <DatePicker
+          updateForm={handleDateUpdate}
+          toggleShow={toggleDateShow}
+          visible={dateStates[showname]}
+          field={field}
+        />
       );
     } else if (field.type === 'string') {
       return (
@@ -141,7 +147,6 @@ const UpdateRecordScreen = ({ route }) => {
           <View>
             <TextInput
               onChangeText={(newText) => {
-                console.log(newText);
                 setFormState((prevState) => ({
                   ...prevState,
                   [field.key]: newText,
@@ -177,22 +182,19 @@ const UpdateRecordScreen = ({ route }) => {
       );
     } else if (field.type === 'bool') {
       return (
-        <View key={field.name} style={styles.row}>
-          <Text style={styles.fieldName}>{field.name}:</Text>
-          <View>
-            <Switch
-              ios_backgroundColor={'grey'}
-              onValueChange={() => {
-                const oldState = formState[field.key];
-                setFormState((prevState) => ({
-                  ...prevState,
-                  [field.key]: !oldState,
-                }));
-              }}
-              value={formState[field.key]}
-            ></Switch>
-          </View>
-        </View>
+        <BoolInput
+          value={formState[field.key]}
+          updateBool={updateBool}
+          field={field}
+        />
+      );
+    } else {
+      //custom picker
+      return (
+        <CustomDataPicker
+          updateForm={handleFormUpdate}
+          field={field}
+        ></CustomDataPicker>
       );
     }
   };
@@ -207,16 +209,32 @@ const UpdateRecordScreen = ({ route }) => {
               <Text style={styles.patientInfoItem}>ID: {record.id}</Text>
               <Text style={styles.patientInfoItem}>Name: {record.name}</Text>
               <Text style={styles.patientInfoItem}>DOB: {record.dob}</Text>
-              {hasStationInfo && (
+              {!isStationOne && (
                 <>
-                  {station.fields.map((field) => {
-                    console.log('hello', field, record[field]);
-                    return (
-                      <Text style={styles.patientInfoItem}>
-                        {field.name}: {record[field.key].toString()}
-                      </Text>
-                    );
-                  })}
+                  {hasStationInfo && (
+                    <>
+                      {station.fields.map((field) => {
+                        console.log('hello', field, record[field.key]);
+                        if (
+                          record[field.key] === undefined ||
+                          record[field.key] === null
+                        ) {
+                          console.log('NO DATA FOR THIS FIELD', field);
+                          return (
+                            <Text style={styles.patientInfoItem}>
+                              {field.name}:
+                            </Text>
+                          );
+                        } else {
+                          return (
+                            <Text style={styles.patientInfoItem}>
+                              {field.name}: {record[field.key].toString()}
+                            </Text>
+                          );
+                        }
+                      })}
+                    </>
+                  )}
                 </>
               )}
             </View>
