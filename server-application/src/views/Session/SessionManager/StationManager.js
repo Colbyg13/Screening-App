@@ -17,7 +17,7 @@ export default function StationManager() {
   return (
     <div className='h-screen flex flex-col p-8 items-center overflow-y-scroll'>
       <Paper>
-        <div className='w-fit bg-gray-50 space-y-4 p-16'>
+        <div className='w-fit bg-gray-50 space-y-4 py-8 px-16 rounded-lg'>
           <StationFields
             isGeneral
             station={{

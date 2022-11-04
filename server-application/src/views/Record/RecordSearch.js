@@ -14,13 +14,9 @@ export default function RecordSearch({
 
 
     return (
-        <TextField
-            className='w-1/2 min-w-fit'
-            size='small'
+        <input
+            className='h-10 w-1/2 px-2 min-w-fit bg-white rounded-full shadow-inner placeholder-gray-400 outline-green-300'
             placeholder='Search'
-            style={{
-                background: 'white',
-            }}
             value={searchInput}
             onChange={({ target: { value } }) => setSearchInput(value)}
         />

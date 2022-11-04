@@ -12,9 +12,10 @@ module.exports = APP => {
         // SERVER FUNCTIONS
         getIP: ip.address,
         getIsSessionRunning: () => APP.sessionIsRunning,
+        getRecordCount: () => APP.db.collection("patients").countDocuments(),
         getRecords: (search = '', sort = {}, skip = 0, pageSize = 50, allFieldKeys = []) => new Promise((resolve, reject) => APP.db.collection("patients")
             .find(search ? {
-                $or: allFieldKeys.map(key => ({
+                $or: ['id', 'name'].map(key => ({
                     $expr: {
                         $regexMatch: {
                             input: { "$toString": `$${key}` },
@@ -22,6 +23,15 @@ module.exports = APP => {
                         }
                     }
                 })),
+                // SEARCHES ALL KEYS
+                // $or: allFieldKeys.map(key => ({
+                //     $expr: {
+                //         $regexMatch: {
+                //             input: { "$toString": `$${key}` },
+                //             regex: new RegExp(search, 'i'),
+                //         }
+                //     }
+                // })),
             } : {}).sort(sort).limit(pageSize).skip(skip).toArray((err, patients) => {
                 if (err) {
                     console.error(err);

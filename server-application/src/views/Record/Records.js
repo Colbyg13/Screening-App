@@ -15,6 +15,7 @@ export default function Records() {
 
   const [loading, setLoading] = useState(false);
   const [records, setRecords] = useState([]);
+  const [totalRecordCount, setTotalRecordCount] = useState();
   const [skip, setSkip] = useState(0);
   const [reachedEndOfRecords, setReachedEndOfRecords] = useState(false);
   const { allFieldKeys, fieldKeyMap, sortedFieldKeys } = useFieldKeys();
@@ -22,6 +23,12 @@ export default function Records() {
   const { updateSortArray, mainSortKey, sort } = useFieldSort({ allFieldKeys, resetSkip });
   const [search, setSearch] = useState('');
   const [selectedRecord, setSelectedRecord] = useState();
+
+  useEffect(() => {
+    window.api.getRecordCount()
+      .then(count => setTotalRecordCount(count));
+  }, []);
+
 
   useEffect(() => {
     // used for getting our records from the database when sort or skip are updated
@@ -78,9 +85,12 @@ export default function Records() {
       />
       <div className='w-full h-full overflow-hidden'>
         <div className='pt-8 px-2 pb-2 bg-green-500 flex justify-between items-center'>
-          <h2 className='ml-2 font-bold text-2xl'>
-            All Records
-          </h2>
+          <span className='flex items-baseline space-x-2'>
+            <h2 className='ml-2 font-bold text-2xl'>
+              Records Page
+            </h2>
+            <span>{totalRecordCount ? `(${totalRecordCount.toLocaleString()} records)` : ''}</span>
+          </span>
           <RecordSearch
             updateSearch={updateSearch}
           />
