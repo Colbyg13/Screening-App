@@ -1,6 +1,9 @@
 const path = require('path');
 const { app, BrowserWindow } = require('electron');
 const isDev = require('electron-is-dev');
+const remoteMain = require('@electron/remote/main');
+
+remoteMain.initialize();
 
 function createWindow() {
     // Create the browser window.
@@ -25,6 +28,9 @@ function createWindow() {
             ? 'http://localhost:3000'
             : `file://${path.join(__dirname, '../build/index.html')}`
     );
+
+    remoteMain.enable(win.webContents);
+
     // Open the DevTools.
     if (isDev) {
         win.webContents.openDevTools({ mode: 'detach' });

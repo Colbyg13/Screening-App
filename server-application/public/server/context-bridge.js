@@ -1,7 +1,10 @@
 const { contextBridge } = require("electron");
+const { dialog } = require("@electron/remote");
 const ip = require('ip');
 const { ObjectId } = require("mongodb");
 const { normalizeFields } = require("./utils");
+const fs = require('fs');
+const downloadsFolder = require('downloads-folder');
 
 module.exports = APP => {
     contextBridge.exposeInMainWorld("api", {
@@ -11,10 +14,31 @@ module.exports = APP => {
         },
         // SERVER FUNCTIONS
         getIP: ip.address,
+        showMessage: ({title, message, type}) => dialog.showMessageBox(null, {title, message, type}),
+        showSaveDialog: () => {
+            const date = new Date();
+            const fileName = `records-${date.toLocaleDateString()}`.replace(/\//g, '-');
+            const baseOutputPath = `${downloadsFolder()}/${fileName}`;
+            let outputPath = `${baseOutputPath}.csv`;
+            let fileNumber = 1;
+
+            while (fs.existsSync(outputPath)) {
+                // Find a file name that isn't being used
+                outputPath = `${baseOutputPath}(${fileNumber++}).csv`;
+            }
+
+            return dialog.showSaveDialogSync(null, {
+                defaultPath: outputPath,
+                filters: [
+                    { name: 'Spread Sheet', extensions: ['csv', 'xlsx', 'ods'] },
+                ]
+            });
+        },
         getIsSessionRunning: () => APP.sessionIsRunning,
+        getRecordCount: () => APP.db.collection("patients").countDocuments(),
         getRecords: (search = '', sort = {}, skip = 0, pageSize = 50, allFieldKeys = []) => new Promise((resolve, reject) => APP.db.collection("patients")
             .find(search ? {
-                $or: allFieldKeys.map(key => ({
+                $or: ['id', 'name'].map(key => ({
                     $expr: {
                         $regexMatch: {
                             input: { "$toString": `$${key}` },
@@ -22,6 +46,15 @@ module.exports = APP => {
                         }
                     }
                 })),
+                // SEARCHES ALL KEYS
+                // $or: allFieldKeys.map(key => ({
+                //     $expr: {
+                //         $regexMatch: {
+                //             input: { "$toString": `$${key}` },
+                //             regex: new RegExp(search, 'i'),
+                //         }
+                //     }
+                // })),
             } : {}).sort(sort).limit(pageSize).skip(skip).toArray((err, patients) => {
                 if (err) {
                     console.error(err);
@@ -50,6 +83,42 @@ module.exports = APP => {
                 reject("Error updating patient record");
             })
         ),
+        downloadRecords: (initialOutputPath, allFieldKeys = []) => new Promise((resolve, reject) => {
+
+            const outputPath = initialOutputPath.match(/.csv$/) ?
+                initialOutputPath
+                :
+                `${initialOutputPath}.csv}`;
+
+            fs.mkdirSync(outputPath.replace(/^(.*(\/|\\)).*$/, '$1'), { recursive: true });
+
+            const writeStream = fs.createWriteStream(outputPath, { flags: 'w' });
+            const stream = APP.db.collection('patients').find().stream();
+
+            writeStream.write(`${allFieldKeys.map(key => key).join(',')}\n`);
+
+            stream.on('data', doc => {
+                writeStream.write(`${allFieldKeys.map(key => doc[key] || '').join(',')}\n`)
+            });
+            stream.on('end', () => {
+                console.log('record stream ended');
+                writeStream.end();
+            });
+            stream.on('error', err => {
+                console.error(err);
+                reject('An error occurred when trying to download the records.');
+            });
+
+            writeStream.on('close', () => {
+                console.log('Close');
+                resolve('Download Completed');
+            });
+
+            writeStream.on('error', function (err) {
+                console.log(err);
+                reject('An error occurred when trying to download the records.');
+            });
+        }),
         getFields: () => new Promise((resolve, reject) => APP.db.collection("fields")
             .find().toArray((err, fields) => {
                 if (err) {

@@ -61,7 +61,7 @@ export default function RecordModal({
                 <div className='w-full flex justify-between'>
                     <Button
                         size="small"
-                        color="secondary"
+                        color="inherit"
                         variant="contained"
                         onClick={onClose}
                     >

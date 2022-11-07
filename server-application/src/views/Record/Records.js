@@ -1,4 +1,4 @@
-import { CircularProgress } from '@mui/material';
+import { Button, CircularProgress } from '@mui/material';
 import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
 import replace from '../../utils/replace';
@@ -14,7 +14,9 @@ const recordPageSize = 100;
 export default function Records() {
 
   const [loading, setLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [records, setRecords] = useState([]);
+  const [totalRecordCount, setTotalRecordCount] = useState();
   const [skip, setSkip] = useState(0);
   const [reachedEndOfRecords, setReachedEndOfRecords] = useState(false);
   const { allFieldKeys, fieldKeyMap, sortedFieldKeys } = useFieldKeys();
@@ -22,6 +24,12 @@ export default function Records() {
   const { updateSortArray, mainSortKey, sort } = useFieldSort({ allFieldKeys, resetSkip });
   const [search, setSearch] = useState('');
   const [selectedRecord, setSelectedRecord] = useState();
+
+  useEffect(() => {
+    window.api.getRecordCount()
+      .then(count => setTotalRecordCount(count));
+  }, []);
+
 
   useEffect(() => {
     // used for getting our records from the database when sort or skip are updated
@@ -78,15 +86,45 @@ export default function Records() {
       />
       <div className='w-full h-full overflow-hidden'>
         <div className='pt-8 px-2 pb-2 bg-green-500 flex justify-between items-center'>
-          <h2 className='ml-2 font-bold text-2xl'>
-            All Records
-          </h2>
+          <span className='flex items-baseline space-x-2'>
+            <h2 className='ml-2 font-bold text-2xl'>
+              Records Page
+            </h2>
+            <span>{totalRecordCount ? `(${totalRecordCount.toLocaleString()} records)` : ''}</span>
+          </span>
           <RecordSearch
             updateSearch={updateSearch}
           />
-          <button className='px-4 py-1 bg-white hover:bg-gray-100 rounded-md font-bold'>
-            Export
-          </button>
+          <Button
+            size="small"
+            color="inherit"
+            variant="contained"
+            disabled={downloading}
+            type="button"
+            onClick={async () => {
+              const outputPath = window.api.showSaveDialog();
+              console.log({outputPath})
+              if (outputPath) {
+                setDownloading(true);
+                window.api.downloadRecords(outputPath, allFieldKeys)
+                  .then(() => {
+                    console.log('Download Complete');
+                    setDownloading(false);
+                    window.api.showMessage({title: 'Download Complete', message: 'Your download is complete.', type: 'info'})
+                  })
+                  .catch(err => {
+                    console.log({ err })
+                    setDownloading(false);
+                    window.api.showMessage({title: 'Download Failed', message: 'Your download has failed to complete. Please try again.', type: 'error'})
+                  })
+              }
+            }}
+          >
+            {downloading ? (
+              <CircularProgress size={24} />
+            ) : null}
+            <span>Export</span>
+          </Button>
         </div>
         {records.length ? (
           <div className='bg-white h-full pb-32 overflow-auto'

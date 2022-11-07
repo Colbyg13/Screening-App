@@ -4,8 +4,8 @@ import { ALL_SESSION_DATA_TYPES, SESSION_DATA_TYPE_LABELS } from '../../constant
 
 export default function BaseFields() {
     return (
-        <div className='flex flex-col items-center pt-8 pb-16'>
-            <h2 className='text-2xl mb-4'>Base Types</h2>
+        <div className='flex flex-col items-center'>
+            <h2 className='text-2xl'>Base Types</h2>
             <div className='flex flex-col space-y-2'>
                 {ALL_SESSION_DATA_TYPES.map(baseType => (
                     <TextField

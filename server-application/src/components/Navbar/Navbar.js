@@ -53,7 +53,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(true);
 
   return (
-    <div className="h-full min-w-fit shadow-lg border-r border-gray-600 flex flex-col justify-between">
+    <div className="relative h-full min-w-fit shadow-lg border-r border-gray-600 flex flex-col justify-between">
       <List>
         <NavbarItem
           open={open}
@@ -98,7 +98,7 @@ export default function Navbar() {
           onClick={() => navigate(ROUTES.Offline.path)}
         />
       </List>
-      <div>
+      <div className='mb-4'>
         <List>
           <NavbarItem
             open={open}
@@ -109,6 +109,9 @@ export default function Navbar() {
           />
         </List>
       </div>
+      {open ? (
+        <div className='absolute bottom-1 left-0 right-0 text-center text-sm'>IPv4: {window.api.getIP()}</div>
+      ) : null}
     </div>
   )
 }
