@@ -4,8 +4,7 @@ import { TextInput } from '@react-native-material/core';
 import { styles } from '../../style/styles';
 
 const StringInput = (props) => {
-  field = props.field;
-  console.log('field in textinput', field);
+  const field = props.field;
   return (
     <View key={field.name} style={styles.row}>
       <Text style={styles.fieldName}>{field.name}:</Text>

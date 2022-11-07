@@ -4,7 +4,6 @@ import { styles } from '../../style/styles';
 
 const BoolInput = (props) => {
   const field = props.field
-  console.log('field inside bool input', field);
   const [value, setValue] = useState(false)
   useEffect(() => {
     setValue(props.value)

@@ -52,10 +52,6 @@ const AddToOnlineQueue = ({ route }) => {
   }, []);
 
   useEffect(() => {
-    console.log('Fields after default state was called', fields);
-  }, [fields]);
-
-  useEffect(() => {
     //sets the default patient to have a null id, and the correct fields for the station.
     setPatient((prevState) => ({ ...prevState, data: formState, id: null }));
     console.log(formState);
@@ -74,15 +70,15 @@ const AddToOnlineQueue = ({ route }) => {
   };
 
   const handleFormUpdate = (field, selectedItem) => {
-    console.log('handling update', field, selectedItem);
+    //console.log('handling update', field, selectedItem);
     setFormState((prevState) => ({
       ...prevState,
-      [field.key]: selectedItem, //year/month/day
+      [field.key]: selectedItem,
     }));
   };
 
   const handleDateUpdate = (field, showname, newDate) => {
-    console.log('handling date update', field, showname, newDate);
+    //console.log('handling date update', field, showname, newDate);
     setFormState((prevState) => ({
       ...prevState,
       [field.key]: newDate.toLocaleDateString(), //year/month/day
@@ -110,7 +106,6 @@ const AddToOnlineQueue = ({ route }) => {
   };
 
   const renderInput = (field) => {
-    console.log('rendering input', field);
     if (field.type === 'date') {
       let showname = `show${field.key}`;
       return (

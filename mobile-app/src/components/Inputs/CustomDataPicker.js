@@ -6,7 +6,6 @@ import SelectDropdown from 'react-native-select-dropdown';
 import { styles } from '../../style/styles';
 const CustomDataPicker = (props) => {
   const field = props.field;
-  console.log('field in custom picker', field);
   const { customDataTypes } = useCustomDataTypesContext();
   let customData = customDataTypes.filter((item) => {
     return item.type == field.type;
