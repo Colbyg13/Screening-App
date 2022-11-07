@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react';
 import { ROUTES } from '../../components/Navbar/Navbar';
 import HomeLinkButton from './HomeLinkButton';
 
@@ -10,6 +10,7 @@ export default function HomePage() {
             <div className='flex space-x-4'>
                 {[ROUTES.Records, ROUTES.Session, ROUTES.CustomFields, ROUTES.Settings].map(({ title, path }) => (
                     <HomeLinkButton
+                        key={title}
                         title={title}
                         to={path}
                     />
