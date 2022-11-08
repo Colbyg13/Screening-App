@@ -30,7 +30,7 @@ export default function UserDefinedFields({
 }) {
 
     return (
-        <div className='pt-4 px-8 pb-20 bg-white rounded-md'>
+        <div className='py-4 px-8 bg-white rounded-md shadow-md'>
             <h2 className='text-2xl mb-4 border-b-2 border-gray-500'>User Defined Fields</h2>
             <div className='flex flex-col space-y-2'>
                 <div className='flex space-x-2'>

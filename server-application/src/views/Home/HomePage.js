@@ -5,7 +5,7 @@ import HomeLinkButton from './HomeLinkButton';
 export default function HomePage() {
 
     return (
-        <div className="w-full h-full p-8 flex flex-col space-y-8">
+        <div className="w-full h-full overflow-y-auto pb-16 p-8 flex flex-col space-y-8">
             <h1 className='text-4xl'>Samoa Screening App</h1>
             <div className='flex space-x-4'>
                 {[ROUTES.CustomFields, ROUTES.Session, ROUTES.Records, ROUTES.Settings].map(({ title, path }) => (
@@ -16,7 +16,7 @@ export default function HomePage() {
                     />
                 ))}
             </div>
-            <div className='bg-white w-full h-full overflow-y-auto p-4 pb-12 space-y-4'>
+            <div className='bg-white w-full h-full p-4 space-y-4 rounded-md shadow-md'>
                 <h2 className='text-xl font-semibold'>
                     Welcome to Samoa Screening App's Server Application!
                 </h2>

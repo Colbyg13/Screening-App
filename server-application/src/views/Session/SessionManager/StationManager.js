@@ -15,9 +15,9 @@ export default function StationManager() {
   } = useSessionContext();
 
   return (
-    <div className='h-screen flex flex-col p-8 items-center overflow-y-scroll'>
+    <div className='h-screen flex flex-col p-8 pb-16 items-center overflow-y-scroll'>
       <Paper>
-        <div className='w-fit bg-gray-50 space-y-4 py-8 px-16 rounded-lg'>
+        <div className='w-fit bg-gray-50 space-y-4 py-8 px-16 rounded-md'>
           <StationFields
             isGeneral
             station={{

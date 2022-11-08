@@ -55,7 +55,7 @@ export default function CustomFields() {
     usePrompt('You have unsaved changes. Are you sure you want to leave?', hasChanges)
 
     return (
-        <form className='flex h-screen px-8 pt-8 pb-16 overflow-auto'
+        <form className='flex w-full max-h-screen px-8 pt-8 pb-16 space-x-8 overflow-auto'
             onSubmit={async () => {
                 setLoading(true);
                 await window.api.saveCustomDataTypes({
@@ -66,7 +66,7 @@ export default function CustomFields() {
                 setLoading(false);
             }}
         >
-            <div className='flex-1'>
+            <div className="h-full">
                 <UserDefinedFields
                     customDataTypes={customDataTypes}
                     addCustomDataType={addCustomDataType}
@@ -77,9 +77,7 @@ export default function CustomFields() {
                     deleteCustomDataTypeValue={deleteCustomDataTypeValue}
                 />
             </div>
-            <div className='flex-1'>
-                <BaseFields />
-            </div>
+            <BaseFields />
             <div className='absolute bottom-4 right-8'>
                 <Button
                     type="submit"

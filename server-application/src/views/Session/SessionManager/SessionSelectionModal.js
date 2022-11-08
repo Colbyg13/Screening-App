@@ -61,7 +61,7 @@ export default function SessionSelectionModal({
                     {sessionList.map(({ _id, createdAt, generalFields }, i) => (
                         <div
                             key={_id}
-                            className='relative w-full p-3 border rounded-lg cursor-pointer hover:bg-gray-100'
+                            className='relative w-full p-3 border rounded-md cursor-pointer hover:bg-gray-100'
                             onClick={() => startSession(_id)}
                         >
                             <div>Session: {createdAt.toLocaleString()}</div>
