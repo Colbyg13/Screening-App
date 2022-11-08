@@ -53,7 +53,10 @@ export default function SessionProvider({ children }) {
 
     const [sessionInfo, setSessionInfo] = useState(JSON.parse(localStorage.getItem(sessionInfoStorageKey)) || initialSystemInfo);
     const [sessionLogs, setSessionLogs] = useState([]);
-    const addSessionLog = (log, type = LOG_TYPES.GENERAL) => setSessionLogs(logs => [...logs, { log, type }]);
+    const addSessionLog = (log, type = LOG_TYPES.GENERAL) => setSessionLogs(logs => [
+        ...logs.length > 500 ? logs.slice(1,) : logs,
+        { log, type }
+    ]);
     const [sessionRecords, setSessionRecords] = useState([]);
     const [connectedUsers, setConnectedUsers] = useState([]);
     const connectedUsersByStation = useMemo(() => connectedUsers.reduce((connectedUsersByStation, user) => ({

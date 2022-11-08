@@ -20,7 +20,7 @@ export default function RecordsHeader({
                     <th key={key} className={`px-4 py-3 text-start hover:bg-gray-100 cursor-pointer shadow-inner ${mainSortKey === key ? 'text-blue-500' : ''}`}
                         onClick={() => updateSortArray(key)}
                     >
-                        <div className='flex space-x-1'>
+                        <div className='flex space-x-1 items-center'>
                             <span>{fieldKeyMap[key]?.name || key}</span>
                             <span>{customDataTypeMap[fieldKeyMap[key]?.type] && customDataTypeMap[fieldKeyMap[key]?.type] !== 'Custom' ? `(${customDataTypeMap[fieldKeyMap[key].type]})` : ''}</span>
                             {sort[key] < 0 ? (

@@ -95,8 +95,10 @@ module.exports = APP => {
 
                 if (APP.sessionIsRunning) {
                     const oldRecord = APP.sessionRecords.find(({ id }) => id === record.id);
-                    if (oldRecord) APP.sessionRecords = replace(APP.sessionRecords, APP.sessionRecords.indexOf(oldRecord), updatedRecord);
-                    APP.io.sockets.emit('record-updated', updatedRecord);
+                    if (oldRecord) {
+                        APP.sessionRecords = replace(APP.sessionRecords, APP.sessionRecords.indexOf(oldRecord), updatedRecord);
+                        APP.io.sockets.emit('record-updated', updatedRecord);
+                    }
                 }
 
                 res.json({ record: updatedRecord });
