@@ -60,10 +60,10 @@ const UpdateRecordScreen = ({ route }) => {
   const checkForStationInfo = () => {
     fields.forEach((field) => {
       if (record.hasOwnProperty(field)) {
-        console.log('field', field, 'exists in record', record);
+        //console.log('field', field, 'exists in record', record);
         setHasStationInfo(true);
       } else {
-        console.log('field', field, 'does not exist');
+        //console.log('field', field, 'does not exist');
       }
     });
   };
@@ -75,16 +75,16 @@ const UpdateRecordScreen = ({ route }) => {
   }, []);
 
   useEffect(() => {
-    console.log('FORM STATE UPDATED', formState);
+    //console.log('FORM STATE UPDATED', formState);
   }, [formState]);
 
   useEffect(() => {
-    console.log('Fields after default state was called', fields);
+    //console.log('Fields after default state was called', fields);
     checkForStationInfo();
   }, [fields]);
 
   const handleFormUpdate = (field, selectedItem) => {
-    console.log('handling update', field, selectedItem);
+    //console.log('handling update', field, selectedItem);
     setFormState((prevState) => ({
       ...prevState,
       [field.key]: selectedItem, //year/month/day
@@ -92,7 +92,7 @@ const UpdateRecordScreen = ({ route }) => {
   };
 
   const handleDateUpdate = (field, showname, newDate) => {
-    console.log('handling date update', field, showname, newDate);
+    //console.log('handling date update', field, showname, newDate);
     setFormState((prevState) => ({
       ...prevState,
       [field.key]: newDate.toLocaleDateString(), //year/month/day
@@ -125,15 +125,14 @@ const UpdateRecordScreen = ({ route }) => {
     //On success open dialog with new ID, name, and DOB
     //On dialog close go back to session and update list of patients
     const result = await sendRecord(formState);
-    console.log('update result', result);
     setVisible(true);
   };
   const renderInput = (field) => {
-    console.log('rendering input', field);
     if (field.type === 'date') {
       let showname = `show${field.key}`;
       return (
         <DatePicker
+          key={field.name}
           updateForm={handleDateUpdate}
           toggleShow={toggleDateShow}
           visible={dateStates[showname]}
@@ -143,7 +142,7 @@ const UpdateRecordScreen = ({ route }) => {
     } else if (field.type === 'string') {
       return (
         <View key={field.name} style={styles.row}>
-          <Text style={styles.fieldName}>{field.name}:</Text>
+          <Text key={field.name} style={styles.fieldName}>{field.name}:</Text>
           <View>
             <TextInput
               onChangeText={(newText) => {

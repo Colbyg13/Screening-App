@@ -1,9 +1,10 @@
 import { useNavigation } from '@react-navigation/native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   FlatList, SafeAreaView, StatusBar, StyleSheet, Text
 } from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
+import { TextInput } from '@react-native-material/core';
 import AddToQueueBtn from './AddToQueueBtn';
 import SessionQueueItem from './SessionQueueItem';
 
@@ -12,7 +13,9 @@ const SessionQueue = (props) => {
   const { sessionInfo: { stations }, sessionRecords,  selectedStation: station } = useSessionContext();
   const stationIndex = stations.indexOf(station);
   const isStationOne = stations[0] === station;
-
+  const [isSearching, setIsSearching] = React.useState(false);
+  const [searchText, setSearchText] = React.useState('');
+  const [filteredRecords, setFilteredRecords] = useState([]);
   const sortedRecords = [...sessionRecords].sort((recordA, recordB) => {
     // secondary sorting
     if (recordA.nextStationIndex === recordB.nextStationIndex) return recordA.lastModified <= recordB.lastModified ? -1 : 1;
@@ -32,19 +35,47 @@ const SessionQueue = (props) => {
     // if (recordA.nextStationIndex < stationIndex) return 1;
     // return -1;
   });
-  // console.log({station, stations})
-  // const [isStationOne, setIsStationOne] = useState(props.station.isStationOne);
+  
+  useEffect(() => {
+    setFilteredRecords([]);
+    setSearchText('');
+    setIsSearching(false);
+  }, [sessionRecords]);
+  
   const navigation = useNavigation();
   const handlePress = (item) => {
-
-    console.log('you pressed me', item);
-
     navigation.navigate('Update Record', { item, isStationOne });
   };
   const handleAddToQueuePress = () => {
     navigation.navigate('Add To Queue', { station });
   }
 
+  const handleSearchInput = (text) => {
+    setSearchText(text);
+    setIsSearching(text.length > 0);
+  }
+
+  useEffect(() => {
+    searchForRecord();
+  }, [isSearching, searchText]);
+
+  const searchForRecord = () => {
+    if (isSearching) {
+      const foundRecord = sortedRecords.filter(record => record.name.toLowerCase().includes(searchText.toLowerCase()));
+      if(foundRecord.length > 0) {
+        console.log('foundRecord', foundRecord);
+        setFilteredRecords(foundRecord);
+      }
+      else {
+        console.log('no record found');
+        setFilteredRecords([]);
+      }
+    }
+    else {
+      console.log('not searching');
+      setFilteredRecords([]);
+    }
+  }
   //NEED SOCKET EVENT TO LISTEN FOR NEW DATA ADDED
   const renderQueueItem = ({ item }) => {
     return (
@@ -59,13 +90,23 @@ const SessionQueue = (props) => {
     <SafeAreaView style={styles.container}>
       <Text style={styles.stationTitle}>{station?.title}</Text>
       <Text style={styles.pageDirection}>Current Session</Text>
-      <Text style={styles.searchBar}>Search Bar will go here</Text>
-      <FlatList
-        data={sortedRecords}
+      <TextInput placeholder='Search by Name' style={styles.searchBar} value={searchText} onChangeText={handleSearchInput}></TextInput>
+      {!isSearching && (
+        <FlatList
+          data={sortedRecords}
+          keyExtractor={(item) => item.id}
+          renderItem={renderQueueItem}
+          style={styles.flatList}
+        />
+      )}
+      {isSearching && (
+        <FlatList
+        data={filteredRecords}
         keyExtractor={(item) => item.id}
         renderItem={renderQueueItem}
         style={styles.flatList}
       />
+      )}
       {isStationOne && (
         <AddToQueueBtn onPress={handleAddToQueuePress}></AddToQueueBtn>
       )}
@@ -90,7 +131,7 @@ const styles = StyleSheet.create({
 
   },
   pageDirection: {
-    margin: 20,
+    margin: 10,
     fontSize: 34,
     alignSelf: 'center',
   },
@@ -101,7 +142,9 @@ const styles = StyleSheet.create({
   },
   searchBar: {
     margin: 5,
-    fontSize: 20,
+    fontSize: 30,
+    width: 200,
+    padding: 1,
     alignSelf: 'center',
   }
 });

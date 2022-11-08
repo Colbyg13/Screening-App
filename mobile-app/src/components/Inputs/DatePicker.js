@@ -12,7 +12,6 @@ const DatePicker = (props) => {
   }, [props.visible]);
 
   let field = props.field;
-  console.log('field inside datePicker', field);
   let showname = `show${field.key}`;
   return (
     <View key={field.name} style={styles.row}>
