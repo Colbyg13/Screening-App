@@ -119,7 +119,7 @@ const AddToOnlineQueue = ({ route }) => {
       );
     } else if (field.type === 'string') {
       return (
-        <View key={field.name} style={styles.row}>
+        <View key={field.key} style={styles.row}>
           <Text style={styles.fieldName}>{field.name}:</Text>
           <View>
             <TextInput
@@ -137,7 +137,7 @@ const AddToOnlineQueue = ({ route }) => {
       );
     } else if (field.type === 'number') {
       return (
-        <View key={field.name} style={styles.row}>
+        <View key={field.key} style={styles.row}>
           <Text style={styles.fieldName}>{field.name}:</Text>
           <View>
             <TextInput
@@ -160,6 +160,7 @@ const AddToOnlineQueue = ({ route }) => {
     } else if (field.type === 'bool') {
       return (
         <BoolInput
+          key={field.key}
           value={formState[field.key]}
           updateBool={updateBool}
           field={field}
@@ -217,23 +218,27 @@ const AddToOnlineQueue = ({ route }) => {
             <DialogHeader title='Added to Queue Successully!' />
             <DialogContent>
               <Text>New ID: {patient.id}</Text>
-              {fields.map((field) => {
+              {fields.map((field, index) => {
                 if (
                   patient.data[field] === true ||
                   patient.data[field] === false
                 ) {
                   return (
-                    <Text key={field.key}>
-                      {station.fields.find(({ key }) => key === field)?.name}:{' '}
-                      {patient.data[field].toString()}
-                    </Text>
+                    <React.Fragment key={index}>
+                      <Text>
+                        {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                        {patient.data[field].toString()}
+                      </Text>
+                    </React.Fragment>
                   );
                 } else {
                   return (
-                    <Text key={field.key}>
-                      {station.fields.find(({ key }) => key === field)?.name}:{' '}
-                      {patient.data[field]}
-                    </Text>
+                    <React.Fragment key={index}>
+                      <Text key={field.name}>
+                        {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                        {patient.data[field]}
+                      </Text>
+                    </React.Fragment>
                   );
                 }
               })}
