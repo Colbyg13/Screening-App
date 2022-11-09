@@ -110,6 +110,7 @@ const AddToOnlineQueue = ({ route }) => {
       let showname = `show${field.key}`;
       return (
         <DatePicker
+          key={field.key}
           updateForm={handleDateUpdate}
           toggleShow={toggleDateShow}
           visible={dateStates[showname]}

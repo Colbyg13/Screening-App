@@ -131,18 +131,23 @@ const UpdateRecordScreen = ({ route }) => {
     if (field.type === 'date') {
       let showname = `show${field.key}`;
       return (
+        <React.Fragment key={field.key}>
         <DatePicker
-          key={field.name}
+          key={field.key}
           updateForm={handleDateUpdate}
           toggleShow={toggleDateShow}
           visible={dateStates[showname]}
           field={field}
         />
+        </React.Fragment>
       );
     } else if (field.type === 'string') {
       return (
-        <View key={field.name} style={styles.row}>
-          <Text key={field.name} style={styles.fieldName}>{field.name}:</Text>
+        <React.Fragment key={field.key}>
+        <View key={field.key} style={styles.row}>
+          <Text key={field.key} style={styles.fieldName}>
+            {field.name}:
+          </Text>
           <View>
             <TextInput
               onChangeText={(newText) => {
@@ -156,11 +161,13 @@ const UpdateRecordScreen = ({ route }) => {
             ></TextInput>
           </View>
         </View>
+        </React.Fragment>
       );
     } else if (field.type === 'number') {
       return (
-        <View key={field.name} style={styles.row}>
-          <Text style={styles.fieldName}>{field.name}:</Text>
+        <React.Fragment key={field.key}>
+        <View key={field.key} style={styles.row}>
+          <Text key={field.key} style={styles.fieldName}>{field.name}:</Text>
           <View>
             <TextInput
               keyboardType='number-pad'
@@ -178,22 +185,29 @@ const UpdateRecordScreen = ({ route }) => {
             ></TextInput>
           </View>
         </View>
+        </React.Fragment>
       );
     } else if (field.type === 'bool') {
       return (
+        <React.Fragment key={field.key}>
         <BoolInput
+          key={field.key}
           value={formState[field.key]}
           updateBool={updateBool}
           field={field}
         />
+        </React.Fragment>
       );
     } else {
       //custom picker
       return (
+        <React.Fragment key={field.key}>
         <CustomDataPicker
+          key={field.key}
           updateForm={handleFormUpdate}
           field={field}
         ></CustomDataPicker>
+        </React.Fragment>
       );
     }
   };
@@ -214,21 +228,26 @@ const UpdateRecordScreen = ({ route }) => {
                     <>
                       {station.fields.map((field) => {
                         console.log('hello', field, record[field.key]);
+                        console.log('field.key', field.key);
                         if (
                           record[field.key] === undefined ||
                           record[field.key] === null
                         ) {
                           console.log('NO DATA FOR THIS FIELD', field);
                           return (
-                            <Text style={styles.patientInfoItem}>
+                            <React.Fragment key={field.key}>
+                            <Text key={field.key} style={styles.patientInfoItem}>
                               {field.name}:
                             </Text>
+                            </React.Fragment>
                           );
                         } else {
                           return (
-                            <Text style={styles.patientInfoItem}>
+                            <React.Fragment key={field.key}>
+                            <Text key={field.key} style={styles.patientInfoItem}>
                               {field.name}: {record[field.key].toString()}
                             </Text>
+                            </React.Fragment>
                           );
                         }
                       })}
@@ -278,17 +297,21 @@ const UpdateRecordScreen = ({ route }) => {
               {fields.map((field) => {
                 if (formState[field] === true || formState[field] === false) {
                   return (
+                    <React.Fragment key={field.key}>
                     <Text key={field.key}>
                       {station.fields.find(({ key }) => key === field)?.name}:{' '}
                       {formState[field].toString()}
                     </Text>
+                    </React.Fragment>
                   );
                 } else {
                   return (
+                    <React.Fragment key={field.key}>
                     <Text key={field.key}>
                       {station.fields.find(({ key }) => key === field)?.name}:{' '}
                       {formState[field]}
                     </Text>
+                    </React.Fragment>
                   );
                 }
               })}

@@ -35,17 +35,17 @@ const CustomDataPicker = (props) => {
     );
   } else {
     let items = [];
-    console.log('custom data from DB', customData);
-    customData[0].values.forEach((element) => {
+    customData[0].values.forEach((element, index) => {
       let obj = {
         label: element,
         value: element,
+        key: index,
       };
       items.push(obj);
     });
 
     return (
-      <View key={field.name} style={styles.row}>
+      <View style={styles.row}>
         <Text style={styles.fieldName}>{field.name}:</Text>
         <View>
           <SelectDropdown
@@ -58,6 +58,9 @@ const CustomDataPicker = (props) => {
               // text represented for each item in dropdown
               // if data array is an array of objects then return item.property to represent item in dropdown
               return item;
+            }}
+            keyExtractor={(item, index) => {
+              return item.key
             }}
           />
         </View>

@@ -8,10 +8,10 @@ export default function SessionQueueItemStatus(props) {
     return (
         <View style={styles.statusWrapper}>
             {person.progress.map((status, i, {length}) => (
-                <>
+                <React.Fragment key={i}>
                     <View style={[styles.progressCircle, styles[status]]} />
                     {i !== length - 1 ? <View style={[styles.spacer, styles[status]]} /> : null}
-                </>
+                </React.Fragment>
             ))}
         </View>
     )
