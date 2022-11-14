@@ -177,8 +177,6 @@ const AddToOnlineQueue = ({ route }) => {
     }
   };
   return (
-    // must be wrapped in this to use dialog/modal
-    <Provider>
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView}>
           <Text style={styles.pageDirection}>Patient Information</Text>
@@ -257,7 +255,6 @@ const AddToOnlineQueue = ({ route }) => {
           </Dialog>
         </ScrollView>
       </SafeAreaView>
-    </Provider>
   );
 };
 

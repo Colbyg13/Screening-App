@@ -21,7 +21,7 @@ export default function SessionManager() {
                 onClose={() => setOpenSessionModal(false)}
             />
             <StationManager />
-            <div className='absolute bottom-4 right-8 flex space-x-4'>
+            <div className='absolute bottom-4 right-8 space-x-4 flex'>
                 <Button
                     type='button'
                     size="large"

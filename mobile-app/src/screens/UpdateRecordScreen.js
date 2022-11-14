@@ -211,7 +211,6 @@ const UpdateRecordScreen = ({ route }) => {
   };
 
   return (
-    <Provider>
       <SafeAreaView style={styles.container}>
         <ScrollView style={styles.scrollView}>
           <View style={styles.container}>
@@ -328,7 +327,6 @@ const UpdateRecordScreen = ({ route }) => {
           </Dialog>
         </ScrollView>
       </SafeAreaView>
-    </Provider>
   );
 };
 const styles = StyleSheet.create({

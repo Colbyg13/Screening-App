@@ -59,12 +59,15 @@ export default function Records() {
     setSelectedRecord(record);
   }
 
-  function handleOnClose(update) {
+  function handleOnClose() {
+    setSelectedRecord();
+  }
+
+  function handleModalSave(update) {
     if (update) setRecords(records => {
       const oldRecord = records.find(({ id }) => id === update.id);
-      return replace(records, records.indexOf(oldRecord), { ...oldRecord, ...update })
+      if (oldRecord) return replace(records, records.indexOf(oldRecord), { ...oldRecord, ...update })
     })
-    setSelectedRecord();
   }
 
   return (
@@ -74,6 +77,7 @@ export default function Records() {
         allFieldKeys={sortedFieldKeys}
         fieldKeyMap={fieldKeyMap}
         onClose={handleOnClose}
+        onSave={handleModalSave}
       />
       <div className='w-full h-full overflow-hidden'>
         <RecordTitleBar

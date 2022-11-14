@@ -1,3 +1,5 @@
+import { ActivityIndicator, Button, Dialog, DialogActions, DialogContent, DialogHeader, Text } from "@react-native-material/core";
+import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { io } from "socket.io-client";
@@ -27,6 +29,8 @@ export const useSessionContext = () => useContext(SessionContext);
 
 export default function SessionProvider({ children }) {
 
+    const navigation = useNavigation();
+
     // SERVER
     const [serverIp, setServerIp] = useState();
     const [socket, setSocket] = useState();
@@ -37,11 +41,13 @@ export default function SessionProvider({ children }) {
     const [loading, setLoading] = useState(false);
     const [sessionInfo, setSessionInfo] = useState();
     const [sessionRecords, setSessionRecords] = useState([]);
-    const patientRecords = useMemo(() => sessionRecords.map(record => new PatientRecord(record, sessionInfo.stations)), [sessionRecords, sessionInfo])
     const [selectedStationId, setSelectedStationId] = useState();
-    const selectedStation = sessionInfo?.stations?.find(({ id }) => id === selectedStationId);
 
+    const patientRecords = useMemo(() => sessionRecords.map(record => new PatientRecord(record, sessionInfo.stations)), [sessionRecords, sessionInfo])
+    const selectedStation = useMemo(() => sessionInfo?.stations?.find(({ id }) => id === selectedStationId), [sessionInfo, selectedStationId]);
 
+    // OTHER
+    const [modalMessage, setModalMessage] = useState('');
 
     useEffect(() => {
         console.log('Finding Server');
@@ -66,6 +72,16 @@ export default function SessionProvider({ children }) {
                             records;
                     });
                 });
+                socket.on('session-started', () => {
+                    console.log('session started');
+                    getSessionInfo();
+                    setModalMessage('');
+                })
+                socket.on('session-ended', () => {
+                    console.log('session ended');
+                    setModalMessage('The current session has ended.');
+                    setSessionRecords([]);
+                });
                 setIsConnected(true);
             });
 
@@ -74,6 +90,8 @@ export default function SessionProvider({ children }) {
                 socket.off('record-created');
                 socket.off('record-updated');
                 setIsConnected(false);
+                setModalMessage('You have disconnected from the server.');
+                console.log(navigation.getState());
             });
 
             socket.connect();
@@ -83,12 +101,14 @@ export default function SessionProvider({ children }) {
                 socket.off('disconnect');
                 socket.off('record-created');
                 socket.off('record-updated');
+                socket.off('session-started');
+                socket.off('session-ended');
             };
         }
     }, [socket]);
 
     async function tryFindingServer() {
-        // const serverIp = 'http://10.75.170.196:3333';
+        // const serverIp = 'http://10.75.180.154:3333';
         if (!isConnected) {
             setServerLoading(true);
 
@@ -111,7 +131,7 @@ export default function SessionProvider({ children }) {
     async function getSessionInfo() {
         setLoading(true);
         if (socket) {
-            console.log('Connecting to session');
+            console.log('Connecting to session...');
 
             try {
                 const url = `${serverIp}/api/v1/sessions/current`;
@@ -195,6 +215,29 @@ export default function SessionProvider({ children }) {
                 sendRecord,
             }}
         >
+            <Dialog
+                visible={!!modalMessage}
+                onDismiss={() => { }}
+            >
+                <DialogHeader title={modalMessage} />
+                <DialogContent>
+                    <ActivityIndicator />
+                    <Text>Waiting to reconnect</Text>
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        title='Go Home'
+                        compact
+                        variant='text'
+                        onPress={() => {
+                            setModalMessage('');
+                            while (navigation.canGoBack()) {
+                                navigation.goBack();
+                            }
+                        }}
+                    />
+                </DialogActions>
+            </Dialog>
             {children}
         </SessionContext.Provider>
     );
