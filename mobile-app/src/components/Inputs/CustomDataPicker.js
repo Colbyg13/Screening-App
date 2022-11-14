@@ -24,7 +24,7 @@ const CustomDataPicker = (props) => {
             returnKeyType='done'
             onSubmitEditing={Keyboard.dismiss}
             onChangeText={(newText) => {
-              console.log(newText);
+              // console.log(newText);
               props.updateForm(field, newText);
             }}
             style={styles.fieldInput}
@@ -51,7 +51,7 @@ const CustomDataPicker = (props) => {
           <SelectDropdown
             data={customData[0].values}
             onSelect={(selectedItem, index) => {
-              console.log(selectedItem, index);
+              // console.log(selectedItem, index);
               props.updateForm(field, selectedItem);
             }}
             rowTextForSelection={(item, index) => {

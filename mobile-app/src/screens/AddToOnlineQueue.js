@@ -54,7 +54,7 @@ const AddToOnlineQueue = ({ route }) => {
   useEffect(() => {
     //sets the default patient to have a null id, and the correct fields for the station.
     setPatient((prevState) => ({ ...prevState, data: formState, id: null }));
-    console.log(formState);
+    // console.log(formState);
   }, [formState]);
 
   const handleSubmit = async () => {
@@ -145,7 +145,7 @@ const AddToOnlineQueue = ({ route }) => {
               returnKeyType='done'
               onSubmitEditing={Keyboard.dismiss}
               onChangeText={(newText) => {
-                console.log(newText);
+                // console.log(newText);
                 setFormState((prevState) => ({
                   ...prevState,
                   [field.key]: newText,

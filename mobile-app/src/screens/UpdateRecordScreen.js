@@ -174,7 +174,7 @@ const UpdateRecordScreen = ({ route }) => {
               returnKeyType='done'
               onSubmitEditing={Keyboard.dismiss}
               onChangeText={(newText) => {
-                console.log(newText);
+                // console.log(newText);
                 setFormState((prevState) => ({
                   ...prevState,
                   [field.key]: newText,
@@ -224,8 +224,8 @@ const UpdateRecordScreen = ({ route }) => {
                   {hasStationInfo && (
                     <>
                       {station.fields.map((field, index) => {
-                        console.log('hello', field, record[field.key]);
-                        console.log('field.key', field.key);
+                        // console.log('hello', field, record[field.key]);
+                        // console.log('field.key', field.key);
                         if (
                           record[field.key] === undefined ||
                           record[field.key] === null
