@@ -170,6 +170,7 @@ const AddToOnlineQueue = ({ route }) => {
       //custom picker
       return (
         <CustomDataPicker
+          key={field.key}
           updateForm={handleFormUpdate}
           field={field}
         ></CustomDataPicker>
@@ -180,14 +181,14 @@ const AddToOnlineQueue = ({ route }) => {
     // must be wrapped in this to use dialog/modal
     <Provider>
       <SafeAreaView style={styles.container}>
-        <ScrollView style={styles.scrollView}>
+        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={true} persistentScrollbar={true}>
           <Text style={styles.pageDirection}>Patient Information</Text>
           <View>
             {station.fields.map((field) => {
               return renderInput(field);
             })}
           </View>
-
+        </ScrollView>
           <View style={styles.wrapper}>
             <Pressable
               style={styles.btnSubmit}
@@ -255,7 +256,6 @@ const AddToOnlineQueue = ({ route }) => {
               />
             </DialogActions>
           </Dialog>
-        </ScrollView>
       </SafeAreaView>
     </Provider>
   );
