@@ -29,26 +29,26 @@ const HomeScreen = ({ navigation }) => {
     >
       <Stack fill center spacing={20}>
         <Button
-          style={{ width: 250 }}
+          style={{ width: 350, padding: 20, margin: 20 }}
           title='Connect to Session'
           color='#EDEDED'
-          titleStyle={{ fontSize: 18, fontWeight: 'bold' }}
+          titleStyle={{ fontSize: 22, fontWeight: 'bold' }}
           loading={loading}
           loadingIndicatorPosition='trailing'
           onPress={handleOnPress}
         ></Button>
         <Button
-          style={{ width: 250 }}
+          style={{ width: 350, padding: 20, margin: 20 }}
           title='Offline Mode'
           color='#EDEDED'
-          titleStyle={{ fontSize: 18, fontWeight: 'bold' }}
+          titleStyle={{ fontSize: 22, fontWeight: 'bold' }}
           onPress={offlineMode}
         ></Button>
         <Button
-          style={{ width: 250 }}
+          style={{ width: 350, padding: 20, margin: 20 }}
           title='Sync Offline Records'
           color='#EDEDED'
-          titleStyle={{ fontSize: 18, fontWeight: 'bold' }}
+          titleStyle={{ fontSize: 22, fontWeight: 'bold' }}
         ></Button>
       </Stack>
     </SafeAreaView>

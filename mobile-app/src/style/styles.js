@@ -23,15 +23,16 @@ export const styles = StyleSheet.create({
     fontSize: 30,
   },
   row: {
-    marginLeft: 20,
-    marginTop: 20,
+    marginLeft: 10,
+    marginTop: 5,
     flexDirection: 'column',
     flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'flex-start',
   },
   wrapper: {
-    marginTop: 30,
+    marginTop: 20,
+    marginBottom: 20,
     flexDirection: 'row',
     justifyContent: 'flex-end',
   },
@@ -71,5 +72,8 @@ export const styles = StyleSheet.create({
     borderRadius: 4,
     color: 'red',
     paddingRight: 30, // to ensure the text is never behind the icon
-  }
+  },
+  scrollView: {
+    marginHorizontal: 10,
+  },
 });

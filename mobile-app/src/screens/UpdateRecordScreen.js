@@ -43,14 +43,21 @@ const UpdateRecordScreen = ({ route }) => {
     let newFields = [];
     for (let i = 0; i < numFields; i++) {
       const varName = station.fields[i].key;
-      if (station.fields[i].type === 'date') {
-        let showname = `show${varName}`;
-        setDateStates((prevState) => ({ ...prevState, [showname]: false }));
-      }
-      if (station.fields[i].type === 'bool') {
-        setFormState((prevState) => ({ ...prevState, [varName]: false }));
+      if (record.hasOwnProperty(varName)) {
+        setFormState((prevState) => ({
+          ...prevState,
+          [varName]: record[station.fields[i].key],
+        }));
       } else {
-        setFormState((prevState) => ({ ...prevState, [varName]: undefined }));
+        if (station.fields[i].type === 'date') {
+          let showname = `show${varName}`;
+          setDateStates((prevState) => ({ ...prevState, [showname]: false }));
+        }
+        if (station.fields[i].type === 'bool') {
+          setFormState((prevState) => ({ ...prevState, [varName]: false }));
+        } else {
+          setFormState((prevState) => ({ ...prevState, [varName]: undefined }));
+        }
       }
       newFields.push(varName);
     }
@@ -132,79 +139,78 @@ const UpdateRecordScreen = ({ route }) => {
       let showname = `show${field.key}`;
       return (
         <React.Fragment key={field.key}>
-        <DatePicker
-          
-          updateForm={handleDateUpdate}
-          toggleShow={toggleDateShow}
-          visible={dateStates[showname]}
-          field={field}
-        />
+          <DatePicker
+            updateForm={handleDateUpdate}
+            toggleShow={toggleDateShow}
+            visible={dateStates[showname]}
+            field={field}
+          />
         </React.Fragment>
       );
     } else if (field.type === 'string') {
       return (
         <React.Fragment key={field.key}>
-        <View  style={styles.row}>
-          <Text  style={styles.fieldName}>
-            {field.name}:
-          </Text>
-          <View>
-            <TextInput
-              onChangeText={(newText) => {
-                setFormState((prevState) => ({
-                  ...prevState,
-                  [field.key]: newText,
-                }));
-              }}
-              style={styles.fieldInput}
-              required={field.required}
-            ></TextInput>
+          <View style={styles.row}>
+            <Text style={styles.fieldName}>{field.name}:</Text>
+            <View>
+              <TextInput
+                value={formState[field.key]}
+                onChangeText={(newText) => {
+                  setFormState((prevState) => ({
+                    ...prevState,
+                    [field.key]: newText,
+                  }));
+                }}
+                style={styles.fieldInput}
+                required={field.required}
+              ></TextInput>
+            </View>
           </View>
-        </View>
         </React.Fragment>
       );
     } else if (field.type === 'number') {
       return (
         <React.Fragment key={field.key}>
-        <View style={styles.row}>
-          <Text style={styles.fieldName}>{field.name}:</Text>
-          <View>
-            <TextInput
-              keyboardType='number-pad'
-              returnKeyType='done'
-              onSubmitEditing={Keyboard.dismiss}
-              onChangeText={(newText) => {
-                console.log(newText);
-                setFormState((prevState) => ({
-                  ...prevState,
-                  [field.key]: newText,
-                }));
-              }}
-              style={styles.fieldInput}
-              required={field.required}
-            ></TextInput>
+          <View style={styles.row}>
+            <Text style={styles.fieldName}>{field.name}:</Text>
+            <View>
+              <TextInput
+                value={formState[field.key]}
+                keyboardType='number-pad'
+                returnKeyType='done'
+                onSubmitEditing={Keyboard.dismiss}
+                onChangeText={(newText) => {
+                  console.log(newText);
+                  setFormState((prevState) => ({
+                    ...prevState,
+                    [field.key]: newText,
+                  }));
+                }}
+                style={styles.fieldInput}
+                required={field.required}
+              ></TextInput>
+            </View>
           </View>
-        </View>
         </React.Fragment>
       );
     } else if (field.type === 'bool') {
       return (
         <React.Fragment key={field.key}>
-        <BoolInput
-          value={formState[field.key]}
-          updateBool={updateBool}
-          field={field}
-        />
+          <BoolInput
+            value={formState[field.key]}
+            updateBool={updateBool}
+            field={field}
+          />
         </React.Fragment>
       );
     } else {
       //custom picker
       return (
         <React.Fragment key={field.key}>
-        <CustomDataPicker
-          updateForm={handleFormUpdate}
-          field={field}
-        ></CustomDataPicker>
+          <CustomDataPicker
+            updateForm={handleFormUpdate}
+            field={field}
+          ></CustomDataPicker>
         </React.Fragment>
       );
     }
@@ -219,40 +225,6 @@ const UpdateRecordScreen = ({ route }) => {
             <View style={styles.patientInfoWrapper}>
               <Text style={styles.patientInfoItem}>ID: {record.id}</Text>
               <Text style={styles.patientInfoItem}>Name: {record.name}</Text>
-              <Text style={styles.patientInfoItem}>DOB: {record.dob}</Text>
-              {!isStationOne && (
-                <>
-                  {hasStationInfo && (
-                    <>
-                      {station.fields.map((field, index) => {
-                        console.log('hello', field, record[field.key]);
-                        console.log('field.key', field.key);
-                        if (
-                          record[field.key] === undefined ||
-                          record[field.key] === null
-                        ) {
-                          console.log('NO DATA FOR THIS FIELD', field);
-                          return (
-                            <React.Fragment key={index}>
-                            <Text style={styles.patientInfoItem}>
-                              {field.name}:
-                            </Text>
-                            </React.Fragment>
-                          );
-                        } else {
-                          return (
-                            <React.Fragment key={index}>
-                            <Text style={styles.patientInfoItem}>
-                              {field.name}: {record[field.key].toString()}
-                            </Text>
-                            </React.Fragment>
-                          );
-                        }
-                      })}
-                    </>
-                  )}
-                </>
-              )}
             </View>
 
             <View>
@@ -263,6 +235,8 @@ const UpdateRecordScreen = ({ route }) => {
                 return renderInput(field);
               })}
             </View>
+        </View>
+        </ScrollView>
             <View style={styles.wrapper}>
               <Pressable
                 onPress={handleSubmit}
@@ -280,7 +254,7 @@ const UpdateRecordScreen = ({ route }) => {
                 <Text style={styles.btnText}>Cancel</Text>
               </Pressable>
             </View>
-          </View>
+
           <Dialog
             visible={visible}
             onDismiss={() => {
@@ -296,19 +270,19 @@ const UpdateRecordScreen = ({ route }) => {
                 if (formState[field] === true || formState[field] === false) {
                   return (
                     <React.Fragment key={index}>
-                    <Text>
-                      {station.fields.find(({ key }) => key === field)?.name}:{' '}
-                      {formState[field].toString()}
-                    </Text>
+                      <Text>
+                        {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                        {formState[field].toString()}
+                      </Text>
                     </React.Fragment>
                   );
                 } else {
                   return (
                     <React.Fragment key={index}>
-                    <Text>
-                      {station.fields.find(({ key }) => key === field)?.name}:{' '}
-                      {formState[field]}
-                    </Text>
+                      <Text>
+                        {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                        {formState[field]}
+                      </Text>
                     </React.Fragment>
                   );
                 }
@@ -326,7 +300,6 @@ const UpdateRecordScreen = ({ route }) => {
               />
             </DialogActions>
           </Dialog>
-        </ScrollView>
       </SafeAreaView>
     </Provider>
   );
@@ -378,7 +351,7 @@ const styles = StyleSheet.create({
     margin: 5,
   },
   wrapper: {
-    marginTop: 30,
+    marginTop: 20,
     flexDirection: 'row',
     justifyContent: 'flex-end',
   },
@@ -412,3 +385,37 @@ const styles = StyleSheet.create({
 });
 
 export default UpdateRecordScreen;
+
+// {!isStationOne && (
+//   <>
+//     {hasStationInfo && (
+//       <>
+//         {station.fields.map((field, index) => {
+//           console.log('hello', field, record[field.key]);
+//           console.log('field.key', field.key);
+//           if (
+//             record[field.key] === undefined ||
+//             record[field.key] === null
+//           ) {
+//             console.log('NO DATA FOR THIS FIELD', field);
+//             return (
+//               <React.Fragment key={index}>
+//               <Text style={styles.patientInfoItem}>
+//                 {field.name}:
+//               </Text>
+//               </React.Fragment>
+//             );
+//           } else {
+//             return (
+//               <React.Fragment key={index}>
+//               <Text style={styles.patientInfoItem}>
+//                 {field.name}: {record[field.key].toString()}
+//               </Text>
+//               </React.Fragment>
+//             );
+//           }
+//         })}
+//       </>
+//     )}
+//   </>
+// )}
