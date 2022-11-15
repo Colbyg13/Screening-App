@@ -18,7 +18,6 @@ const SessionQueueItem = (props) => {
           <Text style={styles.title}>Name: {person.name}</Text>
           <View key={person.name} style={styles.fieldsView}>
             <Text style={styles.fieldsitem}>ID: {person.id}</Text>
-            <Text style={styles.fieldsitem}>DOB: {person.dob}</Text>
           </View>
         </View>
         <View style={styles.statusWrapper}>
@@ -33,7 +32,7 @@ const styles = StyleSheet.create({
   item: {
     flex: 1,
     backgroundColor: '#EDEDED',
-    padding: 20,
+    padding: 10,
     marginVertical: 8,
     marginHorizontal: 16,
     borderRadius: 10,
@@ -50,14 +49,14 @@ const styles = StyleSheet.create({
   },
   title: {
     marginBottom: 10,
-    fontSize: 32,
+    fontSize: 20,
     fontWeight: '500',
   },
   fieldsView: {
     alignItems: 'flex-start',
   },
   fieldsitem: {
-    fontSize: 22,
+    fontSize: 18,
     margin: 5,
   },
   statusWrapper: {

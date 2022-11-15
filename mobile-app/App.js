@@ -1,7 +1,9 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StyleSheet } from 'react-native';
-import SessionProvider, { useSessionContext } from './src/contexts/SessionContext';
+import SessionProvider, {
+  useSessionContext,
+} from './src/contexts/SessionContext';
 import HomeScreen from './src/screens/HomeScreen';
 import StationSelectionScreen from './src/screens/StationSelectionScreen';
 import QueueScreen from './src/screens/QueueScreen';
@@ -53,7 +55,6 @@ export default function App() {
     </Provider>
   )
 }
-
 
 const styles = StyleSheet.create({
   container: {
