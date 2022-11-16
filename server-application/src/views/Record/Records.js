@@ -75,43 +75,45 @@ export default function Records() {
         fieldKeyMap={fieldKeyMap}
         onClose={handleOnClose}
       />
-      <div className='w-full h-full overflow-hidden'>
+      <div className='flex flex-col w-full h-full'>
         <RecordTitleBar
           allFieldKeys={sortedFieldKeys}
           updateSearch={updateSearch}
         />
-        {records.length ? (
-          <div className='bg-white h-full pb-32 overflow-y-auto'
-            onScroll={handleScroll}
-          >
-            <table className='w-full table-auto'>
-              <RecordsHeader
-                mainSortKey={mainSortKey}
-                allFieldKeys={sortedFieldKeys}
-                fieldKeyMap={fieldKeyMap}
-                updateSortArray={updateSortArray}
-                sort={sort}
-              />
-              <RecordList
-                search={search}
-                records={records}
-                allFieldKeys={sortedFieldKeys}
-                handleRecordClick={handleRecordClick}
-              />
-            </table>
-            {loading ? (
+        <div className='flex-grow w-full h-full relative'>
+          {records.length ? (
+            <div className='bg-white absolute inset-0 pb-32 overflow-y-auto'
+              onScroll={handleScroll}
+            >
+              <table className='w-full table-auto'>
+                <RecordsHeader
+                  mainSortKey={mainSortKey}
+                  allFieldKeys={sortedFieldKeys}
+                  fieldKeyMap={fieldKeyMap}
+                  updateSortArray={updateSortArray}
+                  sort={sort}
+                />
+                <RecordList
+                  search={search}
+                  records={records}
+                  allFieldKeys={sortedFieldKeys}
+                  handleRecordClick={handleRecordClick}
+                />
+              </table>
+              {loading ? (
+                <CircularProgress />
+              ) : null}
+              {reachedEndOfRecords ? (
+                <h3 className='w-full border-4 text-center text-lg'>End of List</h3>
+              ) : null}
+            </div>
+          ) :
+            loading ? (
               <CircularProgress />
-            ) : null}
-            {reachedEndOfRecords ? (
-              <h3 className='w-full border-4 text-center text-lg'>End of List</h3>
-            ) : null}
-          </div>
-        ) :
-          loading ? (
-            <CircularProgress />
-          ) : (
-            <div>No records found</div>
-          )}
+            ) : (
+              <div>No records found</div>
+            )}
+        </div>
       </div>
     </>
   )
