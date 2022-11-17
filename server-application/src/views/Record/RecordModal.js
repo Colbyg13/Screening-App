@@ -80,13 +80,13 @@ export default function RecordModal({
                                 // puts only updated values in form into
                                 customData: customDataTypes
                                     .reduce((customData, { type, unit }) => {
-                                        const usedField = allFields.find(({ name }) => name === type);
+                                        const usedField = allFields.find(field => field.type === type);
                                         const shouldAddKey = (
                                             (unit !== 'Custom')
                                             &&
                                             usedField
                                             &&
-                                            (usedField.key in update)
+                                            (update[usedField.key] !== undefined)
                                         );
 
                                         return shouldAddKey ?

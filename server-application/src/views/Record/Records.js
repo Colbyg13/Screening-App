@@ -1,12 +1,13 @@
 import { CircularProgress } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 import replace from '../../utils/replace';
 import useFieldKeys from './hooks/useFieldKeys';
 import useFieldSort from './hooks/useFieldSort';
-import RecordTitleBar from './RecordsTitleBar';
 import RecordList from './RecordList';
 import RecordModal from './RecordModal';
 import RecordsHeader from './RecordsHeader';
+import RecordTitleBar from './RecordsTitleBar';
 
 const recordPageSize = 100;
 
@@ -16,18 +17,30 @@ export default function Records() {
   const [records, setRecords] = useState([]);
   const [skip, setSkip] = useState(0);
   const [reachedEndOfRecords, setReachedEndOfRecords] = useState(false);
+  const { customDataTypeMap } = useCustomDataTypesContext();
   const { allFields, allFieldKeys, fieldKeyMap, sortedFieldKeys } = useFieldKeys();
   const resetSkip = () => setSkip(0);
   const { updateSortArray, mainSortKey, sort } = useFieldSort({ allFieldKeys, resetSkip });
   const [search, setSearch] = useState('');
   const [selectedRecord, setSelectedRecord] = useState();
+  const initialUnitConversions = allFields
+    .filter(({ type }) => type && customDataTypeMap[type] && (customDataTypeMap[type] !== 'Custom'))
+    .reduce((all, { key, type }) => ({
+      ...all,
+      [key]: customDataTypeMap[type],
+    }), {});
+  const [unitConversions, setUnitConversions] = useState(initialUnitConversions);
+  const updateFieldUnit = (key, newUnit) => setUnitConversions(unitConversions => ({
+    ...unitConversions,
+    [key]: newUnit,
+  }));
 
   useEffect(() => {
     // used for getting our records from the database when sort or skip are updated
     if (!reachedEndOfRecords || !skip) {
       setLoading(true);
       // console.log({ sort, skip, search })
-      getRecords()
+      window.api.getRecords(search, sort, skip, recordPageSize, unitConversions)
         .then(fetchedRecords => {
           if (fetchedRecords.length) {
             // add the new records to end of list if skip > 0
@@ -39,7 +52,7 @@ export default function Records() {
           setLoading(false);
         });
     }
-  }, [sort, skip, search, reachedEndOfRecords]);
+  }, [sort, skip, search, reachedEndOfRecords, unitConversions]);
 
   function handleScroll(e) {
     // loads more when reaching the end of the page
@@ -50,9 +63,6 @@ export default function Records() {
   function updateSearch(newSearch) {
     setSearch(newSearch);
     resetSkip();
-  }
-  async function getRecords() {
-    return window.api.getRecords(search, sort, skip, recordPageSize, allFieldKeys);
   }
 
   function handleRecordClick(record) {
@@ -91,7 +101,9 @@ export default function Records() {
                   mainSortKey={mainSortKey}
                   allFieldKeys={sortedFieldKeys}
                   fieldKeyMap={fieldKeyMap}
+                  unitConversions={unitConversions}
                   updateSortArray={updateSortArray}
+                  updateFieldUnit={updateFieldUnit}
                   sort={sort}
                 />
                 <RecordList

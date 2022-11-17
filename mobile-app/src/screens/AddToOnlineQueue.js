@@ -69,13 +69,13 @@ const AddToOnlineQueue = ({ route }) => {
       // puts only updated values in form into
       customData: customDataTypes
         .reduce((customData, { type, unit }) => {
-          const usedField = station.fields.find(({ name }) => name === type);
+          const usedField = station.fields.find(field => field.type === type);
           const shouldAddKey = (
             (unit !== 'Custom')
             &&
             usedField
             &&
-            (usedField.key in formState)
+            (formState[usedField.key] !== undefined)
           );
 
           return shouldAddKey ?
