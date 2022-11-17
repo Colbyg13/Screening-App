@@ -16,7 +16,7 @@ export default function Records() {
   const [records, setRecords] = useState([]);
   const [skip, setSkip] = useState(0);
   const [reachedEndOfRecords, setReachedEndOfRecords] = useState(false);
-  const { allFieldKeys, fieldKeyMap, sortedFieldKeys } = useFieldKeys();
+  const { allFields, allFieldKeys, fieldKeyMap, sortedFieldKeys } = useFieldKeys();
   const resetSkip = () => setSkip(0);
   const { updateSortArray, mainSortKey, sort } = useFieldSort({ allFieldKeys, resetSkip });
   const [search, setSearch] = useState('');
@@ -73,6 +73,7 @@ export default function Records() {
         record={selectedRecord}
         allFieldKeys={sortedFieldKeys}
         fieldKeyMap={fieldKeyMap}
+        allFields={allFields}
         onClose={handleOnClose}
       />
       <div className='flex flex-col w-full h-full'>

@@ -1,4 +1,4 @@
-import { Box, Button, Modal, TextField, Typography } from '@mui/material';
+import { Box, Button, Modal, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 import RecordModalInputRow from './RecordModalInputRow';
@@ -8,12 +8,14 @@ export default function RecordModal({
     record: {
         id,
     } = {},
+    allFields = [],
     allFieldKeys = [],
     fieldKeyMap = {},
     onClose,
 }) {
 
     const [update, setUpdate] = useState({});
+    const { customDataTypes } = useCustomDataTypesContext()
 
     useEffect(() => {
         setUpdate({});
@@ -73,8 +75,29 @@ export default function RecordModal({
                         variant="contained"
                         disabled={allFieldKeys.every(key => update[key] === undefined || (record?.[key] === update[key]))}
                         onClick={async () => {
-                            const result = await window.api.updateRecord({ id, ...update });
-                            console.log({ result, update })
+                            const result = await window.api.updateRecord({
+                                record: {id, ...update},
+                                // puts only updated values in form into
+                                customData: customDataTypes
+                                    .reduce((customData, { type, unit }) => {
+                                        const usedField = allFields.find(({ name }) => name === type);
+                                        const shouldAddKey = (
+                                            (unit !== 'Custom')
+                                            &&
+                                            usedField
+                                            &&
+                                            (usedField.key in update)
+                                        );
+
+                                        return shouldAddKey ?
+                                            {
+                                                ...customData,
+                                                [usedField.key]: unit,
+                                            }
+                                            :
+                                            customData;
+                                    }, {}),
+                            });
                             onClose({ id, ...update });
                         }}
                     >
@@ -82,6 +105,6 @@ export default function RecordModal({
                     </Button>
                 </div>
             </Box>
-        </Modal>
+        </Modal >
     )
 }

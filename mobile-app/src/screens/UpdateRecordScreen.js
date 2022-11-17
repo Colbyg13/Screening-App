@@ -22,9 +22,11 @@ import { useSessionContext } from '../contexts/SessionContext';
 import BoolInput from '../components/Inputs/BoolInput';
 import CustomDataPicker from '../components/Inputs/CustomDataPicker';
 import DatePicker from '../components/Inputs/DatePicker';
+import { useCustomDataTypesContext } from '../contexts/CustomDataContext';
 
 const UpdateRecordScreen = ({ route }) => {
   const navigation = useNavigation();
+  const { customDataTypes } = useCustomDataTypesContext();
   const record = route.params.item;
   const {
     sendRecord,
@@ -131,7 +133,28 @@ const UpdateRecordScreen = ({ route }) => {
     //call function to handle SOCKET EVENT TO ADD NEW RECORD TO SESSION/QUEUE
     //On success open dialog with new ID, name, and DOB
     //On dialog close go back to session and update list of patients
-    const result = await sendRecord(formState);
+    const result = await sendRecord({
+      record: formState,
+      customData: customDataTypes
+        .reduce((customData, { type, unit }) => {
+          const usedField = station.fields.find(({ name }) => name === type);
+          const shouldAddKey = (
+            (unit !== 'Custom')
+            &&
+            usedField
+            &&
+            (usedField.key in formState)
+          );
+
+          return shouldAddKey ?
+            {
+              ...customData,
+              [usedField.key]: unit,
+            }
+            :
+            customData;
+        }, {}),
+    });
     setVisible(true);
   };
   const renderInput = (field) => {
@@ -235,71 +258,71 @@ const UpdateRecordScreen = ({ route }) => {
                 return renderInput(field);
               })}
             </View>
-        </View>
+          </View>
         </ScrollView>
-            <View style={styles.wrapper}>
-              <Pressable
-                onPress={handleSubmit}
-                style={styles.btnSubmit}
-                pressEffect='ripple'
-                pressEffectColor='#4c5e75'
-              >
-                <Text style={styles.btnText}>Submit</Text>
-              </Pressable>
-              <Pressable
-                style={styles.btnCancel}
-                pressEffect='ripple'
-                pressEffectColor='#FCB8B8'
-              >
-                <Text style={styles.btnText}>Cancel</Text>
-              </Pressable>
-            </View>
-
-          <Dialog
-            visible={visible}
-            onDismiss={() => {
-              setVisible(false);
-              navigation.navigate('Current Session Queue');
-            }}
+        <View style={styles.wrapper}>
+          <Pressable
+            onPress={handleSubmit}
+            style={styles.btnSubmit}
+            pressEffect='ripple'
+            pressEffectColor='#4c5e75'
           >
-            <DialogHeader title='Information successfully updated!' />
-            <DialogContent>
-              <Text>Updated Info for {record.name}</Text>
-              <Text>ID:{record.id}</Text>
-              {fields.map((field, index) => {
-                if (formState[field] === true || formState[field] === false) {
-                  return (
-                    <React.Fragment key={index}>
-                      <Text>
-                        {station.fields.find(({ key }) => key === field)?.name}:{' '}
-                        {formState[field].toString()}
-                      </Text>
-                    </React.Fragment>
-                  );
-                } else {
-                  return (
-                    <React.Fragment key={index}>
-                      <Text>
-                        {station.fields.find(({ key }) => key === field)?.name}:{' '}
-                        {formState[field]}
-                      </Text>
-                    </React.Fragment>
-                  );
-                }
-              })}
-            </DialogContent>
-            <DialogActions>
-              <Button
-                title='Ok'
-                compact
-                variant='text'
-                onPress={() => {
-                  setVisible(false);
-                  navigation.navigate('Current Session Queue');
-                }}
-              />
-            </DialogActions>
-          </Dialog>
+            <Text style={styles.btnText}>Submit</Text>
+          </Pressable>
+          <Pressable
+            style={styles.btnCancel}
+            pressEffect='ripple'
+            pressEffectColor='#FCB8B8'
+          >
+            <Text style={styles.btnText}>Cancel</Text>
+          </Pressable>
+        </View>
+
+        <Dialog
+          visible={visible}
+          onDismiss={() => {
+            setVisible(false);
+            navigation.navigate('Current Session Queue');
+          }}
+        >
+          <DialogHeader title='Information successfully updated!' />
+          <DialogContent>
+            <Text>Updated Info for {record.name}</Text>
+            <Text>ID:{record.id}</Text>
+            {fields.map((field, index) => {
+              if (formState[field] === true || formState[field] === false) {
+                return (
+                  <React.Fragment key={index}>
+                    <Text>
+                      {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                      {formState[field].toString()}
+                    </Text>
+                  </React.Fragment>
+                );
+              } else {
+                return (
+                  <React.Fragment key={index}>
+                    <Text>
+                      {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                      {formState[field]}
+                    </Text>
+                  </React.Fragment>
+                );
+              }
+            })}
+          </DialogContent>
+          <DialogActions>
+            <Button
+              title='Ok'
+              compact
+              variant='text'
+              onPress={() => {
+                setVisible(false);
+                navigation.navigate('Current Session Queue');
+              }}
+            />
+          </DialogActions>
+        </Dialog>
       </SafeAreaView>
     </Provider>
   );

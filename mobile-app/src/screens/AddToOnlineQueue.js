@@ -16,9 +16,11 @@ import CustomDataPicker from '../components/Inputs/CustomDataPicker';
 import { styles } from '../style/styles';
 import DatePicker from '../components/Inputs/DatePicker';
 import BoolInput from '../components/Inputs/BoolInput';
+import { useCustomDataTypesContext } from '../contexts/CustomDataContext';
 
 const AddToOnlineQueue = ({ route }) => {
   const navigation = useNavigation();
+  const { customDataTypes } = useCustomDataTypesContext();
   const { sendRecord, selectedStation: station } = useSessionContext();
   const [formState, setFormState] = useState({}); //used to keep track of inputs.
   const [dateStates, setDateStates] = useState({});
@@ -62,7 +64,29 @@ const AddToOnlineQueue = ({ route }) => {
     //call function to handle SOCKET EVENT TO ADD NEW RECORD TO SESSION/QUEUE
     //On success open dialog with new ID, name, and DOB
     //On dialog close go back to session and update list of patients
-    const newId = await sendRecord(formState);
+    const newId = await sendRecord({
+      record: formState,
+      // puts only updated values in form into
+      customData: customDataTypes
+        .reduce((customData, { type, unit }) => {
+          const usedField = station.fields.find(({ name }) => name === type);
+          const shouldAddKey = (
+            (unit !== 'Custom')
+            &&
+            usedField
+            &&
+            (usedField.key in formState)
+          );
+
+          return shouldAddKey ?
+            {
+              ...customData,
+              [usedField.key]: unit,
+            }
+            :
+            customData;
+        }, {}),
+    });
     // let newId = Math.floor(Math.random() * 10); //this id will be given in the server
     setPatient((prevState) => ({ ...prevState, id: newId })); //on server success set the patient in state for display.
 
@@ -189,73 +213,73 @@ const AddToOnlineQueue = ({ route }) => {
             })}
           </View>
         </ScrollView>
-          <View style={styles.wrapper}>
-            <Pressable
-              style={styles.btnSubmit}
-              pressEffect='ripple'
-              pressEffectColor='#4c5e75'
-              onPress={handleSubmit}
-            >
-              <Text style={styles.btnText}>Submit</Text>
-            </Pressable>
-            <Pressable
-              style={styles.btnCancel}
-              pressEffect='ripple'
-              pressEffectColor='#FCB8B8'
-            >
-              <Text style={styles.btnText}>Cancel</Text>
-            </Pressable>
-          </View>
-          <Dialog
-            visible={visible}
-            onDismiss={() => {
-              setFormState({});
-              setVisible(false);
-            }}
-            onClose={() => {
-              defaultState();
-            }}
+        <View style={styles.wrapper}>
+          <Pressable
+            style={styles.btnSubmit}
+            pressEffect='ripple'
+            pressEffectColor='#4c5e75'
+            onPress={handleSubmit}
           >
-            <DialogHeader title='Added to Queue Successully!' />
-            <DialogContent>
-              <Text>New ID: {patient.id}</Text>
-              {fields.map((field, index) => {
-                if (
-                  patient.data[field] === true ||
-                  patient.data[field] === false
-                ) {
-                  return (
-                    <React.Fragment key={index}>
-                      <Text>
-                        {station.fields.find(({ key }) => key === field)?.name}:{' '}
-                        {patient.data[field].toString()}
-                      </Text>
-                    </React.Fragment>
-                  );
-                } else {
-                  return (
-                    <React.Fragment key={index}>
-                      <Text key={field.name}>
-                        {station.fields.find(({ key }) => key === field)?.name}:{' '}
-                        {patient.data[field]}
-                      </Text>
-                    </React.Fragment>
-                  );
-                }
-              })}
-            </DialogContent>
-            <DialogActions>
-              <Button
-                title='Ok'
-                compact
-                variant='text'
-                onPress={() => {
-                  setVisible(false);
-                  navigation.navigate('Current Session Queue');
-                }}
-              />
-            </DialogActions>
-          </Dialog>
+            <Text style={styles.btnText}>Submit</Text>
+          </Pressable>
+          <Pressable
+            style={styles.btnCancel}
+            pressEffect='ripple'
+            pressEffectColor='#FCB8B8'
+          >
+            <Text style={styles.btnText}>Cancel</Text>
+          </Pressable>
+        </View>
+        <Dialog
+          visible={visible}
+          onDismiss={() => {
+            setFormState({});
+            setVisible(false);
+          }}
+          onClose={() => {
+            defaultState();
+          }}
+        >
+          <DialogHeader title='Added to Queue Successully!' />
+          <DialogContent>
+            <Text>New ID: {patient.id}</Text>
+            {fields.map((field, index) => {
+              if (
+                patient.data[field] === true ||
+                patient.data[field] === false
+              ) {
+                return (
+                  <React.Fragment key={index}>
+                    <Text>
+                      {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                      {patient.data[field].toString()}
+                    </Text>
+                  </React.Fragment>
+                );
+              } else {
+                return (
+                  <React.Fragment key={index}>
+                    <Text key={field.name}>
+                      {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                      {patient.data[field]}
+                    </Text>
+                  </React.Fragment>
+                );
+              }
+            })}
+          </DialogContent>
+          <DialogActions>
+            <Button
+              title='Ok'
+              compact
+              variant='text'
+              onPress={() => {
+                setVisible(false);
+                navigation.navigate('Current Session Queue');
+              }}
+            />
+          </DialogActions>
+        </Dialog>
       </SafeAreaView>
     </Provider>
   );

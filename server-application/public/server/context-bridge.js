@@ -14,7 +14,7 @@ module.exports = APP => {
         },
         // SERVER FUNCTIONS
         getIP: ip.address,
-        showMessage: ({title, message, type}) => dialog.showMessageBox(null, {title, message, type}),
+        showMessage: ({ title, message, type }) => dialog.showMessageBox(null, { title, message, type }),
         showSaveDialog: () => {
             const date = new Date();
             const fileName = `records-${date.toLocaleDateString()}`.replace(/\//g, '-');
@@ -62,10 +62,20 @@ module.exports = APP => {
                 }
                 resolve(patients);
             })),
-        updateRecord: record => new Promise((resolve, reject) => APP.db.collection("patients")
+        updateRecord: ({ record, customData = {} }) => new Promise((resolve, reject) => APP.db.collection("patients")
             .findOneAndUpdate(
                 { id: record.id },
-                { $set: { lastModified: new Date(), ...record, eyes: undefined } },
+                {
+                    $set: {
+                        lastModified: new Date(),
+                        ...record,
+                        // only updates the fields the record is tied to
+                        ...Object.entries(customData).reduce((all, [key, value]) => ({
+                            ...all,
+                            [`customData.${key}`]: value,
+                        }), {}),
+                    }
+                },
                 { returnDocument: 'after' }
             )
             .then(({ value: updatedRecord }) => {

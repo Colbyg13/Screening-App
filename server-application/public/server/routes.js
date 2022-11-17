@@ -16,7 +16,7 @@ module.exports = APP => {
         .find().toArray((err, customDataTypes) => {
             if (err) {
                 console.error(err);
-                res.status(400).send("Error finding patient records");
+                res.status(400).send("Error finding custom data types");
             }
             res.status(200).json(customDataTypes);
         }));
@@ -33,7 +33,10 @@ module.exports = APP => {
 
     APP.post('/api/v1/patients/create', (req, res) => {
         if (APP.sessionIsRunning) {
-            const record = req.body;
+            const {
+                record,
+                customData = {},
+            } = req.body;
             APP.db.collection('latestRecordID')
                 .findOneAndUpdate(
                     {},
@@ -53,6 +56,7 @@ module.exports = APP => {
                         sessionId: APP.sessionInfo._id,
                         ...generalInfo,
                         ...record,
+                        customData,
                     };
 
                     APP.db.collection("patients")
@@ -83,12 +87,25 @@ module.exports = APP => {
     });
 
     APP.post('/api/v1/patients/update', (req, res) => {
-        const record = req.body;
+        const {
+            record,
+            customData = {},
+        } = req.body;
 
         APP.db.collection("patients")
             .findOneAndUpdate(
                 { id: record.id },
-                { $set: { lastModified: new Date(), ...record, } },
+                {
+                    $set: {
+                        lastModified: new Date(),
+                        ...record,
+                        // only updates the fields the record is tied to
+                        ...Object.entries(customData).reduce((all, [key, value]) => ({
+                            ...all,
+                            [`customData.${key}`]: value,
+                        }), {}),
+                    }
+                },
                 { returnDocument: 'after' }
             )
             .then(({ value: updatedRecord }) => {
