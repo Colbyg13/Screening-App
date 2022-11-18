@@ -68,6 +68,7 @@ export default function CustomFields() {
         >
             <div className="h-full">
                 <UserDefinedFields
+                    initialDataTypes={initialDataTypes}
                     customDataTypes={customDataTypes}
                     addCustomDataType={addCustomDataType}
                     updateCustomDataType={updateCustomDataType}

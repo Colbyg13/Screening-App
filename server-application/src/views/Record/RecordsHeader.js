@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react'
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
-import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { Menu, MenuItem } from '@mui/material';
 import convert from 'convert-units';
+import React, { useEffect, useState } from 'react';
 
 export default function RecordsHeader({
     mainSortKey,
@@ -37,7 +36,6 @@ export default function RecordsHeader({
         }
     }, [unitConversions]);
 
-
     return (
         <>
             <thead className='py-2 h-10 min-h-fit sticky top-0 bg-white shadow-lg'>
@@ -69,7 +67,7 @@ export default function RecordsHeader({
                     'aria-labelledby': 'basic-button',
                 }}
             >
-                {anchorEl && convert().from(console.log({id: anchorEl.id, unitConversions}) || unitConversions[anchorEl?.id]).possibilities().map(unit => (
+                {anchorEl && convert().from(unitConversions[anchorEl?.id]).possibilities().map(unit => (
                     <MenuItem onClick={() => {
                         updateFieldUnit(anchorEl.id, unit);
                         handleClose();
