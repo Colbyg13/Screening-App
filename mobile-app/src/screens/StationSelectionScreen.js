@@ -5,10 +5,10 @@ import { useIsFocused } from '@react-navigation/native';
 import { useCustomDataTypesContext } from '../contexts/CustomDataContext';
 const StationSelectionScreen = ({ route, navigation }) => {
   const { customDataTypes } = useCustomDataTypesContext();
-  console.log('Custom Data Types: ', customDataTypes);
+  // console.log('Custom Data Types: ', customDataTypes);
   const isFocused = useIsFocused();
   const { selectedStation, leaveStation, sessionInfo } = useSessionContext();
-  console.log('Session Info: ', sessionInfo);
+  // console.log('Session Info: ', sessionInfo);
   // leave the station automatically
   useEffect(() => {
     if (isFocused && selectedStation) leaveStation();

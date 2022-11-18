@@ -46,9 +46,6 @@ export default function SessionProvider({ children }) {
      * (it should not cut the session when the view leaves)
      */
 
-    // // TODO: implement this later
-    // let offlineRecordId = 0;
-
     const [sessionIsRunning, setSessionIsRunning] = useState(window.api.getIsSessionRunning());
 
     const [sessionInfo, setSessionInfo] = useState(JSON.parse(localStorage.getItem(sessionInfoStorageKey)) || initialSystemInfo);

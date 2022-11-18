@@ -23,7 +23,7 @@ const asyncTap = cb => async arg => {
 
 const normalizeFields = fields => fields.map(field => ({
     ...field,
-    key: _.camelCase(field.name),
+    key: _.camelCase(field.name.toLowerCase()),
 }))
 
 

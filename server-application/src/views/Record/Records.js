@@ -69,12 +69,15 @@ export default function Records() {
     setSelectedRecord(record);
   }
 
-  function handleOnClose(update) {
+  function handleOnClose() {
+    setSelectedRecord();
+  }
+
+  function handleModalSave(update) {
     if (update) setRecords(records => {
       const oldRecord = records.find(({ id }) => id === update.id);
-      return replace(records, records.indexOf(oldRecord), { ...oldRecord, ...update })
+      if (oldRecord) return replace(records, records.indexOf(oldRecord), { ...oldRecord, ...update })
     })
-    setSelectedRecord();
   }
 
   return (
@@ -85,6 +88,7 @@ export default function Records() {
         fieldKeyMap={fieldKeyMap}
         allFields={allFields}
         onClose={handleOnClose}
+        onSave={handleModalSave}
       />
       <div className='flex flex-col w-full h-full'>
         <RecordTitleBar

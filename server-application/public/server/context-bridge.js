@@ -72,6 +72,52 @@ module.exports = APP => {
                 })
                 resolve(convertedPatients);
             })),
+        createRecord: record => new Promise((resolve, reject) => {
+            if (APP.sessionIsRunning) {
+                APP.db.collection('latestRecordID')
+                    .findOneAndUpdate(
+                        {},
+                        { $inc: { "latestID": 1 } },
+                    )
+                    .then(({ value: { latestID } = {} } = {}) => {
+
+                        const generalInfo = APP.sessionInfo.generalFields.reduce((all, { key, value }) => ({
+                            ...all,
+                            [key]: value,
+                        }), {});
+
+                        const newUser = {
+                            id: latestID,
+                            createdAt: new Date(),
+                            lastModified: new Date(),
+                            sessionId: APP.sessionInfo._id,
+                            ...generalInfo,
+                            ...record,
+                        };
+
+                        APP.db.collection("patients")
+                            .insertOne(newUser)
+                            .then(result => {
+
+                                const newUserWithId = {
+                                    _id: result.insertedId,
+                                    ...newUser,
+                                };
+
+                                APP.io.sockets.emit('record-created', newUserWithId);
+
+                                APP.sessionRecords = [...APP.sessionRecords, newUserWithId];
+
+                                resolve({ newId: latestID });
+                            })
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        reject("Error creating patient record");
+                    });
+            }
+            else reject("Session not started. Please start a session to create a record");
+        }),
         updateRecord: ({ record, customData = {} }) => new Promise((resolve, reject) => APP.db.collection("patients")
             .findOneAndUpdate(
                 { id: record.id },
@@ -221,6 +267,8 @@ module.exports = APP => {
                         APP.sessionRecords = sessionRecords;
                         APP.sessionIsRunning = true;
 
+                        APP.io.sockets.emit('session-started');
+
                         resolve({
                             sessionInfo: APP.sessionInfo,
                             sessionRecords: APP.sessionRecords,
@@ -263,6 +311,8 @@ module.exports = APP => {
                         }
                     })));
 
+                    APP.io.sockets.emit('session-started');
+
                     resolve({
                         sessionInfo: APP.sessionInfo,
                         sessionRecords: APP.sessionRecords,
@@ -275,6 +325,7 @@ module.exports = APP => {
                 APP.sessionInfo = undefined;
                 APP.sessionRecords = undefined;
                 APP.sessionIsRunning = false;
+                APP.io.sockets.emit('session-ended');
                 return 'Successfully stopped session';
             }
             return 'The session is already stopped';

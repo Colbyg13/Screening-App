@@ -240,91 +240,88 @@ const UpdateRecordScreen = ({ route }) => {
   };
 
   return (
-    <Provider>
-      <SafeAreaView style={styles.container}>
-        <ScrollView style={styles.scrollView}>
-          <View style={styles.container}>
-            <Text style={styles.pageDirection}>Patient Information</Text>
-            <View style={styles.patientInfoWrapper}>
-              <Text style={styles.patientInfoItem}>ID: {record.id}</Text>
-              <Text style={styles.patientInfoItem}>Name: {record.name}</Text>
-            </View>
-
-            <View>
-              <Text style={styles.pageDirection}>{station.name} Data:</Text>
-            </View>
-            <View>
-              {station.fields.map((field) => {
-                return renderInput(field);
-              })}
-            </View>
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.container}>
+          <Text style={styles.pageDirection}>Patient Information</Text>
+          <View style={styles.patientInfoWrapper}>
+            <Text style={styles.patientInfoItem}>ID: {record.id}</Text>
+            <Text style={styles.patientInfoItem}>Name: {record.name}</Text>
           </View>
-        </ScrollView>
-        <View style={styles.wrapper}>
-          <Pressable
-            onPress={handleSubmit}
-            style={styles.btnSubmit}
-            pressEffect='ripple'
-            pressEffectColor='#4c5e75'
-          >
-            <Text style={styles.btnText}>Submit</Text>
-          </Pressable>
-          <Pressable
-            style={styles.btnCancel}
-            pressEffect='ripple'
-            pressEffectColor='#FCB8B8'
-          >
-            <Text style={styles.btnText}>Cancel</Text>
-          </Pressable>
-        </View>
-
-        <Dialog
-          visible={visible}
-          onDismiss={() => {
-            setVisible(false);
-            navigation.navigate('Current Session Queue');
-          }}
-        >
-          <DialogHeader title='Information successfully updated!' />
-          <DialogContent>
-            <Text>Updated Info for {record.name}</Text>
-            <Text>ID:{record.id}</Text>
-            {fields.map((field, index) => {
-              if (formState[field] === true || formState[field] === false) {
-                return (
-                  <React.Fragment key={index}>
-                    <Text>
-                      {station.fields.find(({ key }) => key === field)?.name}:{' '}
-                      {formState[field].toString()}
-                    </Text>
-                  </React.Fragment>
-                );
-              } else {
-                return (
-                  <React.Fragment key={index}>
-                    <Text>
-                      {station.fields.find(({ key }) => key === field)?.name}:{' '}
-                      {formState[field]}
-                    </Text>
-                  </React.Fragment>
-                );
-              }
+          <View>
+            <Text style={styles.pageDirection}>{station.name} Data:</Text>
+          </View>
+          <View>
+            {station.fields.map((field) => {
+              return renderInput(field);
             })}
-          </DialogContent>
-          <DialogActions>
-            <Button
-              title='Ok'
-              compact
-              variant='text'
-              onPress={() => {
-                setVisible(false);
-                navigation.navigate('Current Session Queue');
-              }}
-            />
-          </DialogActions>
-        </Dialog>
-      </SafeAreaView>
-    </Provider>
+          </View>
+        </View>
+      </ScrollView>
+      <View style={styles.wrapper}>
+        <Pressable
+          onPress={handleSubmit}
+          style={styles.btnSubmit}
+          pressEffect='ripple'
+          pressEffectColor='#4c5e75'
+        >
+          <Text style={styles.btnText}>Submit</Text>
+        </Pressable>
+        <Pressable
+          style={styles.btnCancel}
+          pressEffect='ripple'
+          pressEffectColor='#FCB8B8'
+        >
+          <Text style={styles.btnText}>Cancel</Text>
+        </Pressable>
+      </View>
+
+      <Dialog
+        visible={visible}
+        onDismiss={() => {
+          setVisible(false);
+          navigation.navigate('Current Session Queue');
+        }}
+      >
+        <DialogHeader title='Information successfully updated!' />
+        <DialogContent>
+          <Text>Updated Info for {record.name}</Text>
+          <Text>ID:{record.id}</Text>
+          {fields.map((field, index) => {
+            if (formState[field] === true || formState[field] === false) {
+              return (
+                <React.Fragment key={index}>
+                  <Text>
+                    {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                    {formState[field].toString()}
+                  </Text>
+                </React.Fragment>
+              );
+            } else {
+              return (
+                <React.Fragment key={index}>
+                  <Text>
+                    {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                    {formState[field]}
+                  </Text>
+                </React.Fragment>
+              );
+            }
+          })}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            title='Ok'
+            compact
+            variant='text'
+            onPress={() => {
+              setVisible(false);
+              navigation.navigate('Current Session Queue');
+            }}
+          />
+        </DialogActions>
+      </Dialog>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({

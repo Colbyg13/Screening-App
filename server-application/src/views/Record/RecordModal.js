@@ -11,7 +11,8 @@ export default function RecordModal({
     allFields = [],
     allFieldKeys = [],
     fieldKeyMap = {},
-    onClose,
+    onClose = () => { },
+    onSave = () => { },
 }) {
 
     const [update, setUpdate] = useState({});
@@ -24,7 +25,7 @@ export default function RecordModal({
     return (
         <Modal
             open={!!record}
-            onClose={() => onClose()}
+            onClose={onClose}
             aria-labelledby="modal-modal-title"
             aria-describedby="modal-modal-description"
         >
@@ -76,7 +77,7 @@ export default function RecordModal({
                         disabled={allFieldKeys.every(key => update[key] === undefined || (record?.[key] === update[key]))}
                         onClick={async () => {
                             const result = await window.api.updateRecord({
-                                record: {id, ...update},
+                                record: { id, ...update },
                                 // puts only updated values in form into
                                 customData: customDataTypes
                                     .reduce((customData, { type, unit }) => {
@@ -98,7 +99,7 @@ export default function RecordModal({
                                             customData;
                                     }, {}),
                             });
-                            onClose({ id, ...update });
+                            onSave({ id, ...update });
                         }}
                     >
                         Save
