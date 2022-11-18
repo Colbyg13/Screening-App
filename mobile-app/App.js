@@ -12,6 +12,8 @@ import ServerStatus from './src/components/ServerStatus';
 import UpdateRecordScreen from './src/screens/UpdateRecordScreen';
 import CustomDataTypesProvider from './src/contexts/CustomDataContext';
 import { Provider } from '@react-native-material/core';
+import IpadOfflineMode from './src/screens/IpadOfflineMode';
+import OfflineRecordsScreen from './src/screens/OfflineRecordsScreen';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -20,9 +22,12 @@ export default function App() {
       <NavigationContainer>
         <SessionProvider>
           <CustomDataTypesProvider>
-            <Stack.Navigator initialRouteName='Home' screenOptions={{
-              headerRight: ServerStatus,
-            }}>
+            <Stack.Navigator
+              initialRouteName='Home'
+              screenOptions={{
+                headerRight: ServerStatus,
+              }}
+            >
               <Stack.Screen
                 name='Home'
                 component={HomeScreen}
@@ -44,16 +49,26 @@ export default function App() {
                 options={{ title: 'Add to Queue' }}
               />
               <Stack.Screen
-                name="Update Record"
+                name='Update Record'
                 component={UpdateRecordScreen}
                 options={{ title: 'Update Record' }}
+              />
+              <Stack.Screen
+                name='Offline Mode'
+                component={IpadOfflineMode}
+                options={{ title: 'Offline Mode' }}
+              />
+              <Stack.Screen
+                name='Offline Records'
+                component={OfflineRecordsScreen}
+                options={{ title: 'Offline Records' }}
               />
             </Stack.Navigator>
           </CustomDataTypesProvider>
         </SessionProvider>
       </NavigationContainer>
     </Provider>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
