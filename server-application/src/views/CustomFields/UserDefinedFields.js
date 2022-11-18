@@ -23,7 +23,6 @@ const allUnits = [
 ]
 
 export default function UserDefinedFields({
-    initialDataTypes,
     customDataTypes,
     addCustomDataType,
     updateCustomDataType,
@@ -32,8 +31,6 @@ export default function UserDefinedFields({
     updateCustomDataTypeValue,
     deleteCustomDataTypeValue,
 }) {
-
-    console.log({ initialDataTypes, customDataTypes })
 
     return (
         <div className='py-4 px-8 bg-white rounded-md shadow-md'>

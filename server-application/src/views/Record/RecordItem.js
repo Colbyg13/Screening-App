@@ -27,7 +27,10 @@ export default function RecordItem({
                                 !!record[key] ? 'Yes' : 'No'
                                 :
                                 typeof record[key] === 'number' ?
-                                    record[key].toFixed(2)
+                                    `${record[key]}`.match(/^\d+\.\d+$/) ?
+                                        record[key].toFixed(2)
+                                        :
+                                        record[key]
                                     :
                                     record[key] || ''}
                     />

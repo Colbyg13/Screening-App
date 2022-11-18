@@ -8,6 +8,7 @@ export default function RecordModal({
     record: {
         id,
     } = {},
+    unitConversions = {},
     allFields = [],
     allFieldKeys = [],
     fieldKeyMap = {},
@@ -54,6 +55,7 @@ export default function RecordModal({
                         <RecordModalInputRow
                             key={key}
                             fieldKey={key}
+                            unitConversions={unitConversions}
                             fieldKeyMap={fieldKeyMap}
                             update={update}
                             record={record}
@@ -93,7 +95,7 @@ export default function RecordModal({
                                         return shouldAddKey ?
                                             {
                                                 ...customData,
-                                                [usedField.key]: unit,
+                                                [usedField.key]: unitConversions[usedField.key],
                                             }
                                             :
                                             customData;

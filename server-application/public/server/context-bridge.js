@@ -149,7 +149,7 @@ module.exports = APP => {
                 reject("Error updating patient record");
             })
         ),
-        downloadRecords: (initialOutputPath, allFieldKeys = []) => new Promise((resolve, reject) => {
+        downloadRecords: (initialOutputPath, allFieldKeys = [], unitConversions = {}) => new Promise((resolve, reject) => {
 
             const outputPath = initialOutputPath.match(/.csv$/) ?
                 initialOutputPath
@@ -164,7 +164,13 @@ module.exports = APP => {
             writeStream.write(`${allFieldKeys.map(key => key).join(',')}\n`);
 
             stream.on('data', doc => {
-                writeStream.write(`${allFieldKeys.map(key => doc[key] || '').join(',')}\n`)
+                writeStream.write(`${allFieldKeys.map(key => doc[key] === undefined ?
+                    ''
+                    :
+                    unitConversions[key] ?
+                        convert(doc[key]).from(doc.customData[key]).to(unitConversions[key])
+                        :
+                        doc[key]).join(',')}\n`)
             });
             stream.on('end', () => {
                 console.log('record stream ended');

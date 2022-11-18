@@ -78,12 +78,14 @@ export default function Records() {
       const oldRecord = records.find(({ id }) => id === update.id);
       if (oldRecord) return replace(records, records.indexOf(oldRecord), { ...oldRecord, ...update })
     })
+    setSelectedRecord();
   }
 
   return (
     <>
       <RecordModal
         record={selectedRecord}
+        unitConversions={unitConversions}
         allFieldKeys={sortedFieldKeys}
         fieldKeyMap={fieldKeyMap}
         allFields={allFields}
@@ -92,6 +94,7 @@ export default function Records() {
       />
       <div className='flex flex-col w-full h-full'>
         <RecordTitleBar
+          unitConversions={unitConversions}
           allFieldKeys={sortedFieldKeys}
           updateSearch={updateSearch}
         />

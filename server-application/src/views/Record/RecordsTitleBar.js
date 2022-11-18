@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import RecordSearch from './RecordSearch';
 
 export default function RecordTitleBar({
+    unitConversions = {},
     updateSearch,
     allFieldKeys,
 }) {
@@ -38,7 +39,7 @@ export default function RecordTitleBar({
                     console.log({ outputPath })
                     if (outputPath) {
                         setDownloading(true);
-                        window.api.downloadRecords(outputPath, allFieldKeys)
+                        window.api.downloadRecords(outputPath, allFieldKeys, unitConversions)
                             .then(() => {
                                 console.log('Download Complete');
                                 setDownloading(false);

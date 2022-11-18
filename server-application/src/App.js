@@ -21,7 +21,7 @@ function App() {
                 <Route path={ROUTES.Session.path} element={<Sessions />} />
                 <Route path={ROUTES.Records.path} element={<Records />} />
                 <Route path={ROUTES.CustomFields.path} element={<CustomFields />} />
-                <Route path={ROUTES.Offline.path} element={<Offline />} />
+                {/* <Route path={ROUTES.Offline.path} element={<Offline />} /> */}
                 <Route path={ROUTES.Settings.path} element={<Settings />} />
                 <Route
                   path="*"
