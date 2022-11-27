@@ -14,7 +14,7 @@ import CustomDataTypesProvider from './src/contexts/CustomDataContext';
 import { Provider } from '@react-native-material/core';
 import IpadOfflineModeStep1 from './src/screens/Offline/IpadOfflineModeStep1';
 import OfflineRecordsScreenStep2 from './src/screens/Offline/OfflineRecordsScreenStep2';
-import OfflineAddAndUpdateRecordStep3 from './src/screens/Offline/OfflineAddAndUpdateRecordStep3';
+import OfflineAddRecordStep3 from './src/screens/Offline/OfflineAddRecordStep3';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
@@ -66,7 +66,7 @@ export default function App() {
               />
               <Stack.Screen
                 name='Offline Add and Update Records'
-                component={OfflineAddAndUpdateRecordStep3}
+                component={OfflineAddRecordStep3}
                 options={{ title: 'Add Offline Record' }}
               />
             </Stack.Navigator>
