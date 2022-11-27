@@ -18,6 +18,7 @@ const BoolInput = (props) => {
                 props.updateBool(field);
               }}
               value={value}
+              style={styles.switch}
             ></Switch>
           </View>
         </View>
