@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Switch } from 'react-native';
 import { Button } from '@react-native-material/core';
 import { AntDesign } from '@expo/vector-icons';
 
-const OfflineSessionDataItem = (props) => {
+const OfflineStationDataTypeItem = (props) => {
   const field = props.item;
   const [showValues, setShowValues] = useState(false);
   const [value, setValue] = useState(false);
@@ -11,7 +11,13 @@ const OfflineSessionDataItem = (props) => {
   const [customData, setCustomData] = useState(props.customData);
   let options = [];
   if(type === 'custom') {
+    console.log('custom data', customData)
+    if(customData.values !== null) {
     options = customData.values;
+    }
+    else {
+      options = null;
+    }
   }
 
   const handleIconPress = () => {
@@ -25,18 +31,23 @@ const OfflineSessionDataItem = (props) => {
           <Text style={styles.text}>Field: {field.name}</Text>
           <Text style={styles.text}>Type: {type === 'custom' ? 'custom' : `${field.type}`}</Text>
           {type == 'custom' && (
-            <View style={styles.optionIconWrapper} >
+            <React.Fragment>
+              {options !== null && (
+                <View style={styles.optionIconWrapper} >
+                <Text style={styles.text} onPress={handleIconPress}>
+                  
+                  Options:
+                  </Text>
+                  {showValues ? (
+                    <AntDesign  style={styles.icon} name='rightcircleo' size={24} color='black' onPress={handleIconPress}/>
+                  ) : (
+                    <AntDesign style={styles.icon} name='downcircleo' size={24} color='black' onPress={handleIconPress}/>
+                  )}
+                </View>
+                )}
+            
 
-           
-            <Text style={styles.text} onPress={handleIconPress}>
-              Options:
-              </Text>
-              {showValues ? (
-                <AntDesign  style={styles.icon} name='rightcircleo' size={24} color='black' onPress={handleIconPress}/>
-              ) : (
-                <AntDesign style={styles.icon} name='downcircleo' size={24} color='black' onPress={handleIconPress}/>
-              )}
-            </View>
+            </React.Fragment>
           )}
         </View>
         <View>
@@ -53,7 +64,7 @@ const OfflineSessionDataItem = (props) => {
           <View style={styles.valuesWrapper}>
             {options.map((option, index) => {
               return (
-                <View style={styles.optionLabelAndTextWrapper}>
+                <View key={index} style={styles.optionLabelAndTextWrapper}>
                   <Text style={styles.optionLabel}>Option {index + 1}:</Text>
                   <Text style={styles.optiontext}>{option}</Text>
                 </View>
@@ -126,4 +137,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default OfflineSessionDataItem;
+export default OfflineStationDataTypeItem;
