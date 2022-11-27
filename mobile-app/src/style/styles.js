@@ -22,6 +22,11 @@ export const styles = StyleSheet.create({
     padding: 5,
     fontSize: 30,
   },
+  switch: {
+    justifyContent: 'flex-end',
+    padding: 5,
+    fontSize: 30,
+  },
   row: {
     marginLeft: 10,
     marginTop: 5,
@@ -76,4 +81,29 @@ export const styles = StyleSheet.create({
   scrollView: {
     marginHorizontal: 10,
   },
+  flatList: {
+    marginTop: 10,
+    height: '75%',
+    flexGrow: 0,
+    padding: 5,
+  },
+  btnOfflineQueue: {
+    alignSelf: 'flex-end',
+    justifyContent: 'start',
+    alignItems: 'center',
+    marginTop: 10,
+    backgroundColor: '#A3CDFF',
+    height: 50,
+    width: 100,
+    borderRadius: 10,
+    overflow: 'hidden',
+    marginRight: 20,
+  },
+  searchBar: {
+    margin: 5,
+    fontSize: 30,
+    width: 200,
+    padding: 1,
+    alignSelf: 'center',
+  }
 });
