@@ -1,7 +1,11 @@
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import {
-  FlatList, SafeAreaView, StatusBar, StyleSheet, Text
+  FlatList,
+  SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  Text,
 } from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
 import { TextInput } from '@react-native-material/core';
@@ -9,8 +13,11 @@ import AddToQueueBtn from './AddToQueueBtn';
 import SessionQueueItem from './SessionQueueItem';
 
 const SessionQueue = (props) => {
-
-  const { sessionInfo: { stations }, sessionRecords,  selectedStation: station } = useSessionContext();
+  const {
+    sessionInfo: { stations },
+    sessionRecords,
+    selectedStation: station,
+  } = useSessionContext();
   const stationIndex = stations.indexOf(station);
   const isStationOne = stations[0] === station;
   const [isSearching, setIsSearching] = React.useState(false);
@@ -18,7 +25,8 @@ const SessionQueue = (props) => {
   const [filteredRecords, setFilteredRecords] = useState([]);
   const sortedRecords = [...sessionRecords].sort((recordA, recordB) => {
     // secondary sorting
-    if (recordA.nextStationIndex === recordB.nextStationIndex) return recordA.lastModified <= recordB.lastModified ? -1 : 1;
+    if (recordA.nextStationIndex === recordB.nextStationIndex)
+      return recordA.lastModified <= recordB.lastModified ? -1 : 1;
     // Puts our station next as first ones in the list
     if (recordA.nextStationIndex === stationIndex) return -1;
     if (recordB.nextStationIndex === stationIndex) return 1;
@@ -35,47 +43,47 @@ const SessionQueue = (props) => {
     // if (recordA.nextStationIndex < stationIndex) return 1;
     // return -1;
   });
-  
+
   useEffect(() => {
     setFilteredRecords([]);
     setSearchText('');
     setIsSearching(false);
   }, [sessionRecords]);
-  
+
   const navigation = useNavigation();
   const handlePress = (item) => {
     navigation.navigate('Update Record', { item, isStationOne });
   };
   const handleAddToQueuePress = () => {
     navigation.navigate('Add To Queue', { station });
-  }
+  };
 
   const handleSearchInput = (text) => {
     setSearchText(text);
     setIsSearching(text.length > 0);
-  }
+  };
 
   useEffect(() => {
     searchForRecord();
   }, [isSearching, searchText]);
-
+  console.log(sortedRecords[0]);
   const searchForRecord = () => {
     if (isSearching) {
-      const foundRecord = sortedRecords.filter(record => record.name.toLowerCase().includes(searchText.toLowerCase()));
-      if(foundRecord.length > 0) {
+      const foundRecord = sortedRecords.filter((record) =>
+        record.id.toString().includes(searchText)
+      );
+      if (foundRecord.length > 0) {
         console.log('foundRecord', foundRecord);
         setFilteredRecords(foundRecord);
-      }
-      else {
+      } else {
         console.log('no record found');
         setFilteredRecords([]);
       }
-    }
-    else {
+    } else {
       console.log('not searching');
       setFilteredRecords([]);
     }
-  }
+  };
   //NEED SOCKET EVENT TO LISTEN FOR NEW DATA ADDED
   const renderQueueItem = ({ item }) => {
     return (
@@ -90,7 +98,14 @@ const SessionQueue = (props) => {
     <SafeAreaView style={styles.container}>
       <Text style={styles.stationTitle}>{station?.title}</Text>
       <Text style={styles.pageDirection}>Current Session</Text>
-      <TextInput placeholder='Search by Name' style={styles.searchBar} value={searchText} onChangeText={handleSearchInput}></TextInput>
+      <TextInput
+        keyboardType='number-pad'
+        returnKeyType='done'
+        placeholder='Search by ID'
+        style={styles.searchBar}
+        value={searchText}
+        onChangeText={handleSearchInput}
+      ></TextInput>
       {!isSearching && (
         <FlatList
           data={sortedRecords}
@@ -101,11 +116,11 @@ const SessionQueue = (props) => {
       )}
       {isSearching && (
         <FlatList
-        data={filteredRecords}
-        keyExtractor={(item) => item.id}
-        renderItem={renderQueueItem}
-        style={styles.flatList}
-      />
+          data={filteredRecords}
+          keyExtractor={(item) => item.id}
+          renderItem={renderQueueItem}
+          style={styles.flatList}
+        />
       )}
       {isStationOne && (
         <AddToQueueBtn onPress={handleAddToQueuePress}></AddToQueueBtn>
@@ -128,7 +143,6 @@ const styles = StyleSheet.create({
     fontSize: 22,
     alignSelf: 'flex-end',
     fontWeight: '200',
-
   },
   pageDirection: {
     margin: 10,
@@ -146,7 +160,7 @@ const styles = StyleSheet.create({
     width: 200,
     padding: 1,
     alignSelf: 'center',
-  }
+  },
 });
 
 export default SessionQueue;
