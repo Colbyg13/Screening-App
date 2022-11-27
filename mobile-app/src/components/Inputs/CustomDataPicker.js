@@ -20,7 +20,7 @@ const CustomDataPicker = (props) => {
         </Text>
         <View>
           <TextInput
-            keyboardType='number-pad'
+            keyboardType='decimal-pad'
             returnKeyType='done'
             onSubmitEditing={Keyboard.dismiss}
             onChangeText={(newText) => {
