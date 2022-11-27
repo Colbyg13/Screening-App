@@ -81,7 +81,7 @@ const AddToOnlineQueue = ({ route }) => {
     //console.log('handling date update', field, showname, newDate);
     setFormState((prevState) => ({
       ...prevState,
-      [field.key]: newDate.toLocaleDateString(), //year/month/day
+      [field.key]: newDate, //year/month/day
     }));
     setDateStates((prevState) => ({
       ...prevState,
@@ -178,83 +178,97 @@ const AddToOnlineQueue = ({ route }) => {
     }
   };
   return (
-      <SafeAreaView style={styles.container}>
-        <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={true} persistentScrollbar={true}>
-          <Text style={styles.pageDirection}>Patient Information</Text>
-          <View>
-            {station.fields.map((field) => {
-              return renderInput(field);
-            })}
-          </View>
-        </ScrollView>
-          <View style={styles.wrapper}>
-            <Pressable
-              style={styles.btnSubmit}
-              pressEffect='ripple'
-              pressEffectColor='#4c5e75'
-              onPress={handleSubmit}
-            >
-              <Text style={styles.btnText}>Submit</Text>
-            </Pressable>
-            <Pressable
-              style={styles.btnCancel}
-              pressEffect='ripple'
-              pressEffectColor='#FCB8B8'
-            >
-              <Text style={styles.btnText}>Cancel</Text>
-            </Pressable>
-          </View>
-          <Dialog
-            visible={visible}
-            onDismiss={() => {
-              setFormState({});
+    <SafeAreaView style={styles.container}>
+      <ScrollView
+        style={styles.scrollView}
+        showsVerticalScrollIndicator={true}
+        persistentScrollbar={true}
+      >
+        <Text style={styles.pageDirection}>Patient Information</Text>
+        <View>
+          {station.fields.map((field) => {
+            return renderInput(field);
+          })}
+        </View>
+      </ScrollView>
+      <View style={styles.wrapper}>
+        <Pressable
+          style={styles.btnSubmit}
+          pressEffect='ripple'
+          pressEffectColor='#4c5e75'
+          onPress={handleSubmit}
+        >
+          <Text style={styles.btnText}>Submit</Text>
+        </Pressable>
+        <Pressable
+          style={styles.btnCancel}
+          pressEffect='ripple'
+          pressEffectColor='#FCB8B8'
+          onPress={() => {
+            setFormState({});
+            navigation.goBack();
+          }}
+        >
+          <Text style={styles.btnText}>Cancel</Text>
+        </Pressable>
+      </View>
+      <Dialog
+        visible={visible}
+        onDismiss={() => {
+          setFormState({});
+          setVisible(false);
+        }}
+        onClose={() => {
+          defaultState();
+        }}
+      >
+        <DialogHeader title='Added to Queue Successully!' />
+        <DialogContent>
+          <Text>New ID: {patient.id}</Text>
+          {fields.map((field, index) => {
+            if (patient.data[field] === true || patient.data[field] === false) {
+              return (
+                <React.Fragment key={index}>
+                  <Text>
+                    {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                    {patient.data[field].toString()}
+                  </Text>
+                </React.Fragment>
+              );
+            } else if (formState[field] instanceof Date) {
+              return (
+                <React.Fragment key={index}>
+                  <Text>
+                    {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                    {formState[field].toLocaleDateString()}
+                  </Text>
+                </React.Fragment>
+              );
+            } else {
+              return (
+                <React.Fragment key={index}>
+                  <Text key={field.name}>
+                    {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                    {patient.data[field]}
+                  </Text>
+                </React.Fragment>
+              );
+            }
+          })}
+        </DialogContent>
+        <DialogActions>
+          <Button
+            title='Ok'
+            compact
+            variant='text'
+            onPress={() => {
               setVisible(false);
+              navigation.navigate('Current Session Queue');
             }}
-            onClose={() => {
-              defaultState();
-            }}
-          >
-            <DialogHeader title='Added to Queue Successully!' />
-            <DialogContent>
-              <Text>New ID: {patient.id}</Text>
-              {fields.map((field, index) => {
-                if (
-                  patient.data[field] === true ||
-                  patient.data[field] === false
-                ) {
-                  return (
-                    <React.Fragment key={index}>
-                      <Text>
-                        {station.fields.find(({ key }) => key === field)?.name}:{' '}
-                        {patient.data[field].toString()}
-                      </Text>
-                    </React.Fragment>
-                  );
-                } else {
-                  return (
-                    <React.Fragment key={index}>
-                      <Text key={field.name}>
-                        {station.fields.find(({ key }) => key === field)?.name}:{' '}
-                        {patient.data[field]}
-                      </Text>
-                    </React.Fragment>
-                  );
-                }
-              })}
-            </DialogContent>
-            <DialogActions>
-              <Button
-                title='Ok'
-                compact
-                variant='text'
-                onPress={() => {
-                  setVisible(false);
-                  navigation.navigate('Current Session Queue');
-                }}
-              />
-            </DialogActions>
-          </Dialog>
-      </SafeAreaView>
+          />
+        </DialogActions>
+      </Dialog>
+    </SafeAreaView>
   );
 };
 
