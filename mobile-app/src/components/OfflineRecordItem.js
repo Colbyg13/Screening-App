@@ -4,19 +4,17 @@ import { Pressable } from '@react-native-material/core';
 
 const OfflineRecordItem = (props) => {
   const person = props.item;
-  console.log('person', person)
+  console.log('person', person);
   return (
-    <Pressable
-      key={person.id}
-      style={styles.item}
-      onPress={props.onPress}
-    >
+    <Pressable key={person.id} style={styles.item} onPress={props.onPress}>
       <View style={styles.innerContent}>
         <View style={styles.itemWrapper}>
-          <Text style={styles.title}>Name: {person.name}</Text>
-          <View key={person.name} style={styles.fieldsView}>
-            <Text style={styles.fieldsitem}>ID: {person.id}</Text>
-          </View>
+          <Text style={styles.title}>ID: {person.id}</Text>
+          {person.name && (
+            <View key={person.name} style={styles.fieldsView}>
+              <Text style={styles.fieldsitem}>Name: {person.name}</Text>
+            </View>
+          )}
         </View>
       </View>
     </Pressable>
@@ -58,7 +56,7 @@ const styles = StyleSheet.create({
     flex: 1,
     display: 'flex',
     justifyContent: 'center',
-  }
+  },
 });
 
 export default OfflineRecordItem;
