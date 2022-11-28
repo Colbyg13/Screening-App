@@ -161,7 +161,7 @@ module.exports = APP => {
             const writeStream = fs.createWriteStream(outputPath, { flags: 'w' });
             const stream = APP.db.collection('patients').find().stream();
 
-            writeStream.write(`${allFieldKeys.map(key => key).join(',')}\n`);
+            writeStream.write(`${allFieldKeys.map(key => unitConversions[key] ? `${key} (${unitConversions[key]})` : key).join(',')}\n`);
 
             stream.on('data', doc => {
                 writeStream.write(`${allFieldKeys.map(key => doc[key] === undefined ?

@@ -55,9 +55,19 @@ export default function Records() {
   }, [sort, skip, search, reachedEndOfRecords, unitConversions]);
 
   function handleScroll(e) {
+
+    const {
+      target: {
+        scrollHeight,
+        clientHeight,
+        scrollTop,
+      } = {},
+    } = e;
+    
+    const margin = 100;
     // loads more when reaching the end of the page
-    const bottom = e.target.scrollHeight - e.target.scrollTop === e.target.clientHeight;
-    if (bottom) setSkip(skip => skip + recordPageSize);
+    const bottom = scrollHeight - scrollTop - margin <= clientHeight;
+    if (!loading && bottom) setSkip(skip => skip + recordPageSize);
   }
 
   function updateSearch(newSearch) {

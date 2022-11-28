@@ -92,6 +92,8 @@ module.exports = APP => {
             customData = {},
         } = req.body;
 
+        console.log({record, customData})
+
         APP.db.collection("patients")
             .findOneAndUpdate(
                 { id: record.id },

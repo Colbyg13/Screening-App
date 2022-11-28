@@ -7,41 +7,46 @@ import { useSessionContext } from '../contexts/SessionContext';
 import { TextInput } from '@react-native-material/core';
 import AddToQueueBtn from './AddToQueueBtn';
 import SessionQueueItem from './SessionQueueItem';
+import { PATIENT_RECORD_STATUS } from '../classes/patient-record';
 
 const SessionQueue = (props) => {
 
-  const { sessionInfo: { stations }, sessionRecords,  selectedStation: station } = useSessionContext();
+  const { sessionInfo: { stations }, sessionRecords, selectedStation: station } = useSessionContext();
   const stationIndex = stations.indexOf(station);
   const isStationOne = stations[0] === station;
   const [isSearching, setIsSearching] = React.useState(false);
   const [searchText, setSearchText] = React.useState('');
   const [filteredRecords, setFilteredRecords] = useState([]);
   const sortedRecords = [...sessionRecords].sort((recordA, recordB) => {
-    // secondary sorting
-    if (recordA.nextStationIndex === recordB.nextStationIndex) return recordA.lastModified <= recordB.lastModified ? -1 : 1;
+
+    if (recordA.nextStationIndex === recordB.nextStationIndex) {
+
+      if (recordA.nextStationIndex === recordB.nextStationStatus) return recordA.lastModified <= recordB.lastModified ? -1 : 1;
+
+      return recordA.nextStationStatus === PATIENT_RECORD_STATUS.PARTIAL ? -1 : 1;
+    }
     // Puts our station next as first ones in the list
     if (recordA.nextStationIndex === stationIndex) return -1;
     if (recordB.nextStationIndex === stationIndex) return 1;
     // complete ones last in the list
     if (recordA.isComplete) return 1;
     if (recordB.isComplete) return -1;
-    // if (
-    //   ((recordA.nextStationIndex > stationIndex) && (recordB.nextStationIndex > stationIndex))
-    //   ||
-    //   ((recordA.nextStationIndex < stationIndex) && (recordB.nextStationIndex < stationIndex))
-    // ) return recordA.nextStationIndex - recordB.nextStationIndex;
-    return recordA.nextStationIndex - recordB.nextStationIndex;
 
-    // if (recordA.nextStationIndex < stationIndex) return 1;
-    // return -1;
+    if ((recordA.nextStationIndex > stationIndex) && (recordB.nextStationIndex > stationIndex)) return recordA.nextStationIndex - recordB.nextStationIndex;
+    
+    if ((recordA.nextStationIndex > stationIndex) && (recordB.nextStationIndex < stationIndex)) return 1;
+
+    if ((recordA.nextStationIndex < stationIndex) && (recordB.nextStationIndex > stationIndex)) return -1;
+
+    return recordB.nextStationIndex - recordA.nextStationIndex;
   });
-  
+
   useEffect(() => {
     setFilteredRecords([]);
     setSearchText('');
     setIsSearching(false);
   }, [sessionRecords]);
-  
+
   const navigation = useNavigation();
   const handlePress = (item) => {
     navigation.navigate('Update Record', { item, isStationOne });
@@ -62,7 +67,7 @@ const SessionQueue = (props) => {
   const searchForRecord = () => {
     if (isSearching) {
       const foundRecord = sortedRecords.filter(record => record.name.toLowerCase().includes(searchText.toLowerCase()));
-      if(foundRecord.length > 0) {
+      if (foundRecord.length > 0) {
         console.log('foundRecord', foundRecord);
         setFilteredRecords(foundRecord);
       }
@@ -101,11 +106,11 @@ const SessionQueue = (props) => {
       )}
       {isSearching && (
         <FlatList
-        data={filteredRecords}
-        keyExtractor={(item) => item.id}
-        renderItem={renderQueueItem}
-        style={styles.flatList}
-      />
+          data={filteredRecords}
+          keyExtractor={(item) => item.id}
+          renderItem={renderQueueItem}
+          style={styles.flatList}
+        />
       )}
       {isStationOne && (
         <AddToQueueBtn onPress={handleAddToQueuePress}></AddToQueueBtn>
