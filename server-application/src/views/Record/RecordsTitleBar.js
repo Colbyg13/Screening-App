@@ -21,9 +21,9 @@ export default function RecordTitleBar({
         <div className='pt-8 px-2 pb-2 bg-green-500 flex justify-between items-center'>
             <span className='flex items-baseline space-x-2'>
                 <h2 className='ml-2 font-bold text-2xl'>
-                    Records Page
+                    All Records
                 </h2>
-                <span>{totalRecordCount ? `(${totalRecordCount.toLocaleString()} records)` : ''}</span>
+                <span>{totalRecordCount ? `(${totalRecordCount.toLocaleString()} total)` : ''}</span>
             </span>
             <RecordSearch
                 updateSearch={updateSearch}

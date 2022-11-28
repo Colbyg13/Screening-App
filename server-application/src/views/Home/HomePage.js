@@ -6,7 +6,6 @@ export default function HomePage() {
 
     return (
         <div className="w-full h-full overflow-y-auto pb-16 p-8 flex flex-col space-y-8">
-            <h1 className='text-4xl'>Samoa Screening App</h1>
             <div className='flex space-x-4'>
                 {[ROUTES.CustomFields, ROUTES.Session, ROUTES.Records, ROUTES.Settings].map(({ title, path }) => (
                     <HomeLinkButton
@@ -17,9 +16,10 @@ export default function HomePage() {
                 ))}
             </div>
             <div className='bg-white w-full h-full p-4 space-y-4 rounded-md shadow-md'>
-                <h2 className='text-xl font-semibold'>
-                    Welcome to Samoa Screening App's Server Application!
-                </h2>
+                <div className='flex items-baseline justify-between'>
+                    <h2 className='text-2xl font-semibold'>Welcome to Healthy Samoa's Server Application</h2>
+                    <img className='h-16 mr-8' src='images/healthylogo.png' alt="healthy samoa app" />
+                </div>
                 <div className='flex flex-col'>
                     <h2 className='text-lg font-semibold'>Custom Fields:</h2>
                     <span>This page is used to define specific fields that will be tracked during the screening option. This allows the application to do unit conversion such as meters to feet or kilograms to pounds.</span>
