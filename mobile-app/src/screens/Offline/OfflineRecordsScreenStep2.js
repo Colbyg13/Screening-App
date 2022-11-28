@@ -12,7 +12,7 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
   const [newRecord, setNewRecord] = useState(null); //object to hold new record
   const [needsToStoreData, setNeedsToStoreData] = useState(false); //boolean to determine if new record needs to be stored
   const [needsUpdate, setNeedsUpdate] = useState(false); //boolean to trigger update of records list
- 
+
   //AsyncStorage.removeItem('LOCAL_RECORDS'); //use this to clear local records
   useEffect(() => {
     retrieveRecords(); //retrieve records from async storage
@@ -23,7 +23,7 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
       const value = await AsyncStorage.getItem('LOCAL_RECORDS');
       if (value !== null) {
         // We have data!!
-        console.log("DATA FROM STORAGE", value);
+        console.log('DATA FROM STORAGE', value);
         setRecords(JSON.parse(value));
         setNeedsUpdate(false);
       }
@@ -34,8 +34,8 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
   };
 
   const storeRecords = async () => {
-    if(records.length > 0) {
-      console.log('storing the records')
+    if (records.length > 0) {
+      console.log('storing the records');
       try {
         const jsonValue = JSON.stringify(records);
         console.log('SETTING STORAGE TO THIS VALUE', jsonValue);
@@ -45,32 +45,38 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
         // saving error
         console.log('error saving record');
       }
-    }
-    else return //no records to store
+    } else return; //no records to store
   };
 
-  useEffect(() => { //should fire when a new record is submitted
+  useEffect(() => {
+    //should fire when a new record is submitted
     if (route.params?.newRecord) {
       setRecords((prevState) => [...prevState, route.params.newRecord]);
       setNeedsToStoreData(true);
     }
   }, [route.params?.newRecord]);
 
-
   useEffect(() => {
     storeRecords();
   }, [needsToStoreData]);
 
-
   const AddRecord = () => {
-    navigation.navigate('Offline Add and Update Records', {
+    navigation.navigate('Offline Add Records', {
+      customDataTypes,
+      selectedDataTypes,
+    });
+  };
+
+  const handlePress = (item) => {
+    navigation.navigate('Offline Update Records', {
+      item,
       customDataTypes,
       selectedDataTypes,
     });
   };
 
   const renderOfflineRecordItem = ({ item }) => {
-    return <OfflineRecordItem item={item} />;
+    return <OfflineRecordItem item={item} onPress={() => handlePress(item)} />;
   };
 
   return (
