@@ -29,11 +29,11 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
     // initially get custom data from async storage
     AsyncStorage.getItem(CUSTOM_DATA_STORAGE_KEY)
       // if there are custom Data types, then we don't want to override it because it came from the DB already
-      .then(storedCustomDataString => setCustomDataTypes(customDataTypes => customDataTypes.length ?
-        customDataTypes
-        :
-        JSON.parse(storedCustomDataString) || []
-    ))
+      .then((storedCustomDataString) =>
+        setCustomDataTypes(
+          (customDataTypes) => JSON.parse(storedCustomDataString) || []
+        )
+      );
     setCustomDataReady(true);
   }, []);
 

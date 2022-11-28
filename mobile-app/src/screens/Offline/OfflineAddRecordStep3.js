@@ -9,7 +9,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
   console.log('add to queue offline screen', route.params);
   const customDataTypes = route.params.customDataTypes;
   const selectedDataTypes = [
-    { name: 'id', key: 'id', type: 'number' },
+    { name: 'ID', key: 'ID', type: 'number' },
     ...route.params.selectedDataTypes,
   ];
   const [formState, setFormState] = useState({}); //used to keep track of inputs.
@@ -86,7 +86,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
   };
 
   const handleSubmit = () => {
-    console.log('formState before submit', formState);
+    //go back a screen with new data and persist it there. 
     navigation.navigate({
       name: 'Offline Records',
       params: { newRecord: formState },
@@ -95,7 +95,6 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
   };
 
   const renderInput = (field) => {
-    console.log('rendering input', field);
     switch (field.type) {
       case 'date':
         let showname = `show${field.key}`;
