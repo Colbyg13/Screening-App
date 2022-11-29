@@ -137,12 +137,12 @@ export default function SessionProvider({ children }) {
     }, [socket]);
 
     async function tryFindingServer() {
-        // const serverIp = 'http://10.75.180.154:3333';
+        const serverIp = 'http://10.75.191.88:3333';
         if (!isConnected) {
             setServerLoading(true);
 
             try {
-                const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
+                // const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
                 if (serverIp) {
                     console.log(`Server found on: ${serverIp}`);
                     const socket = io(serverIp);
@@ -212,8 +212,8 @@ export default function SessionProvider({ children }) {
     }
 
     async function sendRecord(recordPayload) {
-        // console.log('Sending record...', recordPayload);
-        const createRecord = !recordPayload.id;
+        console.log('Sending record...', recordPayload);
+        const createRecord = !recordPayload?.record?.id;
         const createOrUpdate = createRecord ? 'create' : 'update';
         // console.log(createRecord, createOrUpdate)
         const url = `${serverIp}/api/v1/patients/${createOrUpdate}`;

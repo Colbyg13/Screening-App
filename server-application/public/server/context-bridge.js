@@ -5,6 +5,8 @@ const { ObjectId } = require("mongodb");
 const { normalizeFields } = require("./utils");
 const fs = require('fs');
 const downloadsFolder = require('downloads-folder');
+const convert = require('convert-units');
+
 
 module.exports = APP => {
     contextBridge.exposeInMainWorld("api", {
@@ -36,7 +38,7 @@ module.exports = APP => {
         },
         getIsSessionRunning: () => APP.sessionIsRunning,
         getRecordCount: () => APP.db.collection("patients").countDocuments(),
-        getRecords: (search = '', sort = {}, skip = 0, pageSize = 50, allFieldKeys = []) => new Promise((resolve, reject) => APP.db.collection("patients")
+        getRecords: (search = '', sort = {}, skip = 0, pageSize = 50, unitConversions = {}) => new Promise((resolve, reject) => APP.db.collection("patients")
             .find(search ? {
                 $or: ['id', 'name'].map(key => ({
                     $expr: {
@@ -46,21 +48,29 @@ module.exports = APP => {
                         }
                     }
                 })),
-                // SEARCHES ALL KEYS
-                // $or: allFieldKeys.map(key => ({
-                //     $expr: {
-                //         $regexMatch: {
-                //             input: { "$toString": `$${key}` },
-                //             regex: new RegExp(search, 'i'),
-                //         }
-                //     }
-                // })),
             } : {}).sort(sort).limit(pageSize).skip(skip).toArray((err, patients) => {
                 if (err) {
                     console.error(err);
                     reject("Error finding patient records");
                 }
-                resolve(patients);
+
+                const convertedPatients = patients.map(({ customData, ...record }) => ({
+                    ...record,
+                    ...Object.entries(unitConversions).reduce((all, [key, unit]) => ({
+                        ...all,
+                        [key]: record[key] === undefined ?
+                            undefined
+                            :
+                            convert(record[key]).from(customData[key]).to(unit),
+                    }), {})
+                }));
+
+                console.log({
+                    convertedPatients,
+                    patients,
+                    unitConversions,
+                })
+                resolve(convertedPatients);
             })),
         createRecord: record => new Promise((resolve, reject) => {
             if (APP.sessionIsRunning) {
@@ -108,10 +118,20 @@ module.exports = APP => {
             }
             else reject("Session not started. Please start a session to create a record");
         }),
-        updateRecord: record => new Promise((resolve, reject) => APP.db.collection("patients")
+        updateRecord: ({ record, customData = {} }) => new Promise((resolve, reject) => APP.db.collection("patients")
             .findOneAndUpdate(
                 { id: record.id },
-                { $set: { lastModified: new Date(), ...record, eyes: undefined } },
+                {
+                    $set: {
+                        lastModified: new Date(),
+                        ...record,
+                        // only updates the fields the record is tied to
+                        ...Object.entries(customData).reduce((all, [key, value]) => ({
+                            ...all,
+                            [`customData.${key}`]: value,
+                        }), {}),
+                    }
+                },
                 { returnDocument: 'after' }
             )
             .then(({ value: updatedRecord }) => {
@@ -129,7 +149,7 @@ module.exports = APP => {
                 reject("Error updating patient record");
             })
         ),
-        downloadRecords: (initialOutputPath, allFieldKeys = []) => new Promise((resolve, reject) => {
+        downloadRecords: (initialOutputPath, allFieldKeys = [], unitConversions = {}) => new Promise((resolve, reject) => {
 
             const outputPath = initialOutputPath.match(/.csv$/) ?
                 initialOutputPath
@@ -141,10 +161,16 @@ module.exports = APP => {
             const writeStream = fs.createWriteStream(outputPath, { flags: 'w' });
             const stream = APP.db.collection('patients').find().stream();
 
-            writeStream.write(`${allFieldKeys.map(key => key).join(',')}\n`);
+            writeStream.write(`${allFieldKeys.map(key => unitConversions[key] ? `${key} (${unitConversions[key]})` : key).join(',')}\n`);
 
             stream.on('data', doc => {
-                writeStream.write(`${allFieldKeys.map(key => doc[key] || '').join(',')}\n`)
+                writeStream.write(`${allFieldKeys.map(key => doc[key] === undefined ?
+                    ''
+                    :
+                    unitConversions[key] ?
+                        convert(doc[key]).from(doc.customData[key]).to(unitConversions[key])
+                        :
+                        doc[key]).join(',')}\n`)
             });
             stream.on('end', () => {
                 console.log('record stream ended');

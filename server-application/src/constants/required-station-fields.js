@@ -13,12 +13,12 @@ const DOB = {
 
 export const REQUIRED_STATION_FIELDS = {
     [NAME.key]: NAME,
-    [DOB.key]: DOB,
+    // [DOB.key]: DOB,
 };
 
 export const ALL_REQUIRED_STATION_FIELDS = [
     NAME,
-    DOB,
+    // DOB,
 ];
 
 export const ALL_REQUIRED_STATION_FIELD_KEYS = ALL_REQUIRED_STATION_FIELDS.map(({ key }) => key);

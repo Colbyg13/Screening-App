@@ -26,8 +26,11 @@ export default function RecordItem({
                             typeof record[key] === 'boolean' ?
                                 !!record[key] ? 'Yes' : 'No'
                                 :
-                                record[key] instanceof Date ?
-                                    record[key].toLocaleDateString()
+                                typeof record[key] === 'number' ?
+                                    `${record[key]}`.match(/^\d+\.\d+$/) ?
+                                        record[key].toFixed(2)
+                                        :
+                                        record[key]
                                     :
                                     record[key] || ''}
                     />

@@ -16,9 +16,11 @@ import CustomDataPicker from '../components/Inputs/CustomDataPicker';
 import { styles } from '../style/styles';
 import DatePicker from '../components/Inputs/DatePicker';
 import BoolInput from '../components/Inputs/BoolInput';
+import { useCustomDataTypesContext } from '../contexts/CustomDataContext';
 
 const AddToOnlineQueue = ({ route }) => {
   const navigation = useNavigation();
+  const { customDataTypes } = useCustomDataTypesContext();
   const { sendRecord, selectedStation: station } = useSessionContext();
   const [formState, setFormState] = useState({}); //used to keep track of inputs.
   const [dateStates, setDateStates] = useState({});
@@ -62,7 +64,29 @@ const AddToOnlineQueue = ({ route }) => {
     //call function to handle SOCKET EVENT TO ADD NEW RECORD TO SESSION/QUEUE
     //On success open dialog with new ID, name, and DOB
     //On dialog close go back to session and update list of patients
-    const newId = await sendRecord(formState);
+    const newId = await sendRecord({
+      record: formState,
+      // puts only updated values in form into
+      customData: customDataTypes
+        .reduce((customData, { type, unit }) => {
+          const usedField = station.fields.find(field => field.type === type);
+          const shouldAddKey = (
+            (unit !== 'Custom')
+            &&
+            usedField
+            &&
+            (formState[usedField.key] !== undefined)
+          );
+
+          return shouldAddKey ?
+            {
+              ...customData,
+              [usedField.key]: unit,
+            }
+            :
+            customData;
+        }, {}),
+    });
     // let newId = Math.floor(Math.random() * 10); //this id will be given in the server
     setPatient((prevState) => ({ ...prevState, id: newId })); //on server success set the patient in state for display.
 

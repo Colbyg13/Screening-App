@@ -22,9 +22,11 @@ import { useSessionContext } from '../contexts/SessionContext';
 import BoolInput from '../components/Inputs/BoolInput';
 import CustomDataPicker from '../components/Inputs/CustomDataPicker';
 import DatePicker from '../components/Inputs/DatePicker';
+import { useCustomDataTypesContext } from '../contexts/CustomDataContext';
 
 const UpdateRecordScreen = ({ route }) => {
   const navigation = useNavigation();
+  const { customDataTypes } = useCustomDataTypesContext();
   const record = route.params.item;
   const {
     sendRecord,
@@ -131,7 +133,28 @@ const UpdateRecordScreen = ({ route }) => {
     //call function to handle SOCKET EVENT TO ADD NEW RECORD TO SESSION/QUEUE
     //On success open dialog with new ID, name, and DOB
     //On dialog close go back to session and update list of patients
-    const result = await sendRecord(formState);
+    const result = await sendRecord({
+      record: formState,
+      customData: customDataTypes
+        .reduce((customData, { type, unit }) => {
+          const usedField = station.fields.find(field => field.type === type);
+          const shouldAddKey = (
+            (unit !== 'Custom')
+            &&
+            usedField
+            &&
+            (formState[usedField.key] !== undefined)
+          );
+
+          return shouldAddKey ?
+            {
+              ...customData,
+              [usedField.key]: unit,
+            }
+            :
+            customData;
+        }, {}),
+    });
     setVisible(true);
   };
   const renderInput = (field) => {
@@ -225,7 +248,6 @@ const UpdateRecordScreen = ({ route }) => {
             <Text style={styles.patientInfoItem}>ID: {record.id}</Text>
             <Text style={styles.patientInfoItem}>Name: {record.name}</Text>
           </View>
-
           <View>
             <Text style={styles.pageDirection}>{station.name} Data:</Text>
           </View>
