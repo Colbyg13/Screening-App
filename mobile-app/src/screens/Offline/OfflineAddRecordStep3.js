@@ -138,7 +138,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                   // console.log(newText);
                   setFormState((prevState) => ({
                     ...prevState,
-                    [field.key]: newText,
+                    [field.key]: +newText,
                   }));
                 }}
                 style={styles.fieldInput}

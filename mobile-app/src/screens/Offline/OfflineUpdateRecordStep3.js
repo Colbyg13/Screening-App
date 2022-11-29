@@ -184,7 +184,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
             <Text style={styles.fieldName}>{field.name}:</Text>
             <View>
               <TextInput
-                value={formState[field.key]}
+                value={String(formState[field.key])}
                 keyboardType='number-pad'
                 returnKeyType='done'
                 onSubmitEditing={Keyboard.dismiss}
@@ -192,7 +192,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                   // console.log(newText);
                   setFormState((prevState) => ({
                     ...prevState,
-                    [field.key]: newText,
+                    [field.key]: +newText,
                   }));
                 }}
                 style={styles.fieldInput}
@@ -288,7 +288,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
             }}
           />
           <Button
-            title='Ok'
+            title='I understand'
             compact
             color='#A3CDFF'
             style={{ marginLeft: 10, marginRight: 10 }}
@@ -297,7 +297,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
               console.log('formState before submit in dialog', formState);
               navigation.navigate({
                 name: 'Offline Records',
-                params: { updatedRecord: formState, oldRecordID: item.id },
+                params: { updatedRecord: formState, oldRecordID: item.ID},
                 merge: true,
               });
             }}

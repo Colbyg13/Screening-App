@@ -4,7 +4,6 @@ import { Pressable } from '@react-native-material/core';
 
 const OfflineRecordItem = (props) => {
   const person = props.item;
-  console.log('person', person);
   return (
     <Pressable key={person.ID} style={styles.item} onPress={props.onPress}>
       <View style={styles.innerContent}>
