@@ -6,6 +6,7 @@ const { normalizeFields } = require("./utils");
 const fs = require('fs');
 const downloadsFolder = require('downloads-folder');
 const convert = require('convert-units');
+const isDev = require('electron-is-dev');
 
 
 module.exports = APP => {
@@ -36,6 +37,7 @@ module.exports = APP => {
                 ]
             });
         },
+        getIsDev: () => isDev,
         getIsSessionRunning: () => APP.sessionIsRunning,
         getRecordCount: () => APP.db.collection("patients").countDocuments(),
         getRecords: (search = '', sort = {}, skip = 0, pageSize = 50, unitConversions = {}) => new Promise((resolve, reject) => APP.db.collection("patients")
