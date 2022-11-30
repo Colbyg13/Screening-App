@@ -4,21 +4,19 @@ import { BrowserRouter, HashRouter } from "react-router-dom";
 import App from './App';
 import './index.css';
 
-
 function render() {
 
     const root = ReactDOM.createRoot(document.getElementById("root"));
     root.render(
         <React.StrictMode>
-            {window.getIsDev() ? (
-                <BrowserRouter>
-                    <App />
-                </BrowserRouter>
-            ) : (
-                <HashRouter>
-                    <App />
-                </HashRouter>
-            )}
+            {/* FOR DEV */}
+            {/* <BrowserRouter>
+                <App />
+            </BrowserRouter> */}
+            {/* FOR PROD */}
+            <HashRouter>
+                <App />
+            </HashRouter>
         </React.StrictMode>
     );
 }
