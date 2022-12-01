@@ -263,8 +263,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
         <DialogHeader title='Updating ID Warning' />
         <DialogContent>
           <Text style={{ fontSize: 20 }}>
-            You are about to change the ID on this record. This will overwrite
-            any existing record with the same ID. Are you sure you want to
+            You are about to change the ID on this record. Are you sure you want to
             continue?
           </Text>
           <Text style={{ marginTop: 10, fontSize: 22, fontWeight: 'bold' }}>
