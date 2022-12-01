@@ -70,7 +70,7 @@ const SessionQueue = (props) => {
   useEffect(() => {
     searchForRecord();
   }, [isSearching, searchText]);
-  console.log(sortedRecords[0]);
+  // console.log(sortedRecords[0]);
   const searchForRecord = () => {
     if (isSearching) {
       const foundRecord = sortedRecords.filter((record) =>

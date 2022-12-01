@@ -6,7 +6,7 @@ import BoolInput from '../../components/Inputs/BoolInput';
 import DatePicker from '../../components/Inputs/DatePicker';
 import CustomDataPickerOffline from '../../components/Inputs/CustomDataPickerOffline';
 const OfflineAddRecordStep3 = ({ route, navigation }) => {
-  console.log('add to queue offline screen', route.params);
+  // console.log('add to queue offline screen', route.params);
   const customDataTypes = route.params.customDataTypes;
   const selectedDataTypes = [
     { name: 'ID', key: 'ID', type: 'number' },
@@ -44,24 +44,36 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
 
   useEffect(() => {
     //sets the state for the form dynamically. I have not implemented validation yet.
-    console.log('formState updated', formState);
+    // console.log('formState updated', formState);
   }, [formState]);
 
 
 
   const handleFormUpdate = (field, selectedItem) => {
     //console.log('handling update', field, selectedItem);
+    const customFieldData = customDataTypes.find(({ type }) => type === field.type);
+    const customData = customFieldData ? { [field.key]: customFieldData.unit } : {}
     setFormState((prevState) => ({
       ...prevState,
       [field.key]: selectedItem,
+      customData: {
+        ...prevState.customData,
+        ...customData,
+      }
     }));
   };
 
   const handleDateUpdate = (field, showname, newDate) => {
+    const customFieldData = customDataTypes.find(({ type }) => type === field.type);
+    const customData = customFieldData ? { [field.key]: customFieldData.unit } : {}
     //console.log('handling date update', field, showname, newDate);
     setFormState((prevState) => ({
       ...prevState,
       [field.key]: newDate, //year/month/day
+      customData: {
+        ...prevState.customData,
+        ...customData,
+      }
     }));
     setDateStates((prevState) => ({
       ...prevState,
@@ -79,9 +91,15 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
 
   const updateBool = (field) => {
     const oldState = formState[field.key];
+    const customFieldData = customDataTypes.find(({ type }) => type === field.type);
+    const customData = customFieldData ? { [field.key]: customFieldData.unit } : {}
     setFormState((prevState) => ({
       ...prevState,
       [field.key]: !oldState,
+      customData: {
+        ...prevState.customData,
+        ...customData,
+      }
     }));
   };
 
@@ -114,9 +132,15 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
             <View>
               <TextInput
                 onChangeText={(newText) => {
+                  const customFieldData = customDataTypes.find(({ type }) => type === field.type);
+                  const customData = customFieldData ? { [field.key]: customFieldData.unit } : {}
                   setFormState((prevState) => ({
                     ...prevState,
                     [field.key]: newText,
+                    customData: {
+                      ...prevState.customData,
+                      ...customData,
+                    }
                   }));
                 }}
                 style={styles.fieldInput}
@@ -136,9 +160,15 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                 onSubmitEditing={Keyboard.dismiss}
                 onChangeText={(newText) => {
                   // console.log(newText);
+                  const customFieldData = customDataTypes.find(({ type }) => type === field.type);
+                  const customData = customFieldData ? { [field.key]: customFieldData.unit } : {}
                   setFormState((prevState) => ({
                     ...prevState,
                     [field.key]: +newText,
+                    customData: {
+                      ...prevState.customData,
+                      ...customData,
+                    }
                   }));
                 }}
                 style={styles.fieldInput}

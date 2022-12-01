@@ -8,6 +8,7 @@ import findServer from "../utils/find-server";
 import replace from "../utils/replace";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View } from "react-native";
+import { LOCAL_RECORDS_STORAGE_KEY } from "../screens/Offline/OfflineRecordsScreenStep2";
 
 export const SERVER_PORT = 3333;
 export const MAX_TRIES = 5;
@@ -81,6 +82,22 @@ export default function SessionProvider({ children }) {
         tryFindingServer();
     }, []);
 
+    // UPLOAD OFFLINE RECORDS TO SERVER WHEN CONNECTED
+    useEffect(() => {
+        if (isConnected) {
+            async function uploadOfflineRecords() {
+                const offlineRecords = JSON.parse(await AsyncStorage.getItem(LOCAL_RECORDS_STORAGE_KEY));
+                console.log({ offlineRecords })
+                // if offlineRecords && offlineRecords.length
+                // send offline records to be updated
+                // all successful updates are then removed from storage
+                // snackbar pops up and says complete or error
+            }
+            uploadOfflineRecords();
+        }
+    }, [isConnected])
+
+
     useEffect(() => {
         console.log('socket changed')
         if (socket) {
@@ -137,12 +154,12 @@ export default function SessionProvider({ children }) {
     }, [socket]);
 
     async function tryFindingServer() {
-        const serverIp = 'http://10.75.191.88:3333';
+        // const serverIp = 'http://10.75.191.88:3333';
         if (!isConnected) {
             setServerLoading(true);
 
             try {
-                // const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
+                const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
                 if (serverIp) {
                     console.log(`Server found on: ${serverIp}`);
                     const socket = io(serverIp);
@@ -212,7 +229,7 @@ export default function SessionProvider({ children }) {
     }
 
     async function sendRecord(recordPayload) {
-        console.log('Sending record...', recordPayload);
+        console.log('Sending record...');
         const createRecord = !recordPayload?.record?.id;
         const createOrUpdate = createRecord ? 'create' : 'update';
         // console.log(createRecord, createOrUpdate)
@@ -250,9 +267,9 @@ export default function SessionProvider({ children }) {
             >
                 <DialogHeader title={modalMessage} />
                 <DialogContent>
-                    <View style={{display: 'flex', flexDirection: 'row'}}>
+                    <View style={{ display: 'flex', flexDirection: 'row' }}>
                         <Text>Waiting to reconnect</Text>
-                        <ActivityIndicator style={{marginStart: 6}} />
+                        <ActivityIndicator style={{ marginStart: 6 }} />
                     </View>
                 </DialogContent>
                 <DialogActions>

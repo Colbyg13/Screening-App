@@ -57,7 +57,7 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
   // console.log('customDataTypes', customDataTypes);
   // console.log('standardDataTypes', standardDataTypes);
   useEffect(() => {
-    console.log('selected type changed: ', selectedDataTypes);
+    // console.log('selected type changed: ', selectedDataTypes);
   }, [selectedDataTypes]);
 
   const renderDataTypes = (item) => {

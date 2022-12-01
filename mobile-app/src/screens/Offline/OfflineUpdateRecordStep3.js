@@ -15,7 +15,7 @@ import {
 } from '@react-native-material/core';
 const OfflineAddRecordStep3 = ({ route, navigation }) => {
   const item = route.params.item;
-  console.log('HERE IS THE ITEM TO UPDATE', item);
+  // console.log('HERE IS THE ITEM TO UPDATE', item);
   const customDataTypes = route.params.customDataTypes;
   const selectedDataTypes = [
     { name: 'ID', key: 'ID', type: 'number' },
@@ -35,9 +35,9 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
     let newFields = [];
     for (let i = 0; i < numFields; i++) {
       const varName = selectedDataTypes[i].key;
-      console.log('varName', varName);
+      // console.log('varName', varName);
       if (item.hasOwnProperty(varName)) {
-        console.log('item has property', varName);
+        // console.log('item has property', varName);
         setFormState((prevState) => ({
           ...prevState,
           [varName]: item[varName],
@@ -75,7 +75,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
 
   useEffect(() => {
     //sets the state for the form dynamically. I have not implemented validation yet.
-    console.log('formState updated', formState);
+    // console.log('formState updated', formState);
   }, [formState]);
 
   const handleFormUpdate = (field, selectedItem) => {
@@ -115,12 +115,12 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
   };
 
   const handleSubmit = () => {
-    console.log('formState before submit', formState);
+    // console.log('formState before submit', formState);
     if (checkIDChange()) {
       //show dialog
       setIsVisible(true);
     } else { //no ID change
-      console.log('formState before submit button', formState);
+      // console.log('formState before submit button', formState);
       navigation.navigate({
         name: 'Offline Records',
         params: { updatedRecord: formState, oldRecordID: item.ID },
@@ -293,7 +293,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
             style={{ marginLeft: 10, marginRight: 10 }}
             onPress={() => {
               setIsVisible(false);
-              console.log('formState before submit in dialog', formState);
+              // console.log('formState before submit in dialog', formState);
               navigation.navigate({
                 name: 'Offline Records',
                 params: { updatedRecord: formState, oldRecordID: item.ID},

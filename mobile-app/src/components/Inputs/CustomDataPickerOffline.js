@@ -12,7 +12,7 @@ const CustomDataPickerOffline = (props) => {
   let customData = customDataTypes.filter((item) => {
     return item.type == field.type;
   });
-  console.log(customData)
+  // console.log(customData)
   if (customData[0].values === null) {
     //Not a dropdown, return text input with label for units
     return (

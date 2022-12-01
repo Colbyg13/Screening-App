@@ -11,7 +11,7 @@ const OfflineStationDataTypeItem = (props) => {
   const [customData, setCustomData] = useState(props.customData);
   let options = [];
   if(type === 'custom') {
-    console.log('custom data', customData)
+    // console.log('custom data', customData)
     if(customData.values !== null) {
     options = customData.values;
     }

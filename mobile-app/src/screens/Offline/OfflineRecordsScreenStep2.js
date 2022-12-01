@@ -15,6 +15,8 @@ import {
   TextInput,
 } from '@react-native-material/core';
 
+export const LOCAL_RECORDS_STORAGE_KEY = 'LOCAL_RECORDS';
+
 const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
   const [records, setRecords] = useState([]); //array to hold records list
   const customDataTypes = route.params.customDataTypes;
@@ -36,15 +38,15 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
   }, [needsUpdate]);
 
   useEffect(() => {
-    console.log('RECORDS CHANGED', records); //retrieve records from async storage
+    // console.log('RECORDS CHANGED', records); //retrieve records from async storage
   }, [records]);
 
   const retrieveRecords = async () => {
     try {
-      const value = await AsyncStorage.getItem('LOCAL_RECORDS');
+      const value = await AsyncStorage.getItem(LOCAL_RECORDS_STORAGE_KEY);
       if (value !== null) {
         // We have data!!
-        console.log('DATA FROM STORAGE', value);
+        // console.log('DATA FROM STORAGE', value);
         setRecords(JSON.parse(value));
         setNeedsUpdate(false);
       }
@@ -60,8 +62,8 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
       try {
         const sorted = records.sort((a, b) => (a.ID > b.ID ? 1 : -1));
         const jsonValue = JSON.stringify(sorted);
-        console.log('SETTING STORAGE TO THIS VALUE', jsonValue);
-        await AsyncStorage.setItem('LOCAL_RECORDS', jsonValue);
+        // console.log('SETTING STORAGE TO THIS VALUE', jsonValue);
+        await AsyncStorage.setItem(LOCAL_RECORDS_STORAGE_KEY, jsonValue);
         setNeedsToStoreData(false);
         setNeedsUpdate(true);
       } catch (e) {
@@ -89,12 +91,13 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
         return;
       } else {
         //if not found, add the record
-        console.log(
-          'firing new record. with newRecord ',
-          records,
-          route.params.newRecord
-        );
-        setRecords((prevState) => [...prevState, route.params.newRecord]);
+        // console.log(
+        //   'firing new record. with newRecord ',
+        //   records,
+        //   route.params.newRecord
+        // );
+        const newRecord = route.params.newRecord;
+        setRecords((prevState) => [...prevState, newRecord]);
         setNeedsToStoreData(true);
         route.params.newRecord = null;
       }
