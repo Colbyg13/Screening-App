@@ -11,6 +11,7 @@ import { useSessionContext } from '../contexts/SessionContext';
 import { TextInput } from '@react-native-material/core';
 import AddToQueueBtn from './AddToQueueBtn';
 import SessionQueueItem from './SessionQueueItem';
+import { PATIENT_RECORD_STATUS } from '../classes/patient-record';
 
 const SessionQueue = (props) => {
   const {
@@ -24,24 +25,27 @@ const SessionQueue = (props) => {
   const [searchText, setSearchText] = React.useState('');
   const [filteredRecords, setFilteredRecords] = useState([]);
   const sortedRecords = [...sessionRecords].sort((recordA, recordB) => {
-    // secondary sorting
-    if (recordA.nextStationIndex === recordB.nextStationIndex)
-      return recordA.lastModified <= recordB.lastModified ? -1 : 1;
+
+    if (recordA.nextStationIndex === recordB.nextStationIndex) {
+
+      if (recordA.nextStationIndex === recordB.nextStationStatus) return recordA.lastModified <= recordB.lastModified ? -1 : 1;
+
+      return recordA.nextStationStatus === PATIENT_RECORD_STATUS.PARTIAL ? -1 : 1;
+    }
     // Puts our station next as first ones in the list
     if (recordA.nextStationIndex === stationIndex) return -1;
     if (recordB.nextStationIndex === stationIndex) return 1;
     // complete ones last in the list
     if (recordA.isComplete) return 1;
     if (recordB.isComplete) return -1;
-    // if (
-    //   ((recordA.nextStationIndex > stationIndex) && (recordB.nextStationIndex > stationIndex))
-    //   ||
-    //   ((recordA.nextStationIndex < stationIndex) && (recordB.nextStationIndex < stationIndex))
-    // ) return recordA.nextStationIndex - recordB.nextStationIndex;
-    return recordA.nextStationIndex - recordB.nextStationIndex;
 
-    // if (recordA.nextStationIndex < stationIndex) return 1;
-    // return -1;
+    if ((recordA.nextStationIndex > stationIndex) && (recordB.nextStationIndex > stationIndex)) return recordA.nextStationIndex - recordB.nextStationIndex;
+    
+    if ((recordA.nextStationIndex > stationIndex) && (recordB.nextStationIndex < stationIndex)) return 1;
+
+    if ((recordA.nextStationIndex < stationIndex) && (recordB.nextStationIndex > stationIndex)) return -1;
+
+    return recordB.nextStationIndex - recordA.nextStationIndex;
   });
 
   useEffect(() => {

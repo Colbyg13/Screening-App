@@ -19,6 +19,10 @@ export default class PatientRecord {
         return this.progress.findIndex(status => status !== PATIENT_RECORD_STATUS.COMPLETE);
     }
 
+    get nextStationStatus(){
+        return this.progress[this.nextStationIndex];
+    }
+
     get isComplete() {
         return this.nextStationIndex === -1;
     }

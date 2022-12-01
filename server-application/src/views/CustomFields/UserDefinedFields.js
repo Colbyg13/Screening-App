@@ -16,7 +16,10 @@ const customType = {
 
 const allUnits = [
     customType,
-    ...convert().list(),
+    ...convert().list('length'),
+    ...convert().list('mass'),
+    ...convert().list('temperature'),
+    ...convert().list('pressure'),
 ]
 
 export default function UserDefinedFields({
@@ -39,7 +42,7 @@ export default function UserDefinedFields({
                     <span className='w-52 text-md font-bold'>Unit</span>
                     <span className='w-52 text-md font-bold'>Values</span>
                 </div>
-                {customDataTypes.map(({ type, unit, values }, dataTypeIndex) => (
+                {customDataTypes.map(({ _id, type, unit, values }, dataTypeIndex) => (
                     <div key={dataTypeIndex} className='flex space-x-2'>
                         <div>
                             <IconButton onClick={() => deleteCustomDataType(dataTypeIndex)}>
@@ -70,7 +73,14 @@ export default function UserDefinedFields({
                                 dataTypeIndex,
                             )}
                         >
-                            {allUnits.map(({ abbr, singular, measure, system }) => (
+                            {(_id ?
+                                (unit === CUSTOM_DATA_TYPE) ?
+                                    [customType]
+                                    :
+                                    convert().list(convert().describe(unit).measure)
+                                :
+                                allUnits
+                            ).map(({ abbr, singular, measure, system }) => (
                                 <MenuItem
                                     key={abbr}
                                     value={abbr}

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import RecordSearch from './RecordSearch';
 
 export default function RecordTitleBar({
+    unitConversions = {},
     updateSearch,
     allFieldKeys,
 }) {
@@ -20,9 +21,9 @@ export default function RecordTitleBar({
         <div className='pt-8 px-2 pb-2 bg-green-500 flex justify-between items-center'>
             <span className='flex items-baseline space-x-2'>
                 <h2 className='ml-2 font-bold text-2xl'>
-                    Records Page
+                    All Records
                 </h2>
-                <span>{totalRecordCount ? `(${totalRecordCount.toLocaleString()} records)` : ''}</span>
+                <span>{totalRecordCount ? `(${totalRecordCount.toLocaleString()} total)` : ''}</span>
             </span>
             <RecordSearch
                 updateSearch={updateSearch}
@@ -38,7 +39,7 @@ export default function RecordTitleBar({
                     console.log({ outputPath })
                     if (outputPath) {
                         setDownloading(true);
-                        window.api.downloadRecords(outputPath, allFieldKeys)
+                        window.api.downloadRecords(outputPath, allFieldKeys, unitConversions)
                             .then(() => {
                                 console.log('Download Complete');
                                 setDownloading(false);

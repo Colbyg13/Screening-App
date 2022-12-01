@@ -6,6 +6,7 @@ import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 export default function RecordModalInputRow({
     fieldKeyMap,
     fieldKey,
+    unitConversions,
     record,
     update,
     onChange,
@@ -20,8 +21,8 @@ export default function RecordModalInputRow({
 
     const label = fieldName || fieldKey
     const customDataType = customDataTypeMap[fieldType]
-    const fieldPostfix = customDataType && customDataType !== 'Custom' ?
-        `(${customDataTypeMap[fieldType]})`
+    const fieldPostfix = unitConversions[fieldKey] ?
+        `(${unitConversions[fieldKey]})`
         :
         '';
 
@@ -41,18 +42,18 @@ export default function RecordModalInputRow({
             <span className='w-40'>{title}:</span>
             {customDataType === 'Custom' ? (
                 <TextField
-                required
-                className='w-52'
-                select
-                label={label}
-                size='small'
-                value={value}
-                onChange={({ target: { value } }) => onChange(value)}
-            >
-                {fullCustomDataTypeMap[fieldType].values.map(value => (
-                    <MenuItem key={value} value={value}>{value}</MenuItem>
-                ))}
-            </TextField>
+                    required
+                    className='w-52'
+                    select
+                    label={label}
+                    size='small'
+                    value={value}
+                    onChange={({ target: { value } }) => onChange(value)}
+                >
+                    {fullCustomDataTypeMap[fieldType].values.map(value => (
+                        <MenuItem key={value} value={value}>{value}</MenuItem>
+                    ))}
+                </TextField>
             ) : fieldType === SESSION_DATA_TYPES.BOOL ? (
                 <Switch
                     checked={value}

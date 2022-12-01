@@ -1,5 +1,5 @@
 {
-  "name": "server-application",
+  "name": "healthy-samoa-server-app",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

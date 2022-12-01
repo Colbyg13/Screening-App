@@ -90,13 +90,13 @@ export default function Navbar() {
           selected={pathname.startsWith(ROUTES.Records.path)}
           onClick={() => navigate(ROUTES.Records.path)}
         />
-        <NavbarItem
+        {/* <NavbarItem
           open={open}
           Icon={ROUTES.Offline.Icon}
           title={ROUTES.Offline.title}
           selected={pathname.startsWith(ROUTES.Offline.path)}
           onClick={() => navigate(ROUTES.Offline.path)}
-        />
+        /> */}
       </List>
       <div className='mb-4'>
         <List>

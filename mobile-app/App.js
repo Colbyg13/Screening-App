@@ -1,21 +1,19 @@
+import { Provider } from '@react-native-material/core';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { StyleSheet } from 'react-native';
-import SessionProvider, {
-  useSessionContext,
-} from './src/contexts/SessionContext';
-import HomeScreen from './src/screens/HomeScreen';
-import StationSelectionScreen from './src/screens/StationSelectionScreen';
-import QueueScreen from './src/screens/QueueScreen';
-import AddToOnlineQueue from './src/screens/AddToOnlineQueue';
 import ServerStatus from './src/components/ServerStatus';
-import UpdateRecordScreen from './src/screens/UpdateRecordScreen';
 import CustomDataTypesProvider from './src/contexts/CustomDataContext';
-import { Provider } from '@react-native-material/core';
+import SessionProvider from './src/contexts/SessionContext';
+import AddToOnlineQueue from './src/screens/AddToOnlineQueue';
+import HomeScreen from './src/screens/HomeScreen';
 import IpadOfflineModeStep1 from './src/screens/Offline/IpadOfflineModeStep1';
-import OfflineRecordsScreenStep2 from './src/screens/Offline/OfflineRecordsScreenStep2';
 import OfflineAddRecordStep3 from './src/screens/Offline/OfflineAddRecordStep3';
+import OfflineRecordsScreenStep2 from './src/screens/Offline/OfflineRecordsScreenStep2';
 import OfflineUpdateRecordStep3 from './src/screens/Offline/OfflineUpdateRecordStep3';
+import QueueScreen from './src/screens/QueueScreen';
+import StationSelectionScreen from './src/screens/StationSelectionScreen';
+import UpdateRecordScreen from './src/screens/UpdateRecordScreen';
 const Stack = createNativeStackNavigator();
 
 export default function App() {

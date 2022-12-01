@@ -1,6 +1,6 @@
+import { Button, Stack } from '@react-native-material/core';
 import React from 'react';
-import { View, SafeAreaView } from 'react-native';
-import { Stack, Button } from '@react-native-material/core';
+import { Image, SafeAreaView } from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
 
 const HomeScreen = ({ navigation }) => {
@@ -27,7 +27,14 @@ const HomeScreen = ({ navigation }) => {
         backgroundColor: '#ffffff',
       }}
     >
-      <Stack fill center spacing={20}>
+      <Stack center spacing={20}>
+        <Image
+          source={require('../../assets/healthylogo.png')}
+          style={{
+            height: '25%',
+            resizeMode: 'contain',
+          }}
+        />
         <Button
           style={{ width: 350, padding: 20, margin: 20 }}
           title='Connect to Session'
