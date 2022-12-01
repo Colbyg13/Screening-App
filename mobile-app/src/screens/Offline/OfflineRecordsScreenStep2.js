@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, SafeAreaView, FlatList } from 'react-native';
+import { View, Text, SafeAreaView, FlatList, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { styles } from '../../style/styles';
 import AddOfflineRecordBtn from '../../components/AddOfflineRecordBtn';
@@ -12,6 +12,7 @@ import {
   DialogHeader,
   DialogContent,
   DialogActions,
+  TextInput,
 } from '@react-native-material/core';
 
 const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
@@ -21,8 +22,11 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
   const [newRecord, setNewRecord] = useState(null); //object to hold new record
   const [needsToStoreData, setNeedsToStoreData] = useState(false); //boolean to determine if new record needs to be stored
   const [needsUpdate, setNeedsUpdate] = useState(true); //boolean to trigger update of records list
-
-  //AsyncStorage.removeItem('LOCAL_RECORDS'); //use this to clear local records 
+  const [replacementID, setReplacementID] = useState(null); //string to hold ID of record to be replaced
+  const [isVisible, setIsVisible] = useState(false); //boolean to determine if dialog is visible
+  const [idInUse, setIdInUse] = useState(null); //boolean to determine if ID is already in use
+  const [idInUseType, setIdInUseType] = useState(null); //string to hold type of ID in use
+  //AsyncStorage.removeItem('LOCAL_RECORDS'); //use this to clear local records
   useEffect(() => {
     if (needsUpdate) {
       retrieveRecords(); //retrieve records from async storage
@@ -77,7 +81,11 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
       const found = records.find((record) => record.ID === newRecordID);
       if (found) {
         console.log('found a record with the same ID'); //replace or ignore? for now, ignore
+        setIdInUse(String(newRecordID));
+        setIdInUseType('newRecord');
+        setIsVisible(true);
         //if found, replace the record
+        //display modal to ask if they want to replace the record or overwrite it
         return;
       } else {
         //if not found, add the record
@@ -100,14 +108,21 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
       const updatedRecord = route.params.updatedRecord;
       const oldRecordID = route.params.oldRecordID;
       if (updatedRecord.ID != oldRecordID) {
-        console.log('overwriting ID');
-        for (let i = 0; i < records.length; i++) {
-          if (records[i].ID === oldRecordID) {
-            //find the record with the old ID
-            let update = [...records];
-            update[i] = updatedRecord; //replace the record with the updated record and new ID
-            setRecords(update);
-            setNeedsToStoreData(true);
+        //check if the new ID is already in use
+        const found = records.find((record) => record.ID === updatedRecord.ID);
+        if (found) {
+          setIdInUseType('updatedRecord');
+          setIdInUse(String(updatedRecord.ID));
+          setIsVisible(true);
+        } else {
+          for (let i = 0; i < records.length; i++) {
+            if (records[i].ID === oldRecordID) {
+              //find the record with the old ID
+              let update = [...records];
+              update[i] = updatedRecord; //replace the record with the updated record and new ID
+              setRecords(update);
+              setNeedsToStoreData(true);
+            }
           }
         }
       } else {
@@ -133,6 +148,8 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
   }, [needsToStoreData]);
 
   const AddRecord = () => {
+    setIsVisible(false);
+    setReplacementID('');
     navigation.navigate('Offline Add Records', {
       customDataTypes,
       selectedDataTypes,
@@ -166,6 +183,143 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
         renderItem={renderOfflineRecordItem}
         style={styles.flatList}
       />
+      <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)}>
+        <DialogHeader title='ID already in use' />
+        <DialogContent>
+          <Text style={{ fontSize: 20 }}>
+            Warning! The ID {idInUse} is already in use. Do you want to enter a
+            new ID or overwrite the existing record?
+          </Text>
+          <View style={styles.row}>
+            <Text style={styles.fieldName}>New ID:</Text>
+            <View>
+              <TextInput
+                value={replacementID}
+                keyboardType='number-pad'
+                returnKeyType='done'
+                onSubmitEditing={Keyboard.dismiss}
+                onChangeText={(newText) => {
+                  if (!isNaN(newText)) {
+                    setReplacementID(newText);
+                  }
+                }}
+                style={styles.fieldInput}
+              ></TextInput>
+            </View>
+          </View>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            title='Overwrite'
+            compact
+            color='#FF6464'
+            onPress={() => {
+              let data = {};
+              switch (idInUseType) {
+                case 'newRecord':
+                  data = route.params.newRecord;
+                  const dataID = data.ID;
+                  for (let i = 0; i < records.length; i++) {
+                    if (records[i].ID === dataID) {
+                      let update = [...records];
+                      update[i] = data; //replace the record with the updated record and new ID
+                      setRecords(update);
+                      setNeedsToStoreData(true);
+                    }
+                  }
+                  setIsVisible(false);
+                  break;
+                case 'updatedRecord':
+
+                  data = route.params.updatedRecord;
+                  const oldRecordID = route.params.oldRecordID;
+
+                  for (let i = 0; i < records.length; i++) {
+                    //remove old record, and overwrite with new record
+                    if (records[i].ID === oldRecordID) {
+
+                      //find the record with the old ID
+                      let update = [...records];
+                      update.splice(i, 1);
+                      for (let i = 0; i < update.length; i++) {
+                        if (update[i].ID === +idInUse) {
+                          update[i] = data;
+                          setRecords(update);
+                          setNeedsToStoreData(true);
+                          setIsVisible(false);
+                          return;
+                        }
+                      }
+                    }
+                  }
+                default:
+                  break;
+              }
+            }}
+          />
+          <Button
+            title='Update ID'
+            compact
+            color='#A3CDFF'
+            style={{ marginLeft: 10, marginRight: 10 }}
+            onPress={() => {
+              if (replacementID != '') {
+                let found = records.find(
+                  (record) => record.ID === +replacementID
+                ); //check if replacement ID is already in use, convert to number instead of string
+                if (found) {
+                  setIdInUse(String(replacementID));
+                  switch (idInUseType) {
+                    case 'newRecord':
+                      route.params.newRecord.ID = +replacementID;
+                      break;
+                    case 'updatedRecord':
+                      route.params.updatedRecord.ID = +replacementID;
+                    default:
+                      break;
+                  }
+                  setIsVisible(true);
+                  return;
+                } else {
+                  //if not found, add the record
+                  let data = {};
+                  switch (idInUseType) {
+                    case 'newRecord':
+                      data = route.params.newRecord;
+                      data.ID = +replacementID;
+                      break;
+                    case 'updatedRecord':
+                      data = route.params.updatedRecord;
+                      data.ID = +replacementID;
+                      const oldRecordID = route.params.oldRecordID;
+
+                      for (let i = 0; i < records.length; i++) {
+                        //remove old record, and overwrite with new record
+                        if (records[i].ID === oldRecordID) {
+                          //find the record with the old ID
+                          let update = [...records];
+                          update.splice(i, 1); //remove the old record
+                          update = [...update, data]; //add the new record
+                          setRecords(update);
+                          setNeedsToStoreData(true);
+                          setIsVisible(false);
+                          return;
+                        }
+                      }
+
+                    default:
+                      break;
+                  }
+                  setRecords((prevState) => [...prevState, data]);
+                  setNeedsToStoreData(true);
+                  setIsVisible(false);
+                  setReplacementID('');
+                }
+              }
+            }}
+          />
+        </DialogActions>
+      </Dialog>
       <AddOfflineRecordBtn onPress={AddRecord} />
     </SafeAreaView>
   );
