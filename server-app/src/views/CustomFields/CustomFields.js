@@ -56,7 +56,8 @@ export default function CustomFields() {
 
     return (
         <form className='flex w-full max-h-screen px-8 pt-8 pb-16 space-x-8 overflow-auto'
-            onSubmit={async () => {
+            onSubmit={async e => {
+                e.preventDefault();
                 setLoading(true);
                 await window.api.saveCustomDataTypes({
                     customDataTypes,
