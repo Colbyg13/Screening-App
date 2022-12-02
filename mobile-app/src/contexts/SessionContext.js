@@ -80,18 +80,7 @@ export default function SessionProvider({ children }) {
                 ...fields,
             ], []);
 
-            AsyncStorage.getItem(STATION_FIELDS_STORAGE_KEY)
-                .then(storedStationFields => {
-                    if (storedStationFields) {
-                        // updates the fields based on key
-                        const newStoredStations = Object.values([...JSON.parse(storedStationFields), ...allStationFields].reduce((all, field) => ({
-                            ...all,
-                            [field.key]: field,
-                        }), {}));
-                        AsyncStorage.setItem(STATION_FIELDS_STORAGE_KEY, JSON.stringify(newStoredStations));
-                    }
-                    else AsyncStorage.setItem(STATION_FIELDS_STORAGE_KEY, JSON.stringify(allStationFields));
-                });
+            AsyncStorage.setItem(STATION_FIELDS_STORAGE_KEY, JSON.stringify(allStationFields));
         }
     }, [sessionInfo]);
 
@@ -104,6 +93,7 @@ export default function SessionProvider({ children }) {
     // UPLOAD OFFLINE RECORDS TO SERVER WHEN CONNECTED
     useEffect(() => {
         if (isConnected) {
+            getSessionInfo();
             uploadOfflineRecords();
         }
     }, [isConnected])
@@ -186,7 +176,7 @@ export default function SessionProvider({ children }) {
         }
     }
 
-    async function getSessionInfo() {
+    async function getSessionInfo(showSnackbar) {
         setLoading(true);
         if (socket) {
             console.log('Connecting to session...');
@@ -205,7 +195,7 @@ export default function SessionProvider({ children }) {
                     setSessionInfo(sessionInfo);
                     setSessionRecords(sessionRecords.map(record => new PatientRecord(record, sessionInfo.stations)));
                 } else {
-                    setSnackbarInfo({ status: 'error', message: 'Session not started. Check server and try again.' })
+                    if (showSnackbar) setSnackbarInfo({ status: 'error', message: 'Session not started. Check server and try again.' })
                     throw new Error('Session not started. Check server and try again.')
                 }
                 setLoading(false);
@@ -213,7 +203,7 @@ export default function SessionProvider({ children }) {
             } catch (error) {
                 console.error(error);
                 setLoading(false);
-                setSnackbarInfo({ status: 'error', message: 'Session not started. Check server and try again' })
+                if (showSnackbar) setSnackbarInfo({ status: 'error', message: 'Session not started. Check server and try again' })
                 throw new Error('Session not started. Check server and try again');
             }
         } else {

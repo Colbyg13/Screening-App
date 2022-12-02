@@ -12,8 +12,8 @@ const OfflineStationDataTypeItem = (props) => {
   let options = [];
   if(type === 'custom') {
     // console.log('custom data', customData)
-    if(customData.values !== null) {
-    options = customData.values;
+    if(customData?.values !== null) {
+    options = customData?.values;
     }
     else {
       options = null;

@@ -10,7 +10,7 @@ const HomeScreen = ({ navigation }) => {
 
   const handleOnPress = async () => {
     try {
-      await getSessionInfo();
+      await getSessionInfo(true);
 
       navigation.navigate('Station Selection');
     } catch (e) {
