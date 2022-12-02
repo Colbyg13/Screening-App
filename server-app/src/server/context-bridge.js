@@ -52,7 +52,7 @@ module.exports = APP => {
                         [key]: record[key] === undefined ?
                             undefined
                             :
-                            convert(record[key]).from(customData[key]).to(unit),
+                            convert(record[key]).from(customData[key] || unit).to(unit),
                     }), {})
                 }));
 
@@ -159,7 +159,7 @@ module.exports = APP => {
                     ''
                     :
                     unitConversions[key] ?
-                        convert(doc[key]).from(doc.customData[key]).to(unitConversions[key])
+                        convert(doc[key]).from(doc.customData[key] || unitConversions[key]).to(unitConversions[key])
                         :
                         doc[key]).join(',')}\n`)
             });
