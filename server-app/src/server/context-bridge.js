@@ -15,6 +15,7 @@ module.exports = APP => {
         },
         // SERVER FUNCTIONS
         getIP: ip.address,
+        isConnectedToMongo: () => !!APP.db,
         showMessage: ({ title, message, type }) => dialog.showMessageBox(null, { title, message, type }),
         showSaveDialog: () => {
             const date = new Date();
