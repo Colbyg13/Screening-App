@@ -9,6 +9,7 @@ import replace from "../utils/replace";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View } from "react-native";
 import { LOCAL_RECORDS_STORAGE_KEY } from "../screens/Offline/OfflineRecordsScreenStep2";
+import Snackbar from "../components/Snackbar";
 
 export const SERVER_PORT = 3333;
 export const MAX_TRIES = 5;
@@ -21,6 +22,7 @@ const SessionContext = createContext({
     serverLoading: false,
     sessionInfo: {},
     sessionRecords: [],
+    uploadOfflineRecords: () => { },
     tryFindingServer: () => { },
     selectedStation: () => { },
     joinStation: () => { },
@@ -41,6 +43,7 @@ export default function SessionProvider({ children }) {
     const [socket, setSocket] = useState();
     const [isConnected, setIsConnected] = useState(false);
     const [serverLoading, setServerLoading] = useState(false);
+    const [offlineRecordStatus, setOfflineRecordStatus] = useState();
 
     // SESSION
     const [loading, setLoading] = useState(false);
@@ -85,14 +88,6 @@ export default function SessionProvider({ children }) {
     // UPLOAD OFFLINE RECORDS TO SERVER WHEN CONNECTED
     useEffect(() => {
         if (isConnected) {
-            async function uploadOfflineRecords() {
-                const offlineRecords = JSON.parse(await AsyncStorage.getItem(LOCAL_RECORDS_STORAGE_KEY));
-                console.log({ offlineRecords })
-                // if offlineRecords && offlineRecords.length
-                // send offline records to be updated
-                // all successful updates are then removed from storage
-                // snackbar pops up and says complete or error
-            }
             uploadOfflineRecords();
         }
     }, [isConnected])
@@ -154,12 +149,12 @@ export default function SessionProvider({ children }) {
     }, [socket]);
 
     async function tryFindingServer() {
-        // const serverIp = 'http://10.75.191.88:3333';
+        const serverIp = 'http://10.75.165.194:3333';
         if (!isConnected) {
             setServerLoading(true);
 
             try {
-                const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
+                // const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
                 if (serverIp) {
                     console.log(`Server found on: ${serverIp}`);
                     const socket = io(serverIp);
@@ -228,8 +223,31 @@ export default function SessionProvider({ children }) {
         setSessionRecords([]);
     }
 
+    async function uploadOfflineRecords(showModal) {
+        const offlineRecords = JSON.parse(await AsyncStorage.getItem(LOCAL_RECORDS_STORAGE_KEY));
+        if (offlineRecords && offlineRecords.length) {
+            Promise.allSettled(offlineRecords.map(({ customData, ...record }) => sendRecord({ record, customData })))
+                .then(results => {
+                    const notUpdatedRecords = offlineRecords.filter((_, i) => results[i].status !== 'fulfilled');
+                    // delete all updated records in local storage
+                    console.log({ notUpdatedRecords })
+                    if (notUpdatedRecords.length) {
+                        AsyncStorage.setItem(LOCAL_RECORDS_STORAGE_KEY, JSON.stringify(notUpdatedRecords));
+                        setOfflineRecordStatus({ status: 'error', message: 'Could not sync all offline records' })
+                    }
+                    else {
+                        AsyncStorage.removeItem(LOCAL_RECORDS_STORAGE_KEY);
+                        setOfflineRecordStatus({ status: 'success', message: 'Offline records successfully synced' })
+                    }
+                })
+                .catch(err => console.error(err))
+        }
+        else if (showModal) setOfflineRecordStatus({ status: 'success', message: 'offline records have already been synced' })
+
+    }
+
     async function sendRecord(recordPayload) {
-        console.log('Sending record...');
+        console.log('Sending record...', recordPayload);
         const createRecord = !recordPayload?.record?.id;
         const createOrUpdate = createRecord ? 'create' : 'update';
         // console.log(createRecord, createOrUpdate)
@@ -237,9 +255,10 @@ export default function SessionProvider({ children }) {
         try {
             const result = await axios.post(url, recordPayload);
             // console.log({ result });
-            return result.data.newId;
+            return result.data;
         } catch (error) {
             console.error(error)
+            throw new Error('Unable to send record');
         }
     }
 
@@ -253,6 +272,7 @@ export default function SessionProvider({ children }) {
                 sessionRecords: patientRecords,
                 selectedStation,
                 serverLoading,
+                uploadOfflineRecords,
                 tryFindingServer,
                 joinStation,
                 leaveStation,
@@ -261,6 +281,13 @@ export default function SessionProvider({ children }) {
                 sendRecord,
             }}
         >
+            <Snackbar
+                open={!!offlineRecordStatus}
+                onClose={() => setOfflineRecordStatus()}
+                message={offlineRecordStatus?.message}
+                severity={offlineRecordStatus?.status}
+                duration={6000}
+            />
             <Dialog
                 visible={!!modalMessage}
                 onDismiss={() => { }}

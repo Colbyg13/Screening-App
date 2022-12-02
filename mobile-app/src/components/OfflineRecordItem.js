@@ -5,10 +5,10 @@ import { Pressable } from '@react-native-material/core';
 const OfflineRecordItem = (props) => {
   const person = props.item;
   return (
-    <Pressable key={person.ID} style={styles.item} onPress={props.onPress}>
+    <Pressable key={person.id} style={styles.item} onPress={props.onPress}>
       <View style={styles.innerContent}>
         <View style={styles.itemWrapper}>
-          <Text style={styles.title}>ID: {person.ID}</Text>
+          <Text style={styles.title}>ID: {person.id}</Text>
           {person.name && (
             <View key={person.name} style={styles.fieldsView}>
               <Text style={styles.fieldsitem}>Name: {person.name}</Text>

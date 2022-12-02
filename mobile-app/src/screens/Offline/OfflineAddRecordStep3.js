@@ -9,7 +9,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
   // console.log('add to queue offline screen', route.params);
   const customDataTypes = route.params.customDataTypes;
   const selectedDataTypes = [
-    { name: 'ID', key: 'ID', type: 'number' },
+    { name: 'ID', key: 'id', type: 'number' },
     ...route.params.selectedDataTypes,
   ];
   const [formState, setFormState] = useState({}); //used to keep track of inputs.

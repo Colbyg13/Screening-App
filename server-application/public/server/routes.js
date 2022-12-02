@@ -32,11 +32,12 @@ module.exports = APP => {
         }));
 
     APP.post('/api/v1/patients/create', (req, res) => {
+        const {
+            record,
+            customData = {},
+        } = req.body;
+
         if (APP.sessionIsRunning) {
-            const {
-                record,
-                customData = {},
-            } = req.body;
             APP.db.collection('latestRecordID')
                 .findOneAndUpdate(
                     {},
@@ -92,8 +93,6 @@ module.exports = APP => {
             customData = {},
         } = req.body;
 
-        console.log({record, customData})
-
         APP.db.collection("patients")
             .findOneAndUpdate(
                 { id: record.id },
@@ -119,6 +118,8 @@ module.exports = APP => {
                         APP.io.sockets.emit('record-updated', updatedRecord);
                     }
                 }
+
+                if (!updatedRecord) res.status(400).send('Unable to update record');
 
                 res.json({ record: updatedRecord });
             })

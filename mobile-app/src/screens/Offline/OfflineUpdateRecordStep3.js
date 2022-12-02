@@ -18,7 +18,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
   // console.log('HERE IS THE ITEM TO UPDATE', item);
   const customDataTypes = route.params.customDataTypes;
   const selectedDataTypes = [
-    { name: 'ID', key: 'ID', type: 'number' },
+    { name: 'ID', key: 'id', type: 'number' },
     ...route.params.selectedDataTypes,
   ];
 
@@ -123,7 +123,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
       // console.log('formState before submit button', formState);
       navigation.navigate({
         name: 'Offline Records',
-        params: { updatedRecord: formState, oldRecordID: item.ID },
+        params: { updatedRecord: formState, oldRecordID: item.id },
         merge: true,
       });
     }
@@ -134,7 +134,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
    * @returns true if the ID has changed, false otherwise
    */
   const checkIDChange = () => {
-    if (item.ID != formState.ID) {
+    if (item.id != formState.id) {
       return true;
     } else {
       return false;
@@ -267,10 +267,10 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
             continue?
           </Text>
           <Text style={{ marginTop: 10, fontSize: 22, fontWeight: 'bold' }}>
-            Old ID: {item.ID}
+            Old ID: {item.id}
           </Text>
           <Text style={{ marginTop: 10, fontSize: 22, fontWeight: 'bold' }}>
-            New ID: {formState.ID}
+            New ID: {formState.id}
           </Text>
         </DialogContent>
         <DialogActions>
@@ -281,7 +281,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
             onPress={() => {
               setFormState((prevState) => ({
                 ...prevState,
-                ID: item.ID,
+                ID: item.id,
               }));
               setIsVisible(false);
             }}
@@ -296,7 +296,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
               // console.log('formState before submit in dialog', formState);
               navigation.navigate({
                 name: 'Offline Records',
-                params: { updatedRecord: formState, oldRecordID: item.ID},
+                params: { updatedRecord: formState, oldRecordID: item.id},
                 merge: true,
               });
             }}

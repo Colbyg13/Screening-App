@@ -64,7 +64,7 @@ const AddToOnlineQueue = ({ route }) => {
     //call function to handle SOCKET EVENT TO ADD NEW RECORD TO SESSION/QUEUE
     //On success open dialog with new ID, name, and DOB
     //On dialog close go back to session and update list of patients
-    const newId = await sendRecord({
+    const result = await sendRecord({
       record: formState,
       // puts only updated values in form into
       customData: customDataTypes
@@ -88,7 +88,7 @@ const AddToOnlineQueue = ({ route }) => {
         }, {}),
     });
     // let newId = Math.floor(Math.random() * 10); //this id will be given in the server
-    setPatient((prevState) => ({ ...prevState, id: newId })); //on server success set the patient in state for display.
+    setPatient((prevState) => ({ ...prevState, id: result.newId })); //on server success set the patient in state for display.
 
     setVisible(true); //opens the modal/dialog
   };

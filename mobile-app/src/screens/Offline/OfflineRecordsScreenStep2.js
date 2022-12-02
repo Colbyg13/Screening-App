@@ -60,7 +60,7 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
     if (records.length > 0) {
       console.log('storing the records');
       try {
-        const sorted = records.sort((a, b) => (a.ID > b.ID ? 1 : -1));
+        const sorted = records.sort((a, b) => (a.id > b.id ? 1 : -1));
         const jsonValue = JSON.stringify(sorted);
         // console.log('SETTING STORAGE TO THIS VALUE', jsonValue);
         await AsyncStorage.setItem(LOCAL_RECORDS_STORAGE_KEY, jsonValue);
@@ -79,8 +79,8 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
     if (route.params?.newRecord) {
       //check if ID is already in records
       const newRecord = route.params.newRecord;
-      const newRecordID = newRecord.ID;
-      const found = records.find((record) => record.ID === newRecordID);
+      const newRecordID = newRecord.id;
+      const found = records.find((record) => record.id === newRecordID);
       if (found) {
         console.log('found a record with the same ID'); //replace or ignore? for now, ignore
         setIdInUse(String(newRecordID));
@@ -110,16 +110,16 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
     if (route.params?.updatedRecord) {
       const updatedRecord = route.params.updatedRecord;
       const oldRecordID = route.params.oldRecordID;
-      if (updatedRecord.ID != oldRecordID) {
+      if (updatedRecord.id != oldRecordID) {
         //check if the new ID is already in use
-        const found = records.find((record) => record.ID === updatedRecord.ID);
+        const found = records.find((record) => record.id === updatedRecord.id);
         if (found) {
           setIdInUseType('updatedRecord');
-          setIdInUse(String(updatedRecord.ID));
+          setIdInUse(String(updatedRecord.id));
           setIsVisible(true);
         } else {
           for (let i = 0; i < records.length; i++) {
-            if (records[i].ID === oldRecordID) {
+            if (records[i].id === oldRecordID) {
               //find the record with the old ID
               let update = [...records];
               update[i] = updatedRecord; //replace the record with the updated record and new ID
@@ -131,7 +131,7 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
       } else {
         //updating record, leave ID the same
         for (let i = 0; i < records.length; i++) {
-          if (records[i].ID === updatedRecord.ID) {
+          if (records[i].id === updatedRecord.id) {
             let update = [...records];
             update[i] = updatedRecord;
             setRecords(update);
@@ -171,7 +171,7 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
     return (
       <OfflineRecordItem
         item={item}
-        key={item.ID}
+        key={item.id}
         onPress={() => handlePress(item)}
       />
     );
@@ -182,7 +182,7 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
       <Text style={styles.pageDirection}>Locally Stored Records</Text>
       <FlatList
         data={records}
-        keyExtractor={(item) => item.ID}
+        keyExtractor={(item) => item.id}
         renderItem={renderOfflineRecordItem}
         style={styles.flatList}
       />
@@ -221,9 +221,9 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
               switch (idInUseType) {
                 case 'newRecord':
                   data = route.params.newRecord;
-                  const dataID = data.ID;
+                  const dataID = data.id;
                   for (let i = 0; i < records.length; i++) {
-                    if (records[i].ID === dataID) {
+                    if (records[i].id === dataID) {
                       let update = [...records];
                       update[i] = data; //replace the record with the updated record and new ID
                       setRecords(update);
@@ -239,13 +239,13 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
 
                   for (let i = 0; i < records.length; i++) {
                     //remove old record, and overwrite with new record
-                    if (records[i].ID === oldRecordID) {
+                    if (records[i].id === oldRecordID) {
 
                       //find the record with the old ID
                       let update = [...records];
                       update.splice(i, 1);
                       for (let i = 0; i < update.length; i++) {
-                        if (update[i].ID === +idInUse) {
+                        if (update[i].id === +idInUse) {
                           update[i] = data;
                           setRecords(update);
                           setNeedsToStoreData(true);
@@ -268,16 +268,16 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
             onPress={() => {
               if (replacementID != '') {
                 let found = records.find(
-                  (record) => record.ID === +replacementID
+                  (record) => record.id === +replacementID
                 ); //check if replacement ID is already in use, convert to number instead of string
                 if (found) {
                   setIdInUse(String(replacementID));
                   switch (idInUseType) {
                     case 'newRecord':
-                      route.params.newRecord.ID = +replacementID;
+                      route.params.newRecord.id = +replacementID;
                       break;
                     case 'updatedRecord':
-                      route.params.updatedRecord.ID = +replacementID;
+                      route.params.updatedRecord.id = +replacementID;
                     default:
                       break;
                   }
@@ -289,16 +289,16 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
                   switch (idInUseType) {
                     case 'newRecord':
                       data = route.params.newRecord;
-                      data.ID = +replacementID;
+                      data.id = +replacementID;
                       break;
                     case 'updatedRecord':
                       data = route.params.updatedRecord;
-                      data.ID = +replacementID;
+                      data.id = +replacementID;
                       const oldRecordID = route.params.oldRecordID;
 
                       for (let i = 0; i < records.length; i++) {
                         //remove old record, and overwrite with new record
-                        if (records[i].ID === oldRecordID) {
+                        if (records[i].id === oldRecordID) {
                           //find the record with the old ID
                           let update = [...records];
                           update.splice(i, 1); //remove the old record

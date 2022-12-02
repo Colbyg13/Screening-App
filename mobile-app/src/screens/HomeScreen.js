@@ -4,7 +4,7 @@ import { Image, SafeAreaView } from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
 
 const HomeScreen = ({ navigation }) => {
-  const { getSessionInfo, loading } = useSessionContext();
+  const { getSessionInfo, loading, uploadOfflineRecords } = useSessionContext();
   const handleOnPress = async () => {
     try {
       await getSessionInfo();
@@ -56,6 +56,7 @@ const HomeScreen = ({ navigation }) => {
           title='Sync Offline Records'
           color='#EDEDED'
           titleStyle={{ fontSize: 22, fontWeight: 'bold' }}
+          onPress={uploadOfflineRecords}
         ></Button>
       </Stack>
     </SafeAreaView>
