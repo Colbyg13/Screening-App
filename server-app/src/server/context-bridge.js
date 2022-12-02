@@ -4,7 +4,6 @@ const ip = require('ip');
 const { ObjectId } = require("mongodb");
 const { normalizeFields } = require("./utils");
 const fs = require('fs');
-const downloadsFolder = require('downloads-folder');
 const convert = require('convert-units');
 
 
@@ -20,17 +19,9 @@ module.exports = APP => {
         showSaveDialog: () => {
             const date = new Date();
             const fileName = `records-${date.toLocaleDateString()}`.replace(/\//g, '-');
-            const baseOutputPath = `${downloadsFolder()}/${fileName}`;
-            let outputPath = `${baseOutputPath}.csv`;
-            let fileNumber = 1;
-
-            while (fs.existsSync(outputPath)) {
-                // Find a file name that isn't being used
-                outputPath = `${baseOutputPath}(${fileNumber++}).csv`;
-            }
 
             return dialog.showSaveDialogSync(null, {
-                defaultPath: outputPath,
+                defaultPath: `/${fileName}.csv`,
                 filters: [
                     { name: 'Spread Sheet', extensions: ['csv', 'xlsx', 'ods'] },
                 ]

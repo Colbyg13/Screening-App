@@ -35,6 +35,7 @@ export default function RecordTitleBar({
                 type="button"
                 disabled={downloading || !totalRecordCount}
                 onClick={async () => {
+                    console.log('DOWNLOADING')
                     const outputPath = window.api.showSaveDialog();
                     console.log({ outputPath })
                     if (outputPath) {

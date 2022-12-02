@@ -55,7 +55,6 @@
     "convert-units": "^2.3.4",
     "cors": "^2.8.5",
     "cross-env": "^7.0.3",
-    "downloads-folder": "^3.0.3",
     "express": "^4.18.1",
     "fs": "^0.0.1-security",
     "ip": "^1.1.8",
