@@ -1,6 +1,5 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Button, Stack, TextInput } from '@react-native-material/core';
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Image, SafeAreaView } from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
 
@@ -43,7 +42,6 @@ const HomeScreen = ({ navigation }) => {
           style={{ width: 350 }}
           label="Device Name"
           value={deviceName}
-          keyboardType='number-pad'
           placeholder="John Doe's iPad"
           onChangeText={setDeviceName}
         />

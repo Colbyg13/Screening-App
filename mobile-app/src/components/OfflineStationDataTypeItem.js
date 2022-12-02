@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   optionLabelAndTextWrapper: {
     flexDirection: 'row',
-    flexWrap: 'no-wrap',
+    flexWrap: 'nowrap',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
@@ -131,9 +131,9 @@ const styles = StyleSheet.create({
   },
   optionIconWrapper: {
     flexDirection: 'row',
-    flexWrap: 'no-wrap',
+    flexWrap: 'nowrap',
     alignItems: 'center',
-    justifyContent: 'start',
+    justifyContent: 'flex-start',
   }
 });
 
