@@ -119,7 +119,8 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
     if (checkIDChange()) {
       //show dialog
       setIsVisible(true);
-    } else { //no ID change
+    } else {
+      //no ID change
       // console.log('formState before submit button', formState);
       navigation.navigate({
         name: 'Offline Records',
@@ -130,7 +131,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
   };
 
   /**
-   * 
+   *
    * @returns true if the ID has changed, false otherwise
    */
   const checkIDChange = () => {
@@ -142,8 +143,8 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
   };
 
   /**
-   * 
-   * @param {field} field 
+   *
+   * @param {field} field
    * @returns an input component based on the type of the field
    */
   const renderInput = (field) => {
@@ -239,12 +240,19 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
       </ScrollView>
       <View style={styles.wrapper}>
         <Pressable
-          style={styles.btnSubmit}
+          style={styles.btnCancel}
           pressEffect='ripple'
-          pressEffectColor='#4c5e75'
-          onPress={handleSubmit}
+          pressEffectColor='#FCB8B8'
+          onPress={() => {
+            setFormState({});
+            navigation.navigate({
+              name: 'Offline Records',
+              params: { deleteRecord: item.id },
+              merge: true,
+            });
+          }}
         >
-          <Text style={styles.btnText}>Submit</Text>
+          <Text style={styles.btnText}>Delete Record</Text>
         </Pressable>
         <Pressable
           style={styles.btnCancel}
@@ -257,14 +265,22 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
         >
           <Text style={styles.btnText}>Cancel</Text>
         </Pressable>
+        <Pressable
+          style={styles.btnSubmit}
+          pressEffect='ripple'
+          pressEffectColor='#4c5e75'
+          onPress={handleSubmit}
+        >
+          <Text style={styles.btnText}>Submit</Text>
+        </Pressable>
       </View>
 
       <Dialog visible={isVisible} onDismiss={() => setIsVisible(false)}>
         <DialogHeader title='Updating ID Warning' />
         <DialogContent>
           <Text style={{ fontSize: 20 }}>
-            You are about to change the ID on this record. Are you sure you want to
-            continue?
+            You are about to change the ID on this record. Are you sure you want
+            to continue?
           </Text>
           <Text style={{ marginTop: 10, fontSize: 22, fontWeight: 'bold' }}>
             Old ID: {item.id}
@@ -296,7 +312,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
               // console.log('formState before submit in dialog', formState);
               navigation.navigate({
                 name: 'Offline Records',
-                params: { updatedRecord: formState, oldRecordID: item.id},
+                params: { updatedRecord: formState, oldRecordID: item.id },
                 merge: true,
               });
             }}

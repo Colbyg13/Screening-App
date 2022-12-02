@@ -1,10 +1,18 @@
 import React from 'react';
 import { useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SafeAreaView, Text, View, ScrollView, FlatList } from 'react-native';
+import {
+  SafeAreaView,
+  Text,
+  View,
+  ScrollView,
+  FlatList,
+  StyleSheet,
+} from 'react-native';
 import { styles } from '../../style/styles';
 import OfflineStationDataTypeItem from '../../components/OfflineStationDataTypeItem';
 import NextButton from '../../components/NextButton';
+import AddDataTypeButton from '../../components/AddDataTypeButton';
 import {
   Provider,
   Button,
@@ -12,8 +20,11 @@ import {
   DialogHeader,
   DialogContent,
   DialogActions,
+  TextInput,
 } from '@react-native-material/core';
+import SelectDropdown from 'react-native-select-dropdown';
 
+const originalTypes = ['string', 'number', 'date', 'bool'];
 const IpadOfflineModeStep1 = ({ route, navigation }) => {
   const [customDataTypes, setCustomDataTypes] = useState([]); //list of custom types from async storage
   const [customDataReady, setCustomDataReady] = useState(false);
@@ -25,6 +36,15 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
   const CUSTOM_DATA_STORAGE_KEY = 'customData';
   const STATION_FIELDS_STORAGE_KEY = 'sessionFields';
   const SELECTED_DATA_TYPES_STORAGE_KEY = 'selectedDataTypes';
+
+  //new data type dialog variables
+  const [addNewTypeIsVisible, setAddNewTypeIsVisible] = useState(false);
+  const [newFieldName, setNewFieldName] = useState('');
+  const [newFieldKey, setNewFieldKey] = useState('');
+  const [newFieldType, setNewFieldType] = useState('');
+  const [needToStoreNewType, setNeedToStoreNewType] = useState(false);
+  const [showDuplicateError, setShowDuplicateError] = useState(false);
+  
   useEffect(() => {
     // initially get custom data from async storage
     AsyncStorage.getItem(CUSTOM_DATA_STORAGE_KEY)
@@ -54,12 +74,6 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
     AsyncStorage.removeItem(SELECTED_DATA_TYPES_STORAGE_KEY);
   }, []);
 
-  // console.log('customDataTypes', customDataTypes);
-  // console.log('standardDataTypes', standardDataTypes);
-  useEffect(() => {
-    // console.log('selected type changed: ', selectedDataTypes);
-  }, [selectedDataTypes]);
-
   const renderDataTypes = (item) => {
     const data = item.item;
     let isCustom = checkIsCustom(data);
@@ -67,7 +81,7 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
       let customData = customDataTypes.find(
         (dataType) => dataType.type === data.name
       );
-      //  console.log('found the custom info', customData)
+
       return (
         <OfflineStationDataTypeItem
           key={data._id}
@@ -106,7 +120,6 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
       field.type === 'string' ||
       field.type === 'number' ||
       field.type === 'bool' ||
-      field.type === 'number' ||
       field.type === 'date'
     ) {
       return false;
@@ -126,8 +139,62 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
     }
   };
 
+  handleAddTypePress = () => {
+    setAddNewTypeIsVisible((prevState) => !prevState);
+  };
+
   const handleDismiss = () => {
     setIsVisible((prevState) => !prevState);
+  };
+
+  const handleNewTypeSubmit = () => {
+    //check if newField name, key, and type are not empty
+
+    if (newFieldName !== '' && newFieldKey !== '' && newFieldType !== '') {
+      //check if newType name is not already in the list
+      let isDuplicate = standardDataTypes.find(
+        (type) => type.key === newFieldKey.trim()
+      );
+      if (isDuplicate) {
+        setShowDuplicateError(true);
+      } else {
+        setShowDuplicateError(false);
+        let newType = {
+          name: newFieldName,
+          key: newFieldKey,
+          type: newFieldType,
+        };
+        setStandardDataTypes((prevState) => [...prevState, newType]);
+        setNeedToStoreNewType(true);
+        setAddNewTypeIsVisible((prevState) => !prevState);
+        setNewFieldName('');
+        setNewFieldKey('');
+        setNewFieldType('');
+      }
+    }
+  };
+
+  useEffect(() => {
+    if (needToStoreNewType) {
+      storeStandardTypes();
+    } else {
+      return;
+    }
+  }, [needToStoreNewType]);
+
+  const storeStandardTypes = async () => {
+    if (standardDataTypes.length > 0) {
+      try {
+        const sorted = standardDataTypes.sort((a, b) => {
+          return a.key.localeCompare(b.key);
+        });
+        const jsonValue = JSON.stringify(sorted);
+        await AsyncStorage.setItem(STATION_FIELDS_STORAGE_KEY, jsonValue);
+        setNeedToStoreNewType(false);
+      } catch (error) {
+        console.log('error storing standard types', error);
+      }
+    } else return;
   };
 
   return (
@@ -163,12 +230,85 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
             />
           </DialogActions>
         </Dialog>
-        <NextButton onPress={handleNextPress} />
+        <View style={ButtonStyles.buttonWrapper}>
+          <AddDataTypeButton onPress={handleAddTypePress} />
+          <NextButton onPress={handleNextPress} />
+          <Dialog
+            visible={addNewTypeIsVisible}
+            onDismiss={() => setAddNewTypeIsVisible(false)}
+          >
+            <DialogHeader title='Add New Data Type' />
+            <DialogContent>
+              {showDuplicateError && (
+                <Text style={{ fontSize: 20, color: 'red', marginBottom: 15 }}>
+                  A field with this name/key already exists. Please enter a new
+                  name.
+                </Text>
+              )}
+              <Text style={styles.fieldName}>Field Name</Text>
+              <View>
+                <TextInput
+                  onChangeText={(newText) => {
+                    setNewFieldName(newText);
+                    setNewFieldKey(newText.toLowerCase());
+                  }}
+                  style={styles.fieldInput}
+                ></TextInput>
+              </View>
+              <View>
+                <View>
+                  <SelectDropdown
+                    data={originalTypes}
+                    onSelect={(selectedItem, index) => {
+                      setNewFieldType(selectedItem);
+                    }}
+                    rowTextForSelection={(item, index) => {
+                      // text represented for each item in dropdown
+                      // if data array is an array of objects then return item.property to represent item in dropdown
+                      return item;
+                    }}
+                    keyExtractor={(item, index) => {
+                      return item.key;
+                    }}
+                  />
+                </View>
+              </View>
+            </DialogContent>
+            <DialogActions>
+              <Button
+                title='Cancel'
+                compact
+                color='#FF6464'
+                onPress={() => {
+                  setAddNewTypeIsVisible(false)
+                  setShowDuplicateError(false);
+                  setNewFieldName('');
+                  setNewFieldKey('');
+                  setNewFieldType('');
+                }}
+              />
+              <Button
+                title='Ok'
+                compact
+                color='#A3CDFF'
+                style={{ marginLeft: 10, marginRight: 10 }}
+                onPress={handleNewTypeSubmit}
+              />
+            </DialogActions>
+          </Dialog>
+        </View>
       </View>
     </SafeAreaView>
   );
 };
 
-export default IpadOfflineModeStep1;
+const ButtonStyles = StyleSheet.create({
+  buttonWrapper: {
+    marginTop: 20,
+    marginBottom: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+});
 
-//set up async storage for fields
+export default IpadOfflineModeStep1;
