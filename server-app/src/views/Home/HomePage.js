@@ -1,6 +1,7 @@
 import React from 'react';
 import { ROUTES } from '../../components/Navbar/Navbar';
 import HomeLinkButton from './HomeLinkButton';
+import img from '../../assets/healthylogo.png';
 
 export default function HomePage() {
 
@@ -18,7 +19,7 @@ export default function HomePage() {
             <div className='bg-white w-full h-full p-4 space-y-4 rounded-md shadow-md'>
                 <div className='flex items-baseline justify-between'>
                     <h2 className='text-2xl font-semibold'>Welcome to Healthy Samoa's Server Application</h2>
-                    <img className='h-16 mr-8' src='images/healthylogo.png' alt="healthy samoa app" />
+                    <img className='h-16 mr-8' src={img} alt="healthy samoa app" />
                 </div>
                 <div className='flex flex-col'>
                     <h2 className='text-lg font-semibold'>Custom Fields:</h2>
