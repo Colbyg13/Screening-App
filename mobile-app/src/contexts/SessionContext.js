@@ -1,20 +1,22 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { ActivityIndicator, Button, Dialog, DialogActions, DialogContent, DialogHeader, Text } from "@react-native-material/core";
 import { useNavigation } from "@react-navigation/native";
 import axios from "axios";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { View } from "react-native";
 import { io } from "socket.io-client";
 import PatientRecord from "../classes/patient-record";
-import findServer from "../utils/find-server";
-import replace from "../utils/replace";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View } from "react-native";
-import { LOCAL_RECORDS_STORAGE_KEY } from "../screens/Offline/OfflineRecordsScreenStep2";
 import Snackbar from "../components/Snackbar";
+import { LOCAL_RECORDS_STORAGE_KEY } from "../screens/Offline/OfflineRecordsScreenStep2";
+import findServer, { PREVIOUS_CONNECTION_STORAGE_KEY } from "../utils/find-server";
+import replace from "../utils/replace";
 
 export const SERVER_PORT = 3333;
 export const MAX_TRIES = 5;
 
 const STATION_FIELDS_STORAGE_KEY = 'sessionFields'
+const DEVICE_NAME_STORAGE_KEY = 'device-name';
+
 
 const SessionContext = createContext({
     isConnected: false,
@@ -22,6 +24,8 @@ const SessionContext = createContext({
     serverLoading: false,
     sessionInfo: {},
     sessionRecords: [],
+    deviceName: '',
+    setDeviceName: () => { },
     uploadOfflineRecords: () => { },
     tryFindingServer: () => { },
     selectedStation: () => { },
@@ -43,7 +47,19 @@ export default function SessionProvider({ children }) {
     const [socket, setSocket] = useState();
     const [isConnected, setIsConnected] = useState(false);
     const [serverLoading, setServerLoading] = useState(false);
-    const [offlineRecordStatus, setOfflineRecordStatus] = useState();
+    const [snackbarInfo, setSnackbarInfo] = useState();
+    const [deviceName, setDeviceName] = useState('');
+
+    useEffect(() => {
+        AsyncStorage.getItem(DEVICE_NAME_STORAGE_KEY)
+            .then(name => setDeviceName(name || `device-${~~(Math.random() * 1000)}`));
+    }, [])
+
+
+    useEffect(() => {
+        if (deviceName) AsyncStorage.setItem(DEVICE_NAME_STORAGE_KEY, deviceName);
+        if (socket) setSocket(io(serverIp));
+    }, [deviceName]);
 
     // SESSION
     const [loading, setLoading] = useState(false);
@@ -94,48 +110,50 @@ export default function SessionProvider({ children }) {
 
 
     useEffect(() => {
-        console.log('socket changed')
+        console.log('socket changed');
+
+
         if (socket) {
-            socket.auth = { username: `device ${Math.floor(Math.random() * 1_000)}` };
+            socket.auth = { username: deviceName };
             socket.on('connect', () => {
                 console.log('Connected to server');
-                socket.on('record-created', createdRecord => {
-                    setSessionRecords(records => [...records, createdRecord]);
-                });
-                socket.on('record-updated', updatedRecord => {
-                    setSessionRecords(records => {
-                        const oldRecord = records.find(({ id }) => id === updatedRecord.id);
-                        return oldRecord ?
-                            replace(records, records.indexOf(oldRecord), updatedRecord)
-                            :
-                            records;
-                    });
-                });
-                socket.on('session-started', () => {
-                    console.log('session started');
-                    getSessionInfo();
-                    setModalMessage('');
-                })
-                socket.on('session-ended', () => {
-                    console.log('session ended');
-                    setModalMessage('The current session has ended.');
-                    setSessionRecords([]);
-                });
-                getSessionInfo();
                 setIsConnected(true);
             });
 
-            socket.on('disconnect', () => {
-                console.log('Disconnected from server');
-                socket.off('record-created');
-                socket.off('record-updated');
-                socket.off('session-started');
-                socket.off('session-ended');
-                setIsConnected(false);
-                setModalMessage('You have disconnected from the server.');
+            socket.on('record-created', createdRecord => {
+                setSessionRecords(records => [...records, createdRecord]);
+            });
+            socket.on('record-updated', updatedRecord => {
+                setSessionRecords(records => {
+                    const oldRecord = records.find(({ id }) => id === updatedRecord.id);
+                    return oldRecord ?
+                        replace(records, records.indexOf(oldRecord), updatedRecord)
+                        :
+                        records;
+                });
+            });
+            socket.on('session-started', () => {
+                console.log('session started');
+                getSessionInfo();
+                setModalMessage('');
+            })
+            socket.on('session-ended', () => {
+                console.log('session ended');
+                setModalMessage('The current session has ended.');
+                setSessionRecords([]);
             });
 
             socket.connect();
+
+            socket.on('disconnect', () => {
+                console.log('Disconnected from server');
+                // socket.off('record-created');
+                // socket.off('record-updated');
+                // socket.off('session-started');
+                // socket.off('session-ended');
+                setIsConnected(false);
+                setModalMessage('You have disconnected from the server.');
+            });
 
             return () => {
                 socket.off('connect');
@@ -148,18 +166,17 @@ export default function SessionProvider({ children }) {
         }
     }, [socket]);
 
-    async function tryFindingServer() {
-        // const serverIp = 'http://10.75.165.194:3333';
+    async function tryFindingServer(ipAddress) {
         if (!isConnected) {
             setServerLoading(true);
 
             try {
-                const serverIp = await findServer(SERVER_PORT, 'api/v1/server')
+                const serverIp = ipAddress ? `http://${ipAddress}:3333` : await findServer(SERVER_PORT, 'api/v1/server')
                 if (serverIp) {
+                    AsyncStorage.setItem(PREVIOUS_CONNECTION_STORAGE_KEY, ipAddress);
                     console.log(`Server found on: ${serverIp}`);
-                    const socket = io(serverIp);
                     setServerIp(serverIp);
-                    setSocket(socket);
+                    setSocket(io(serverIp));
                     setServerLoading(false);
                 }
             } catch (error) {
@@ -188,6 +205,7 @@ export default function SessionProvider({ children }) {
                     setSessionInfo(sessionInfo);
                     setSessionRecords(sessionRecords.map(record => new PatientRecord(record, sessionInfo.stations)));
                 } else {
+                    setSnackbarInfo({ status: 'error', message: 'Session not started. Check server and try again.' })
                     throw new Error('Session not started. Check server and try again.')
                 }
                 setLoading(false);
@@ -195,10 +213,13 @@ export default function SessionProvider({ children }) {
             } catch (error) {
                 console.error(error);
                 setLoading(false);
-                throw new Error('Could not find session. Check server and try again');
+                setSnackbarInfo({ status: 'error', message: 'Session not started. Check server and try again' })
+                throw new Error('Session not started. Check server and try again');
             }
         } else {
             setLoading(false);
+
+            setSnackbarInfo({ status: 'error', message: 'Could not find server. Try connecting manually by clicking the top right "offline" button' });
             throw new Error('Could not find server.');
         }
     }
@@ -230,24 +251,23 @@ export default function SessionProvider({ children }) {
                 .then(results => {
                     const notUpdatedRecords = offlineRecords.filter((_, i) => results[i].status !== 'fulfilled');
                     // delete all updated records in local storage
-                    console.log({ notUpdatedRecords })
                     if (notUpdatedRecords.length) {
                         AsyncStorage.setItem(LOCAL_RECORDS_STORAGE_KEY, JSON.stringify(notUpdatedRecords));
-                        setOfflineRecordStatus({ status: 'error', message: 'Could not sync all offline records' })
+                        setSnackbarInfo({ status: 'error', message: 'Could not sync all offline records' })
                     }
                     else {
                         AsyncStorage.removeItem(LOCAL_RECORDS_STORAGE_KEY);
-                        setOfflineRecordStatus({ status: 'success', message: 'Offline records successfully synced' })
+                        setSnackbarInfo({ status: 'success', message: 'Offline records successfully synced' })
                     }
                 })
                 .catch(err => console.error(err))
         }
-        else if (showModal) setOfflineRecordStatus({ status: 'success', message: 'offline records have already been synced' })
+        else if (showModal) setSnackbarInfo({ status: 'success', message: 'offline records have already been synced' })
 
     }
 
     async function sendRecord(recordPayload) {
-        console.log('Sending record...', recordPayload);
+        console.log('Sending record...');
         const createRecord = !recordPayload?.record?.id;
         const createOrUpdate = createRecord ? 'create' : 'update';
         // console.log(createRecord, createOrUpdate)
@@ -272,6 +292,8 @@ export default function SessionProvider({ children }) {
                 sessionRecords: patientRecords,
                 selectedStation,
                 serverLoading,
+                deviceName,
+                setDeviceName,
                 uploadOfflineRecords,
                 tryFindingServer,
                 joinStation,
@@ -282,10 +304,10 @@ export default function SessionProvider({ children }) {
             }}
         >
             <Snackbar
-                open={!!offlineRecordStatus}
-                onClose={() => setOfflineRecordStatus()}
-                message={offlineRecordStatus?.message}
-                severity={offlineRecordStatus?.status}
+                open={!!snackbarInfo}
+                onClose={() => setSnackbarInfo()}
+                message={snackbarInfo?.message}
+                severity={snackbarInfo?.status}
                 duration={6000}
             />
             <Dialog

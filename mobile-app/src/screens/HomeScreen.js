@@ -1,10 +1,14 @@
-import { Button, Stack } from '@react-native-material/core';
-import React from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Button, Stack, TextInput } from '@react-native-material/core';
+import React, { useEffect, useState } from 'react';
 import { Image, SafeAreaView } from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
 
+export const DEVICE_NAME_STORAGE_KEY = 'device-name';
+
 const HomeScreen = ({ navigation }) => {
-  const { getSessionInfo, loading, uploadOfflineRecords } = useSessionContext();
+  const { getSessionInfo, loading, uploadOfflineRecords, deviceName, setDeviceName } = useSessionContext();
+
   const handleOnPress = async () => {
     try {
       await getSessionInfo();
@@ -34,6 +38,14 @@ const HomeScreen = ({ navigation }) => {
             height: '25%',
             resizeMode: 'contain',
           }}
+        />
+        <TextInput
+          style={{ width: 350 }}
+          label="Device Name"
+          value={deviceName}
+          keyboardType='number-pad'
+          placeholder="John Doe's iPad"
+          onChangeText={setDeviceName}
         />
         <Button
           style={{ width: 350, padding: 20, margin: 20 }}
