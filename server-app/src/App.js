@@ -11,7 +11,7 @@ import Settings from "./views/Settings/Settings";
 
 function App() {
 
-  const isConnectedToMongo = window.api.isConnectedToMongo();
+  // const isConnectedToMongo = window.api.isConnectedToMongo();
 
   return (
     <CustomDataTypesProvider>
@@ -19,14 +19,14 @@ function App() {
         <div className="h-screen w-full flex">
           <Navbar />
           <div className="w-full h-full relative bg-gray-200">
-            {isConnectedToMongo ? null : (
+            {/* {isConnectedToMongo ? null : (
               <div className='absolute top-4 left-4 right-4 w-full p-2 bg-red-600 flex text-white space-x-2'>
                 <span>
                   ERROR: MongoDB is not connected. Make sure you have it downloaded!
                 </span>
-                <a className='text-sky-300 underline' href='https://www.mongodb.com/try/download/community'>Click here to download</a>
+                <a target="_blank" className='text-sky-300 underline' href='https://www.mongodb.com/try/download/community'>Click here to download</a>
               </div>
-            )}
+            )} */}
             <Routes>
               <Route path={ROUTES.Home.path} element={<HomePage />} />
               <Route path={ROUTES.Session.path} element={<Sessions />} />
