@@ -23,11 +23,13 @@ import {
   TextInput,
 } from '@react-native-material/core';
 import SelectDropdown from 'react-native-select-dropdown';
+import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 
 const originalTypes = ['string', 'number', 'date', 'bool'];
 const IpadOfflineModeStep1 = ({ route, navigation }) => {
-  const [customDataTypes, setCustomDataTypes] = useState([]); //list of custom types from async storage
-  const [customDataReady, setCustomDataReady] = useState(false);
+  const {customDataTypes} = useCustomDataTypesContext();
+  // const [customDataTypes, setCustomDataTypes] = useState([]); //list of custom types from async storage
+  // const [customDataReady, setCustomDataReady] = useState(false);
   const [standardDataTypes, setStandardDataTypes] = useState([]); //list of standard types from async storage
   const [standardDataReady, setStandardDataReady] = useState(false);
   const [allTypes, setAllTypes] = useState([]); //combined list of standard and custom types
@@ -35,7 +37,6 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
   const [isVisible, setIsVisible] = useState(false); //disable next button until at least one type is selected
   const CUSTOM_DATA_STORAGE_KEY = 'customData';
   const STATION_FIELDS_STORAGE_KEY = 'sessionFields';
-  const SELECTED_DATA_TYPES_STORAGE_KEY = 'selectedDataTypes';
 
   //new data type dialog variables
   const [addNewTypeIsVisible, setAddNewTypeIsVisible] = useState(false);
@@ -57,22 +58,8 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
     setCustomDataReady(true);
   }, []);
 
-  useEffect(() => {
-    // initially get standard data from async storage
-    AsyncStorage.getItem(STATION_FIELDS_STORAGE_KEY)
-      // if there are standard Data types, then we don't want to override it because it came from the DB already
-      .then((storedStandardDataString) =>
-        setStandardDataTypes(
-          (standardTypes) => JSON.parse(storedStandardDataString) || []
-        )
-      );
-    setStandardDataReady(true);
-  }, []);
-
-  useEffect(() => {
-    //initially get saved selected data types from async storage
-    AsyncStorage.removeItem(SELECTED_DATA_TYPES_STORAGE_KEY);
-  }, []);
+  //   AsyncStorage.removeItem(SELECTED_DATA_TYPES_STORAGE_KEY);
+  // }, []);
 
   const renderDataTypes = (item) => {
     const data = item.item;

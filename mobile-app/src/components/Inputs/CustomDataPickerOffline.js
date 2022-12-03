@@ -3,22 +3,22 @@ import { Text, View, Keyboard } from 'react-native';
 import { TextInput } from '@react-native-material/core';
 import SelectDropdown from 'react-native-select-dropdown';
 import { styles } from '../../style/styles';
+import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 const CustomDataPickerOffline = (props) => {
   
   const field = props.field;
-  
   const customDataTypes  = props.customFields
   console.log('custom data picker offline')
   let customData = customDataTypes.filter((item) => {
     return item.type == field.type;
   });
   // console.log(customData)
-  if (customData[0].values === null) {
+  if (customData[0]?.values === null) {
     //Not a dropdown, return text input with label for units
     return (
       <View key={field.name} style={styles.row}>
         <Text style={styles.fieldName}>
-          {field.name}: ({customData[0].unit})
+          {field.name}: ({customData[0]?.unit})
         </Text>
         <View>
           <TextInput
@@ -37,7 +37,7 @@ const CustomDataPickerOffline = (props) => {
     );
   } else {
     let items = [];
-    customData[0].values.forEach((element, index) => {
+    customData[0]?.values?.forEach((element, index) => {
       let obj = {
         label: element,
         value: element,
@@ -51,7 +51,7 @@ const CustomDataPickerOffline = (props) => {
         <Text style={styles.fieldName}>{field.name}:</Text>
         <View>
           <SelectDropdown
-            data={customData[0].values}
+            data={customData[0]?.values}
             onSelect={(selectedItem, index) => {
               // console.log(selectedItem, index);
               props.updateForm(field, selectedItem);

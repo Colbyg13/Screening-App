@@ -11,9 +11,9 @@ const OfflineStationDataTypeItem = (props) => {
   const [customData, setCustomData] = useState(props.customData);
   let options = [];
   if(type === 'custom') {
-
-    if(customData.values !== null) {
-    options = customData.values;
+    // console.log('custom data', customData)
+    if(customData?.values !== null) {
+    options = customData?.values;
     }
     else {
       options = null;
@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   },
   optionLabelAndTextWrapper: {
     flexDirection: 'row',
-    flexWrap: 'no-wrap',
+    flexWrap: 'nowrap',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
@@ -131,9 +131,9 @@ const styles = StyleSheet.create({
   },
   optionIconWrapper: {
     flexDirection: 'row',
-    flexWrap: 'no-wrap',
+    flexWrap: 'nowrap',
     alignItems: 'center',
-    justifyContent: 'start',
+    justifyContent: 'flex-start',
   }
 });
 
