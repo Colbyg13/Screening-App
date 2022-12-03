@@ -16,7 +16,7 @@ export const useCustomDataTypesContext = () => useContext(CustomDataTypesContext
 
 export default function CustomDataTypesProvider({ children }) {
 
-    const { serverIp, sessionInfo } = useSessionContext();
+    const { isConnected, serverIp } = useSessionContext();
 
     const [customDataTypes, setCustomDataTypes] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ export default function CustomDataTypesProvider({ children }) {
     useEffect(() => {
         // gets data from db and uses that
         if (serverIp) fetchData();
-    }, [serverIp, sessionInfo]);
+    }, [serverIp, isConnected]);
 
     async function fetchData() {
         setLoading(true);
