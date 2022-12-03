@@ -19,7 +19,6 @@ export const styles = StyleSheet.create({
   },
   fieldInput: {
     width: 200,
-    padding: 5,
     fontSize: 30,
   },
   switch: {
