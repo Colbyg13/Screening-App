@@ -57,6 +57,7 @@ const CustomDataPicker = (props) => {
         <Text style={styles.fieldName}>{field.name}:</Text>
         <View>
           <SelectDropdown
+            buttonStyle={{width: '75%'}}
             defaultValue={value}
             data={customData[0].values}
             onSelect={(selectedItem, index) => {

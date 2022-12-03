@@ -218,7 +218,7 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
             visible={addNewTypeIsVisible}
             onDismiss={() => setAddNewTypeIsVisible(false)}
           >
-            <DialogHeader title='Add New Data Type' />
+            <DialogHeader title='Add New Data Type' style={{color: 'red'}}/>
             <DialogContent>
               {showDuplicateError && (
                 <Text style={{ fontSize: 20, color: 'red', marginBottom: 15 }}>
@@ -239,6 +239,7 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
               <View>
                 <View>
                   <SelectDropdown
+                    buttonStyle={{width: '75%'}}
                     data={originalTypes}
                     onSelect={(selectedItem, index) => {
                       setNewFieldType(selectedItem);
