@@ -28,14 +28,9 @@ import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 const originalTypes = ['string', 'number', 'date', 'bool'];
 const IpadOfflineModeStep1 = ({ route, navigation }) => {
   const {customDataTypes} = useCustomDataTypesContext();
-  // const [customDataTypes, setCustomDataTypes] = useState([]); //list of custom types from async storage
-  // const [customDataReady, setCustomDataReady] = useState(false);
   const [standardDataTypes, setStandardDataTypes] = useState([]); //list of standard types from async storage
-  const [standardDataReady, setStandardDataReady] = useState(false);
-  const [allTypes, setAllTypes] = useState([]); //combined list of standard and custom types
   const [selectedDataTypes, setSelectedDataTypes] = useState([]); //list of selected types based on switch
   const [isVisible, setIsVisible] = useState(false); //disable next button until at least one type is selected
-  const CUSTOM_DATA_STORAGE_KEY = 'customData';
   const STATION_FIELDS_STORAGE_KEY = 'sessionFields';
 
   //new data type dialog variables
@@ -48,14 +43,13 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
   
   useEffect(() => {
     // initially get custom data from async storage
-    AsyncStorage.getItem(CUSTOM_DATA_STORAGE_KEY)
+    AsyncStorage.getItem(STATION_FIELDS_STORAGE_KEY)
       // if there are custom Data types, then we don't want to override it because it came from the DB already
-      .then((storedCustomDataString) =>
-        setCustomDataTypes(
-          (customDataTypes) => JSON.parse(storedCustomDataString) || []
+      .then((storedFieldsString) =>
+        setStandardDataTypes(
+          (dataTypes) => JSON.parse(storedFieldsString) || []
         )
       );
-    setCustomDataReady(true);
   }, []);
 
   //   AsyncStorage.removeItem(SELECTED_DATA_TYPES_STORAGE_KEY);
