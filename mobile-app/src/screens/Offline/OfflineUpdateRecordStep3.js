@@ -5,6 +5,7 @@ import { styles } from '../../style/styles';
 import BoolInput from '../../components/Inputs/BoolInput';
 import DatePicker from '../../components/Inputs/DatePicker';
 import CustomDataPickerOffline from '../../components/Inputs/CustomDataPickerOffline';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import {
   Provider,
   Button,
@@ -153,6 +154,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
         let showname = `show${field.key}`;
         return (
           <DatePicker
+            value={formState[field.key]}
             key={field.key}
             updateForm={handleDateUpdate}
             toggleShow={toggleDateShow}
@@ -214,6 +216,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
       default:
         return (
           <CustomDataPickerOffline
+            value={String(formState[field.key])}
             key={field.key}
             customFields={customDataTypes}
             updateForm={handleFormUpdate}
@@ -225,10 +228,13 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
+      <KeyboardAwareScrollView
         style={styles.scrollView}
+        resetScrollToCoords={{ x: 0, y: 0 }}
+        scrollEnabled={true}
         showsVerticalScrollIndicator={true}
         persistentScrollbar={true}
+        enableOnAndroid={true}
       >
         <Text style={styles.pageDirection}>Update Record</Text>
 
@@ -237,7 +243,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
             return renderInput(field);
           })}
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
       <View style={styles.wrapper}>
         <Pressable
           style={styles.btnCancel}
