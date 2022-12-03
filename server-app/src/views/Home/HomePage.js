@@ -5,6 +5,8 @@ import img from '../../assets/healthylogo.png';
 
 export default function HomePage() {
 
+    const isConnectedToMongo = window.api.isConnectedToMongo();
+
     return (
         <div className="w-full h-full overflow-y-auto pb-16 p-8 flex flex-col space-y-8">
             <div className='flex space-x-4'>
@@ -16,6 +18,12 @@ export default function HomePage() {
                     />
                 ))}
             </div>
+            {isConnectedToMongo ? null : (
+                <div className='p-2 bg-red-500 text-white'>
+                    <span>Could not connect to MongoDB. Make sure you have it downloaded: </span>
+                    <span className='text-sky-300 underline'>https://www.mongodb.com/try/download/community</span>
+                </div>
+            )}
             <div className='bg-white w-full h-full p-4 space-y-4 rounded-md shadow-md'>
                 <div className='flex items-baseline justify-between'>
                     <h2 className='text-2xl font-semibold'>Welcome to Healthy Samoa's Server Application</h2>

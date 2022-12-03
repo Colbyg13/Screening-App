@@ -151,6 +151,7 @@ export default function Records() {
   ) : (
     <div className='absolute inset-0 flex flex-col justify-center items-center bg-red-500 text-white text-4xl'>
       <div>COULD NOT LOAD RECORDS. PLEASE INSTALL MONGODB.</div>
+      <div className='text-sky-300 underline'>https://www.mongodb.com/try/download/community</div>
     </div>
   );
 }
