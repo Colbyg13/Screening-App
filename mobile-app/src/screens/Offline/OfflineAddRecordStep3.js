@@ -5,6 +5,7 @@ import { styles } from '../../style/styles';
 import BoolInput from '../../components/Inputs/BoolInput';
 import DatePicker from '../../components/Inputs/DatePicker';
 import CustomDataPickerOffline from '../../components/Inputs/CustomDataPickerOffline';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 const OfflineAddRecordStep3 = ({ route, navigation }) => {
   // console.log('add to queue offline screen', route.params);
   const customDataTypes = route.params.customDataTypes;
@@ -47,25 +48,31 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
     // console.log('formState updated', formState);
   }, [formState]);
 
-
-
   const handleFormUpdate = (field, selectedItem) => {
     //console.log('handling update', field, selectedItem);
-    const customFieldData = customDataTypes.find(({ type }) => type === field.type);
-    const customData = customFieldData ? { [field.key]: customFieldData.unit } : {}
+    const customFieldData = customDataTypes.find(
+      ({ type }) => type === field.type
+    );
+    const customData = customFieldData
+      ? { [field.key]: customFieldData.unit }
+      : {};
     setFormState((prevState) => ({
       ...prevState,
       [field.key]: selectedItem,
       customData: {
         ...prevState.customData,
         ...customData,
-      }
+      },
     }));
   };
 
   const handleDateUpdate = (field, showname, newDate) => {
-    const customFieldData = customDataTypes.find(({ type }) => type === field.type);
-    const customData = customFieldData ? { [field.key]: customFieldData.unit } : {}
+    const customFieldData = customDataTypes.find(
+      ({ type }) => type === field.type
+    );
+    const customData = customFieldData
+      ? { [field.key]: customFieldData.unit }
+      : {};
     //console.log('handling date update', field, showname, newDate);
     setFormState((prevState) => ({
       ...prevState,
@@ -73,7 +80,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
       customData: {
         ...prevState.customData,
         ...customData,
-      }
+      },
     }));
     setDateStates((prevState) => ({
       ...prevState,
@@ -91,20 +98,24 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
 
   const updateBool = (field) => {
     const oldState = formState[field.key];
-    const customFieldData = customDataTypes.find(({ type }) => type === field.type);
-    const customData = customFieldData ? { [field.key]: customFieldData.unit } : {}
+    const customFieldData = customDataTypes.find(
+      ({ type }) => type === field.type
+    );
+    const customData = customFieldData
+      ? { [field.key]: customFieldData.unit }
+      : {};
     setFormState((prevState) => ({
       ...prevState,
       [field.key]: !oldState,
       customData: {
         ...prevState.customData,
         ...customData,
-      }
+      },
     }));
   };
 
   const handleSubmit = () => {
-    //go back a screen with new data and persist it there. 
+    //go back a screen with new data and persist it there.
     navigation.navigate({
       name: 'Offline Records',
       params: { newRecord: formState },
@@ -118,6 +129,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
         let showname = `show${field.key}`;
         return (
           <DatePicker
+            value={formState[field.key]}
             key={field.key}
             updateForm={handleDateUpdate}
             toggleShow={toggleDateShow}
@@ -132,19 +144,23 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
             <View>
               <TextInput
                 onChangeText={(newText) => {
-                  const customFieldData = customDataTypes.find(({ type }) => type === field.type);
-                  const customData = customFieldData ? { [field.key]: customFieldData.unit } : {}
+                  const customFieldData = customDataTypes.find(
+                    ({ type }) => type === field.type
+                  );
+                  const customData = customFieldData
+                    ? { [field.key]: customFieldData.unit }
+                    : {};
                   setFormState((prevState) => ({
                     ...prevState,
                     [field.key]: newText,
                     customData: {
                       ...prevState.customData,
                       ...customData,
-                    }
+                    },
                   }));
                 }}
                 style={styles.fieldInput}
-                required={field.required}
+                value={formState[field.key]}
               ></TextInput>
             </View>
           </View>
@@ -160,19 +176,23 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                 onSubmitEditing={Keyboard.dismiss}
                 onChangeText={(newText) => {
                   // console.log(newText);
-                  const customFieldData = customDataTypes.find(({ type }) => type === field.type);
-                  const customData = customFieldData ? { [field.key]: customFieldData.unit } : {}
+                  const customFieldData = customDataTypes.find(
+                    ({ type }) => type === field.type
+                  );
+                  const customData = customFieldData
+                    ? { [field.key]: customFieldData.unit }
+                    : {};
                   setFormState((prevState) => ({
                     ...prevState,
                     [field.key]: +newText,
                     customData: {
                       ...prevState.customData,
                       ...customData,
-                    }
+                    },
                   }));
                 }}
                 style={styles.fieldInput}
-                required={field.required}
+                value={formState[field.key]}
               ></TextInput>
             </View>
           </View>
@@ -199,10 +219,13 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
   };
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
+      <KeyboardAwareScrollView
         style={styles.scrollView}
+        resetScrollToCoords={{ x: 0, y: 0 }}
+        scrollEnabled={true}
         showsVerticalScrollIndicator={true}
         persistentScrollbar={true}
+        enableOnAndroid={true}
       >
         <Text style={styles.pageDirection}>Offline Record</Text>
 
@@ -211,7 +234,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
             return renderInput(field);
           })}
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
       <View style={styles.wrapper}>
         <Pressable
           style={styles.btnSubmit}

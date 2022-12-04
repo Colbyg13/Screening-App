@@ -4,12 +4,19 @@ import { Button, Text } from '@react-native-material/core';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { styles } from '../../style/styles';
 const DatePicker = (props) => {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState(undefined);
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
     setVisible(props.visible);
   }, [props.visible]);
+
+  useEffect(() => {
+    if(props.value !== undefined) {
+      let date = new Date(props.value);
+      setValue(date.toLocaleDateString());
+    }
+  }, [props.value]);
 
   let field = props.field;
   let showname = `show${field.key}`;
