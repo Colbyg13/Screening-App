@@ -63,7 +63,7 @@ export default function Records() {
         scrollTop,
       } = {},
     } = e;
-    
+
     const margin = 100;
     // loads more when reaching the end of the page
     const bottom = scrollHeight - scrollTop - margin <= clientHeight;
@@ -91,7 +91,9 @@ export default function Records() {
     setSelectedRecord();
   }
 
-  return (
+  const isConnectedToMongo = window.api.isConnectedToMongo();
+
+  return isConnectedToMongo ? (
     <>
       <RecordModal
         record={selectedRecord}
@@ -146,5 +148,9 @@ export default function Records() {
         </div>
       </div>
     </>
-  )
+  ) : (
+    <div className='absolute inset-0 flex flex-col justify-center items-center bg-red-500 text-white text-4xl'>
+      <div>COULD NOT LOAD RECORDS. PLEASE INSTALL MONGODB.</div>
+    </div>
+  );
 }

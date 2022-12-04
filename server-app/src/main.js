@@ -14,6 +14,7 @@ remoteMain.initialize();
 const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
+    icon: './icons/icon.png',
     show: false,
     titleBarStyle: 'hidden',
     titleBarOverlay: true,
