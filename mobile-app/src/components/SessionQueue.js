@@ -13,6 +13,7 @@ import AddToQueueBtn from './AddToQueueBtn';
 import SessionQueueItem from './SessionQueueItem';
 import { PATIENT_RECORD_STATUS } from '../classes/patient-record';
 
+//Shows the list of records for that session. Allows for searching by ID, also shows the progress of each record through the stations. 
 const SessionQueue = (props) => {
   const {
     sessionInfo: { stations },

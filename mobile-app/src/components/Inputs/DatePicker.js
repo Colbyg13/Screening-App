@@ -3,6 +3,12 @@ import { View } from 'react-native';
 import { Button, Text } from '@react-native-material/core';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { styles } from '../../style/styles';
+
+/**
+ * 
+ * @param {visible, value} props 
+ * @returns a datepicker that saves the selected date as a Date Object, when rendering the selected value the date is converted to a localeString
+ */
 const DatePicker = (props) => {
   const [value, setValue] = useState(undefined);
   const [visible, setVisible] = useState(false);

@@ -2,6 +2,11 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native';
 import { Pressable } from '@react-native-material/core';
 
+/**
+ * 
+ * @param {*} props 
+ * @returns a styled button that submits a record onPress
+ */
 const AddToQueueBtn = (props) => {
   return (
     <View style={styles.wrapper}>

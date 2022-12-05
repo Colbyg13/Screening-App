@@ -4,11 +4,16 @@ import { TextInput } from '@react-native-material/core';
 import SelectDropdown from 'react-native-select-dropdown';
 import { styles } from '../../style/styles';
 import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
+/**
+ * 
+ * @param {the field being rendered, and the current value from the parent} props  
+ * @returns either a dropdown or a text input for number values. 
+ */
 const CustomDataPickerOffline = (props) => {
   console.log('CustomDataPickerOffline props', props);
   const [value, setValue] = React.useState(undefined);
   const field = props.field;
-  const customDataTypes  = props.customFields
+  const customDataTypes  = props.customFields //grabs custom data types that were passed in by props. Those values come from Async storage. 
   let customData = customDataTypes.filter((item) => {
     return item.type == field.type;
   });
@@ -19,7 +24,6 @@ const CustomDataPickerOffline = (props) => {
     }
   }, [props.value]);
 
-  // console.log(customData)
   if (customData[0]?.values === null) {
     //Not a dropdown, return text input with label for units
     return (

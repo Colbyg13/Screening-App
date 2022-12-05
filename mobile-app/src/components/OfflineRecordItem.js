@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { Pressable } from '@react-native-material/core';
 
+//Returns an offline record item showing the ID and the name if present
 const OfflineRecordItem = (props) => {
   const person = props.item;
   return (

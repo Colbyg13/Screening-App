@@ -1,5 +1,5 @@
 import { SESSION_DATA_TYPES } from "./session-data-types";
-
+//name is required to be part of station 1 normally. 
 const NAME = {
     name: 'Name',
     type: SESSION_DATA_TYPES.STRING,

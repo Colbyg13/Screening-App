@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Text } from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
 
+//Shows if you are connected or not. Long press allows you to type in IP address. 
 export default function ServerStatus() {
     const {
         isConnected,
