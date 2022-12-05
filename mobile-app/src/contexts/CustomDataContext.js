@@ -62,11 +62,11 @@ export default function CustomDataTypesProvider({ children }) {
             if (customDataTypes) {
                 setCustomDataTypes(customDataTypes)
             } else {
-                console.error('Could not retrieve custom data types.')
+                console.warn('Could not retrieve custom data types.')
             }
             setLoading(false);
         } catch (err) {
-            console.error({ err })
+            console.warn({ err })
         }
     }
     return (

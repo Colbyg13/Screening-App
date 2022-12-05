@@ -153,6 +153,7 @@ const UpdateRecordScreen = ({ route }) => {
     });
     setVisible(true);
   };
+
   const renderInput = (field) => {
     if (field.type === 'date') {
       let showname = `show${field.key}`;
@@ -195,7 +196,7 @@ const UpdateRecordScreen = ({ route }) => {
             <Text style={styles.fieldName}>{field.name}:</Text>
             <View>
               <TextInput
-                value={formState[field.key]}
+                value={`${formState[field.key]}`}
                 keyboardType='number-pad'
                 returnKeyType='done'
                 onSubmitEditing={Keyboard.dismiss}

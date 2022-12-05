@@ -24,7 +24,7 @@ export default async function findServer(port, path = '') {
             rej('No server found')
         })
         .catch(e => {
-            console.error(e);
+            console.warn(e);
             rej(e);
         })
     ))

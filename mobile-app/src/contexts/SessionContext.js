@@ -93,8 +93,12 @@ export default function SessionProvider({ children }) {
     // UPLOAD OFFLINE RECORDS TO SERVER WHEN CONNECTED
     useEffect(() => {
         if (isConnected) {
-            getSessionInfo();
-            uploadOfflineRecords();
+            try {
+                getSessionInfo();
+                uploadOfflineRecords();
+            } catch (error) {
+                console.warn(error)
+            }
         }
     }, [isConnected])
 

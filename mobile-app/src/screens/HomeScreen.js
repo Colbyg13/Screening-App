@@ -14,7 +14,7 @@ const HomeScreen = ({ navigation }) => {
 
       navigation.navigate('Station Selection');
     } catch (e) {
-      console.error(e);
+      console.warn(e);
     }
   };
 
