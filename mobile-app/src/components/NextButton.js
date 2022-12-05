@@ -5,7 +5,7 @@ import { Pressable } from '@react-native-material/core';
 const NextButton = (props) => {
 
   return (
-    <View style={styles.wrapper}>
+    <View >
       <Pressable style={styles.btn} onPress={props.onPress} pressEffect='ripple' pressEffectColor='#4c5e75'>
         <Text style={styles.btnText}>Next</Text>
       </Pressable>
@@ -26,7 +26,6 @@ const styles = StyleSheet.create({
     width: 125,
     borderRadius: 10,
     overflow: 'hidden',
-    marginRight: 20,
   },
   btnText: {
     fontSize: 22,

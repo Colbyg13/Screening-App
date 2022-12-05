@@ -143,6 +143,15 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
   }, [route.params?.updatedRecord]);
 
   useEffect(() => {
+    if (route.params?.deleteRecord) {
+      const deleteRecord = route.params.deleteRecord;
+      const filtered = records.filter((record) => record.id !== deleteRecord);
+      setRecords(filtered);
+      setNeedsToStoreData(true);
+    }
+  }, [route.params?.deleteRecord]);
+
+  useEffect(() => {
     if (needsToStoreData) {
       storeRecords();
     } else {
@@ -233,14 +242,12 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
                   setIsVisible(false);
                   break;
                 case 'updatedRecord':
-
                   data = route.params.updatedRecord;
                   const oldRecordID = route.params.oldRecordID;
 
                   for (let i = 0; i < records.length; i++) {
                     //remove old record, and overwrite with new record
                     if (records[i].id === oldRecordID) {
-
                       //find the record with the old ID
                       let update = [...records];
                       update.splice(i, 1);

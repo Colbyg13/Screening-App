@@ -17,6 +17,7 @@ import { styles } from '../style/styles';
 import DatePicker from '../components/Inputs/DatePicker';
 import BoolInput from '../components/Inputs/BoolInput';
 import { useCustomDataTypesContext } from '../contexts/CustomDataContext';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const AddToOnlineQueue = ({ route }) => {
   const navigation = useNavigation();
@@ -203,10 +204,14 @@ const AddToOnlineQueue = ({ route }) => {
   };
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView
+      <KeyboardAwareScrollView
         style={styles.scrollView}
+        resetScrollToCoords={{ x: 0, y: 0 }}
+        scrollEnabled={true}
         showsVerticalScrollIndicator={true}
         persistentScrollbar={true}
+        enableOnAndroid={true}
+        
       >
         <Text style={styles.pageDirection}>Patient Information</Text>
         <View>
@@ -214,7 +219,7 @@ const AddToOnlineQueue = ({ route }) => {
             return renderInput(field);
           })}
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
       <View style={styles.wrapper}>
         <Pressable
           style={styles.btnSubmit}

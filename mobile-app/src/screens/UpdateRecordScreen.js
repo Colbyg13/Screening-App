@@ -23,6 +23,7 @@ import BoolInput from '../components/Inputs/BoolInput';
 import CustomDataPicker from '../components/Inputs/CustomDataPicker';
 import DatePicker from '../components/Inputs/DatePicker';
 import { useCustomDataTypesContext } from '../contexts/CustomDataContext';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const UpdateRecordScreen = ({ route }) => {
   const navigation = useNavigation();
@@ -135,25 +136,20 @@ const UpdateRecordScreen = ({ route }) => {
     //On dialog close go back to session and update list of patients
     const result = await sendRecord({
       record: formState,
-      customData: customDataTypes
-        .reduce((customData, { type, unit }) => {
-          const usedField = station.fields.find(field => field.type === type);
-          const shouldAddKey = (
-            (unit !== 'Custom')
-            &&
-            usedField
-            &&
-            (formState[usedField.key] !== undefined)
-          );
+      customData: customDataTypes.reduce((customData, { type, unit }) => {
+        const usedField = station.fields.find((field) => field.type === type);
+        const shouldAddKey =
+          unit !== 'Custom' &&
+          usedField &&
+          formState[usedField.key] !== undefined;
 
-          return shouldAddKey ?
-            {
+        return shouldAddKey
+          ? {
               ...customData,
               [usedField.key]: unit,
             }
-            :
-            customData;
-        }, {}),
+          : customData;
+      }, {}),
     });
     setVisible(true);
   };
@@ -163,6 +159,7 @@ const UpdateRecordScreen = ({ route }) => {
       return (
         <React.Fragment key={field.key}>
           <DatePicker
+            value={formState[field.key]}
             updateForm={handleDateUpdate}
             toggleShow={toggleDateShow}
             visible={dateStates[showname]}
@@ -220,6 +217,7 @@ const UpdateRecordScreen = ({ route }) => {
       return (
         <React.Fragment key={field.key}>
           <BoolInput
+            style={styles.row}
             value={formState[field.key]}
             updateBool={updateBool}
             field={field}
@@ -231,6 +229,8 @@ const UpdateRecordScreen = ({ route }) => {
       return (
         <React.Fragment key={field.key}>
           <CustomDataPicker
+            style={styles.row}
+            value={formState[field.key]}
             updateForm={handleFormUpdate}
             field={field}
           ></CustomDataPicker>
@@ -241,7 +241,14 @@ const UpdateRecordScreen = ({ route }) => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
+      <KeyboardAwareScrollView
+        style={styles.scrollView}
+        resetScrollToCoords={{ x: 0, y: 0 }}
+        scrollEnabled={true}
+        showsVerticalScrollIndicator={true}
+        persistentScrollbar={true}
+        enableOnAndroid={true}
+      >
         <View style={styles.container}>
           <Text style={styles.pageDirection}>Patient Information</Text>
           <View style={styles.patientInfoWrapper}>
@@ -257,7 +264,7 @@ const UpdateRecordScreen = ({ route }) => {
             })}
           </View>
         </View>
-      </ScrollView>
+      </KeyboardAwareScrollView>
       <View style={styles.wrapper}>
         <Pressable
           onPress={handleSubmit}
@@ -292,7 +299,6 @@ const UpdateRecordScreen = ({ route }) => {
           <Text>Updated Info for {record.name}</Text>
           <Text>ID:{record.id}</Text>
           {fields.map((field, index) => {
-            // console.log('field', field);
             if (formState[field] === true || formState[field] === false) {
               return (
                 <React.Fragment key={index}>
@@ -306,13 +312,12 @@ const UpdateRecordScreen = ({ route }) => {
               return (
                 <React.Fragment key={index}>
                   <Text>
-                    {station.fields.find(({ key }) => key === field)?.name}:{' '}
+                    {station.fields.find(({ key }) => key === field)?.name}:
                     {formState[field].toLocaleDateString()}
                   </Text>
                 </React.Fragment>
               );
-            }
-            else {
+            } else {
               return (
                 <React.Fragment key={index}>
                   <Text>
@@ -356,11 +361,10 @@ const styles = StyleSheet.create({
   },
   fieldInput: {
     width: 200,
-    padding: 5,
     fontSize: 30,
   },
   row: {
-    marginLeft: 20,
+    marginLeft: 10,
     marginTop: 20,
     flexDirection: 'column',
     flexWrap: 'wrap',
