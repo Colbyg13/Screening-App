@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react'
 import { Snackbar as MuiSnackbar } from '@react-native-material/core'
-
+//displays an error or success message throughout the app. 
 export default function Snackbar({
     open,
     onClose = () => {},

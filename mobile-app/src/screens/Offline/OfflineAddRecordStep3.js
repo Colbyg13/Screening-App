@@ -65,7 +65,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
       },
     }));
   };
-
+  //when a date input is selected it will update the records form state
   const handleDateUpdate = (field, showname, newDate) => {
     const customFieldData = customDataTypes.find(
       ({ type }) => type === field.type
@@ -73,7 +73,6 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
     const customData = customFieldData
       ? { [field.key]: customFieldData.unit }
       : {};
-    //console.log('handling date update', field, showname, newDate);
     setFormState((prevState) => ({
       ...prevState,
       [field.key]: newDate, //year/month/day
@@ -87,7 +86,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
       [showname]: false, //should set dob or whatever date to the date text.
     }));
   };
-
+  //toggles the visibility of the datepicker
   const toggleDateShow = (field, showname) => {
     let curState = dateStates[showname];
     setDateStates((prevState) => ({
@@ -95,7 +94,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
       [showname]: !curState,
     }));
   };
-
+  //sets the value in the form state. 
   const updateBool = (field) => {
     const oldState = formState[field.key];
     const customFieldData = customDataTypes.find(

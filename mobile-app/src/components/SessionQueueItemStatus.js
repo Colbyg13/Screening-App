@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, View } from 'react-native';
 import { PATIENT_RECORD_STATUS } from '../classes/patient-record';
 
+//Returns the status circle for the progress tracker
 export default function SessionQueueItemStatus(props) {
     const person = props.person;
 

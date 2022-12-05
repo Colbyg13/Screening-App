@@ -26,6 +26,7 @@ export default function CustomDataTypesProvider({ children }) {
         [type]: unit,
     }), {}), [customDataTypes]);
 
+    //Grabs custom data information from Local Storage. 
     useEffect(() => {
         // initially get custom data from async storage
         AsyncStorage.getItem(CUSTOM_DATA_STORAGE_KEY)
@@ -46,7 +47,7 @@ export default function CustomDataTypesProvider({ children }) {
         // gets data from db and uses that
         if (serverIp) fetchData();
     }, [serverIp, isConnected]);
-
+    //Grabs custom data information directly from the database. 
     async function fetchData() {
         setLoading(true);
         try {

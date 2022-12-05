@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Pressable } from '@react-native-material/core';
 import SessionQueueItemStatus from './SessionQueueItemStatus';
 
+//Returns a record item to click on in the session queue. Clicking on it goes into the update record screen. 
 const SessionQueueItem = (props) => {
   const person = props.item;
   return (

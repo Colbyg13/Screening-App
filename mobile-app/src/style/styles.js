@@ -1,5 +1,5 @@
 import { StyleSheet, StatusBar } from "react-native";
-
+//has most of the styles used throughout the app. However styling is still used in components where it was more convenient than overloading this page. 
 export const styles = StyleSheet.create({
   container: {
     height: '100%',

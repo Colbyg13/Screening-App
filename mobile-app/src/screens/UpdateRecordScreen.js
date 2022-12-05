@@ -25,6 +25,7 @@ import DatePicker from '../components/Inputs/DatePicker';
 import { useCustomDataTypesContext } from '../contexts/CustomDataContext';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
+//this screen is to update a record during an online station. Displays the previously selected values for the record if any exist. 
 const UpdateRecordScreen = ({ route }) => {
   const navigation = useNavigation();
   const { customDataTypes } = useCustomDataTypesContext();

@@ -80,7 +80,6 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
   }, [formState]);
 
   const handleFormUpdate = (field, selectedItem) => {
-    //console.log('handling update', field, selectedItem);
     setFormState((prevState) => ({
       ...prevState,
       [field.key]: selectedItem,
@@ -88,7 +87,6 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
   };
 
   const handleDateUpdate = (field, showname, newDate) => {
-    //console.log('handling date update', field, showname, newDate);
     setFormState((prevState) => ({
       ...prevState,
       [field.key]: newDate, //year/month/day
@@ -116,13 +114,11 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
   };
 
   const handleSubmit = () => {
-    // console.log('formState before submit', formState);
     if (checkIDChange()) {
       //show dialog
       setIsVisible(true);
     } else {
       //no ID change
-      // console.log('formState before submit button', formState);
       navigation.navigate({
         name: 'Offline Records',
         params: { updatedRecord: formState, oldRecordID: item.id },
