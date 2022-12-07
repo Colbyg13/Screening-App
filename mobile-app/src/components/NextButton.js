@@ -2,6 +2,11 @@ import React,  {useState, useEffect} from 'react'
 import { View, Text, StyleSheet } from 'react-native';
 import { Pressable } from '@react-native-material/core';
 
+/**
+ * 
+ * @param {*} props 
+ * @returns a styled button that moves you to step 2 of the offline process
+ */
 const NextButton = (props) => {
 
   return (

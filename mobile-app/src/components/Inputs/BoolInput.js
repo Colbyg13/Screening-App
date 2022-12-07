@@ -2,6 +2,11 @@ import React, {useState, useEffect} from 'react'
 import { Text, View, Switch } from 'react-native'
 import { styles } from '../../style/styles';
 
+/**
+ * 
+ * @param {the field being rendered, and the current value from the parent} props 
+ * @returns a true or false switch with a label for the field name. 
+ */
 const BoolInput = (props) => {
   const field = props.field
   const [value, setValue] = useState(false)

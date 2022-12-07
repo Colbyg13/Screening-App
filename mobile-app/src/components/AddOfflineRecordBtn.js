@@ -2,7 +2,11 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native';
 import { Pressable } from '@react-native-material/core';
 
-
+/**
+ * 
+ * @param {*} props 
+ * @returns a styled button that adds a record to local storage
+ */
 const AddOfflineRecordBtn = (props) => {
   return (
     <View style={styles.wrapper}>

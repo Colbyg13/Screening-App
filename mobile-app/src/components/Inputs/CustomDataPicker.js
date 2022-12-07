@@ -4,10 +4,15 @@ import { TextInput } from '@react-native-material/core';
 import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 import SelectDropdown from 'react-native-select-dropdown';
 import { styles } from '../../style/styles';
+/**
+ * 
+ * @param {the field being rendered, and the current value from the parent} props  
+ * @returns either a dropdown or a text input for number values. 
+ */
 const CustomDataPicker = (props) => {
   const [value, setValue ] = React.useState(undefined);
   const field = props.field;
-  const { customDataTypes } = useCustomDataTypesContext();
+  const { customDataTypes } = useCustomDataTypesContext(); //grabs custom field info from DB
   let customData = customDataTypes.filter((item) => {
     return item.type == field.type;
   });

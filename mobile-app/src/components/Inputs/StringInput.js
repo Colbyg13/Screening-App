@@ -2,7 +2,11 @@ import React from 'react';
 import { Text, View } from 'react-native';
 import { TextInput } from '@react-native-material/core';
 import { styles } from '../../style/styles';
-
+/**
+ * We ended up not using this, for some reason there was a bug that caused all text inputs to overwrite their values to whatever was entered here. Moved this to be just made in the parent instead of imported. 
+ * @param {*} props 
+ * @returns 
+ */
 const StringInput = (props) => {
   const field = props.field;
   return (

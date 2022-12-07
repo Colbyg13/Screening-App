@@ -9,6 +9,7 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import StationsListItem from '../components/StationsListItem';
 import { useSessionContext } from '../contexts/SessionContext';
+//returns the list of stations received from the session context. Clicking on a station lets an iPad start collecting data for those fields. 
 const StationsList = (props) => {
   const {
     sessionInfo,

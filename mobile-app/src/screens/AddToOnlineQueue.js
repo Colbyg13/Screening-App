@@ -31,17 +31,21 @@ const AddToOnlineQueue = ({ route }) => {
   // const station = route.params.station;
   const numFields = station.fields.length;
 
+  //This function is how we dynamically build the input forms. It sets the state for each value in the station.fields and builds from there. All udpates must keep the previous formState. 
   const defaultState = () => {
     let newFields = [];
     for (let i = 0; i < numFields; i++) {
       const varName = station.fields[i].key;
       if (station.fields[i].type === 'date') {
+        //Dates need an additional state to track their visibility. 
         let showname = `show${varName}`;
         setDateStates((prevState) => ({ ...prevState, [showname]: false }));
       }
       if (station.fields[i].type === 'bool') {
+        //starts bools as false. 
         setFormState((prevState) => ({ ...prevState, [varName]: false }));
       } else {
+        //all other values are initially undefined so that DB updates don't overwrite anything on accident. 
         setFormState((prevState) => ({ ...prevState, [varName]: undefined }));
       }
       newFields.push(varName);

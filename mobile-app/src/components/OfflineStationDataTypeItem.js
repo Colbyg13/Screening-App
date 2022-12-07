@@ -3,6 +3,11 @@ import { View, Text, StyleSheet, Switch } from 'react-native';
 import { Button } from '@react-native-material/core';
 import { AntDesign } from '@expo/vector-icons';
 
+/**
+ * 
+ * @param {type} props 
+ * @returns a list item that shows the field name and type, if custom it shows the options available. Has a switch to enable selection. 
+ */
 const OfflineStationDataTypeItem = (props) => {
   const field = props.item;
   const [showValues, setShowValues] = useState(false);

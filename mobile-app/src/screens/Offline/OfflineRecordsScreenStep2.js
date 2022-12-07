@@ -37,16 +37,11 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
     }
   }, [needsUpdate]);
 
-  useEffect(() => {
-    // console.log('RECORDS CHANGED', records); //retrieve records from async storage
-  }, [records]);
-
   const retrieveRecords = async () => {
     try {
       const value = await AsyncStorage.getItem(LOCAL_RECORDS_STORAGE_KEY);
       if (value !== null) {
         // We have data!!
-        // console.log('DATA FROM STORAGE', value);
         setRecords(JSON.parse(value));
         setNeedsUpdate(false);
       }
@@ -62,7 +57,6 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
       try {
         const sorted = records.sort((a, b) => (a.id > b.id ? 1 : -1));
         const jsonValue = JSON.stringify(sorted);
-        // console.log('SETTING STORAGE TO THIS VALUE', jsonValue);
         await AsyncStorage.setItem(LOCAL_RECORDS_STORAGE_KEY, jsonValue);
         setNeedsToStoreData(false);
         setNeedsUpdate(true);
@@ -90,12 +84,6 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
         //display modal to ask if they want to replace the record or overwrite it
         return;
       } else {
-        //if not found, add the record
-        // console.log(
-        //   'firing new record. with newRecord ',
-        //   records,
-        //   route.params.newRecord
-        // );
         const newRecord = route.params.newRecord;
         setRecords((prevState) => [...prevState, newRecord]);
         setNeedsToStoreData(true);

@@ -2,7 +2,7 @@ import React,  {useState, useEffect} from 'react'
 import { View, Text, StyleSheet } from 'react-native';
 import { Pressable } from '@react-native-material/core';
 
-
+/**returns a button that opens a modal in the offlineStep1 to add a new data type. */
 const AddDataTypeButton = (props) => {
   
     return (
