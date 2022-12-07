@@ -1,8 +1,8 @@
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
 import { Menu, MenuItem } from '@mui/material';
-import convert from 'convert-units';
 import React, { useEffect, useState } from 'react';
+import convert from '../../utils/convert';
 
 export default function RecordsHeader({
     mainSortKey,

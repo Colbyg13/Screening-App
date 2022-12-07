@@ -1,8 +1,8 @@
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import { Button, IconButton, MenuItem, TextField } from '@mui/material';
-import convert from 'convert-units';
 import React from 'react';
+import convert from '../../utils/convert';
 
 export const CUSTOM_DATA_TYPE = 'Custom';
 
@@ -18,6 +18,7 @@ const allUnits = [
     customType,
     ...convert().list('length'),
     ...convert().list('mass'),
+    ...convert().list('glucose'),
     ...convert().list('temperature'),
     ...convert().list('pressure'),
 ]

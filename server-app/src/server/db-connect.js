@@ -17,7 +17,10 @@ module.exports = async APP => {
         const lastRecord = APP.db.collection('latestRecordID');
         const result = await lastRecord.countDocuments();
         console.log("RESULT", result, typeof (result));
-        if (result === 0) lastRecord.insertOne({ latestID: 1 });
+        if (result === 0) {
+            lastRecord.insertOne({ latestID: 1 });
+            localStorage.clear();
+        }
 
         // defined fields to sort on
 
@@ -25,7 +28,7 @@ module.exports = async APP => {
             name: 'Id',
             type: 'string',
             key: 'id',
-        },{
+        }, {
             name: 'Created',
             type: 'date',
             key: 'createdAt',

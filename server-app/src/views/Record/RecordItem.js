@@ -28,7 +28,7 @@ export default function RecordItem({
                                 :
                                 typeof record[key] === 'number' ?
                                     `${record[key]}`.match(/^\d+\.\d+$/) ?
-                                        record[key].toFixed(2)
+                                        Math.round(+record[key] * 100) /100
                                         :
                                         record[key]
                                     :

@@ -4,8 +4,7 @@ const ip = require('ip');
 const { ObjectId } = require("mongodb");
 const { normalizeFields } = require("./utils");
 const fs = require('fs');
-const convert = require('convert-units');
-
+const { default: convert } = require("../utils/convert");
 
 module.exports = APP => {
     contextBridge.exposeInMainWorld("api", {
@@ -53,15 +52,10 @@ module.exports = APP => {
                         [key]: record[key] === undefined ?
                             undefined
                             :
-                            convert(record[key]).from(customData[key] || unit).to(unit),
+                            convert(+record[key]).from(customData[key] || unit).to(unit),
                     }), {})
                 }));
 
-                console.log({
-                    convertedPatients,
-                    patients,
-                    unitConversions,
-                })
                 resolve(convertedPatients);
             })),
         createRecord: record => new Promise((resolve, reject) => {
@@ -160,7 +154,7 @@ module.exports = APP => {
                     ''
                     :
                     unitConversions[key] ?
-                        convert(doc[key]).from(doc.customData[key] || unitConversions[key]).to(unitConversions[key])
+                        convert(+doc[key]).from(doc.customData[key] || unitConversions[key]).to(unitConversions[key])
                         :
                         doc[key]).join(',')}\n`)
             });

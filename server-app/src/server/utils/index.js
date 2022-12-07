@@ -1,5 +1,4 @@
 const _ = require('lodash');
-
 const pipe = (arg, ...callbacks) => callbacks.reduce((val, cb) => cb(val), arg);
 
 const asyncPipe = async (promise, cb, ...callbacks) => {
