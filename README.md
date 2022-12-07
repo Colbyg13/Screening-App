@@ -8,10 +8,13 @@ Open the project in VSCode or your preferred editor.
 
 ## Starting the application for development testing.
 Make sure you have NodeJS installed. https://nodejs.org/en/download/
+As well as a local MongoDB https://www.mongodb.com/try/download/community 
 
 Server/Desktop Application:
 
-`Open a terminal and run 'cd server-application'. Then type 'npm i' to install dependencies. After which you can run 'npm run dev'`
+`Open a terminal and run 'cd server-application'. Then type 'npm i' to install dependencies. After which you can run 'npm start'`
+
+`To build the app make sure to cd server-application and run npm run publish. The publish puts the executable in an Amazon S3 bucket. Make sure to define AWS_ACCESS_KEY and AWS_SECRET_KEY within your .env file (see .env-example)`
 
 Mobile/iPad Application:
 `Open a terminal and run 'cd mobile-app'. Then type 'npm i' to install dependencies. After which you can run 'npm start'`
