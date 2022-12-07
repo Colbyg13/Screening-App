@@ -30,10 +30,13 @@ export default function Records() {
       [key]: customDataTypeMap[type],
     }), {});
   const [unitConversions, setUnitConversions] = useState(initialUnitConversions);
-  const updateFieldUnit = (key, newUnit) => setUnitConversions(unitConversions => ({
-    ...unitConversions,
-    [key]: newUnit,
-  }));
+  const updateFieldUnit = (key, newUnit) => {
+    setUnitConversions(unitConversions => ({
+      ...unitConversions,
+      [key]: newUnit,
+    }));
+    resetSkip();
+  }
 
   useEffect(() => {
     // used for getting our records from the database when sort or skip are updated
