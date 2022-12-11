@@ -251,7 +251,7 @@ const AddToOnlineQueue = ({ route }) => {
       >
         <DialogHeader title='Added to Queue Successully!' />
         <DialogContent>
-          <Text style={{ fontSize: 24, marginTop: 10, marginBottom: 10 }}>
+          <Text style={{ fontSize: 24, marginTop: 10, marginBottom: 10, padding: 10 }}>
             New ID: {patient.id}
           </Text>
           {fields.map((field, index) => {
@@ -259,7 +259,7 @@ const AddToOnlineQueue = ({ route }) => {
               return (
                 <React.Fragment key={index}>
                   <Text
-                    style={{ fontSize: 24, marginTop: 10, marginBottom: 10 }}
+                    style={{ fontSize: 24, marginTop: 10, marginBottom: 10, padding: 10 }}
                   >
                     {station.fields.find(({ key }) => key === field)?.name}:{' '}
                     {patient.data[field].toString()}
@@ -270,7 +270,7 @@ const AddToOnlineQueue = ({ route }) => {
               return (
                 <React.Fragment key={index}>
                   <Text
-                    style={{ fontSize: 24, marginTop: 10, marginBottom: 10 }}
+                    style={{ fontSize: 24, marginTop: 10, marginBottom: 10, padding: 10 }}
                   >
                     {station.fields.find(({ key }) => key === field)?.name}:{' '}
                     {formState[field].toLocaleDateString()}
@@ -281,7 +281,7 @@ const AddToOnlineQueue = ({ route }) => {
               return (
                 <React.Fragment key={index}>
                   <Text
-                    style={{ fontSize: 24, marginTop: 10, marginBottom: 10 }}
+                    style={{ fontSize: 24, marginTop: 10, marginBottom: 10, padding: 10 }}
                     key={field.name}
                   >
                     {station.fields.find(({ key }) => key === field)?.name}:{' '}
