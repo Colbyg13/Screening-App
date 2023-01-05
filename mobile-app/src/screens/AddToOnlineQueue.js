@@ -31,21 +31,21 @@ const AddToOnlineQueue = ({ route }) => {
   // const station = route.params.station;
   const numFields = station.fields.length;
 
-  //This function is how we dynamically build the input forms. It sets the state for each value in the station.fields and builds from there. All udpates must keep the previous formState. 
+  //This function is how we dynamically build the input forms. It sets the state for each value in the station.fields and builds from there. All udpates must keep the previous formState.
   const defaultState = () => {
     let newFields = [];
     for (let i = 0; i < numFields; i++) {
       const varName = station.fields[i].key;
       if (station.fields[i].type === 'date') {
-        //Dates need an additional state to track their visibility. 
+        //Dates need an additional state to track their visibility.
         let showname = `show${varName}`;
         setDateStates((prevState) => ({ ...prevState, [showname]: false }));
       }
       if (station.fields[i].type === 'bool') {
-        //starts bools as false. 
+        //starts bools as false.
         setFormState((prevState) => ({ ...prevState, [varName]: false }));
       } else {
-        //all other values are initially undefined so that DB updates don't overwrite anything on accident. 
+        //all other values are initially undefined so that DB updates don't overwrite anything on accident.
         setFormState((prevState) => ({ ...prevState, [varName]: undefined }));
       }
       newFields.push(varName);
@@ -72,25 +72,20 @@ const AddToOnlineQueue = ({ route }) => {
     const result = await sendRecord({
       record: formState,
       // puts only updated values in form into
-      customData: customDataTypes
-        .reduce((customData, { type, unit }) => {
-          const usedField = station.fields.find(field => field.type === type);
-          const shouldAddKey = (
-            (unit !== 'Custom')
-            &&
-            usedField
-            &&
-            (formState[usedField.key] !== undefined)
-          );
+      customData: customDataTypes.reduce((customData, { type, unit }) => {
+        const usedField = station.fields.find((field) => field.type === type);
+        const shouldAddKey =
+          unit !== 'Custom' &&
+          usedField &&
+          formState[usedField.key] !== undefined;
 
-          return shouldAddKey ?
-            {
+        return shouldAddKey
+          ? {
               ...customData,
               [usedField.key]: unit,
             }
-            :
-            customData;
-        }, {}),
+          : customData;
+      }, {}),
     });
     // let newId = Math.floor(Math.random() * 10); //this id will be given in the server
     setPatient((prevState) => ({ ...prevState, id: result.newId })); //on server success set the patient in state for display.
@@ -215,7 +210,6 @@ const AddToOnlineQueue = ({ route }) => {
         showsVerticalScrollIndicator={true}
         persistentScrollbar={true}
         enableOnAndroid={true}
-        
       >
         <Text style={styles.pageDirection}>Patient Information</Text>
         <View>
@@ -226,14 +220,6 @@ const AddToOnlineQueue = ({ route }) => {
       </KeyboardAwareScrollView>
       <View style={styles.wrapper}>
         <Pressable
-          style={styles.btnSubmit}
-          pressEffect='ripple'
-          pressEffectColor='#4c5e75'
-          onPress={handleSubmit}
-        >
-          <Text style={styles.btnText}>Submit</Text>
-        </Pressable>
-        <Pressable
           style={styles.btnCancel}
           pressEffect='ripple'
           pressEffectColor='#FCB8B8'
@@ -243,6 +229,14 @@ const AddToOnlineQueue = ({ route }) => {
           }}
         >
           <Text style={styles.btnText}>Cancel</Text>
+        </Pressable>
+        <Pressable
+          style={styles.btnSubmit}
+          pressEffect='ripple'
+          pressEffectColor='#4c5e75'
+          onPress={handleSubmit}
+        >
+          <Text style={styles.btnText}>Submit</Text>
         </Pressable>
       </View>
       <Dialog
@@ -257,12 +251,16 @@ const AddToOnlineQueue = ({ route }) => {
       >
         <DialogHeader title='Added to Queue Successully!' />
         <DialogContent>
-          <Text>New ID: {patient.id}</Text>
+          <Text style={{ fontSize: 24, marginTop: 10, marginBottom: 10, padding: 10 }}>
+            New ID: {patient.id}
+          </Text>
           {fields.map((field, index) => {
             if (patient.data[field] === true || patient.data[field] === false) {
               return (
                 <React.Fragment key={index}>
-                  <Text>
+                  <Text
+                    style={{ fontSize: 24, marginTop: 10, marginBottom: 10, padding: 10 }}
+                  >
                     {station.fields.find(({ key }) => key === field)?.name}:{' '}
                     {patient.data[field].toString()}
                   </Text>
@@ -271,7 +269,9 @@ const AddToOnlineQueue = ({ route }) => {
             } else if (formState[field] instanceof Date) {
               return (
                 <React.Fragment key={index}>
-                  <Text>
+                  <Text
+                    style={{ fontSize: 24, marginTop: 10, marginBottom: 10, padding: 10 }}
+                  >
                     {station.fields.find(({ key }) => key === field)?.name}:{' '}
                     {formState[field].toLocaleDateString()}
                   </Text>
@@ -280,7 +280,10 @@ const AddToOnlineQueue = ({ route }) => {
             } else {
               return (
                 <React.Fragment key={index}>
-                  <Text key={field.name}>
+                  <Text
+                    style={{ fontSize: 24, marginTop: 10, marginBottom: 10, padding: 10 }}
+                    key={field.name}
+                  >
                     {station.fields.find(({ key }) => key === field)?.name}:{' '}
                     {patient.data[field]}
                   </Text>
@@ -292,12 +295,12 @@ const AddToOnlineQueue = ({ route }) => {
         <DialogActions>
           <Button
             title='Ok'
-            compact
-            variant='text'
+            variant='contained'
             onPress={() => {
               setVisible(false);
               navigation.navigate('Current Session Queue');
             }}
+            style={{ padding: 5 }}
           />
         </DialogActions>
       </Dialog>

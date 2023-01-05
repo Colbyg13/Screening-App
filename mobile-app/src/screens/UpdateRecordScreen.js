@@ -60,7 +60,7 @@ const UpdateRecordScreen = ({ route }) => {
         if (station.fields[i].type === 'bool') {
           setFormState((prevState) => ({ ...prevState, [varName]: false }));
         } else {
-          setFormState((prevState) => ({ ...prevState, [varName]: undefined }));
+          setFormState((prevState) => ({ ...prevState, [varName]: '' }));
         }
       }
       newFields.push(varName);
@@ -268,15 +268,7 @@ const UpdateRecordScreen = ({ route }) => {
         </View>
       </KeyboardAwareScrollView>
       <View style={styles.wrapper}>
-        <Pressable
-          onPress={handleSubmit}
-          style={styles.btnSubmit}
-          pressEffect='ripple'
-          pressEffectColor='#4c5e75'
-        >
-          <Text style={styles.btnText}>Submit</Text>
-        </Pressable>
-        <Pressable
+      <Pressable
           style={styles.btnCancel}
           pressEffect='ripple'
           pressEffectColor='#FCB8B8'
@@ -287,6 +279,15 @@ const UpdateRecordScreen = ({ route }) => {
         >
           <Text style={styles.btnText}>Cancel</Text>
         </Pressable>
+        <Pressable
+          onPress={handleSubmit}
+          style={styles.btnSubmit}
+          pressEffect='ripple'
+          pressEffectColor='#4c5e75'
+        >
+          <Text style={styles.btnText}>Submit</Text>
+        </Pressable>
+      
       </View>
 
       <Dialog
@@ -295,16 +296,18 @@ const UpdateRecordScreen = ({ route }) => {
           setVisible(false);
           navigation.navigate('Current Session Queue');
         }}
+        fullWidth
+        maxWidth="md"
       >
         <DialogHeader title='Information successfully updated!' />
         <DialogContent>
-          <Text>Updated Info for {record.name}</Text>
-          <Text>ID:{record.id}</Text>
+          <Text style={{ fontSize: 24, marginTop: 10, marginBottom: 10, padding: 10 }}>Updated Info for {record.name}</Text>
+          <Text style={{ fontSize: 24, marginTop: 10, marginBottom: 10, padding: 10 }}>ID:{record.id}</Text>
           {fields.map((field, index) => {
             if (formState[field] === true || formState[field] === false) {
               return (
                 <React.Fragment key={index}>
-                  <Text>
+                  <Text style={{ fontSize: 24, marginTop: 10, marginBottom: 10, padding: 10 }}>
                     {station.fields.find(({ key }) => key === field)?.name}:{' '}
                     {formState[field].toString()}
                   </Text>
@@ -313,7 +316,7 @@ const UpdateRecordScreen = ({ route }) => {
             } else if (formState[field] instanceof Date) {
               return (
                 <React.Fragment key={index}>
-                  <Text>
+                  <Text style={{ fontSize: 24, marginTop: 10, marginBottom: 10, padding: 10 }}>
                     {station.fields.find(({ key }) => key === field)?.name}:
                     {formState[field].toLocaleDateString()}
                   </Text>
@@ -322,7 +325,7 @@ const UpdateRecordScreen = ({ route }) => {
             } else {
               return (
                 <React.Fragment key={index}>
-                  <Text>
+                  <Text style={{ fontSize: 24, marginTop: 10, marginBottom: 10, padding: 10 }}>
                     {station.fields.find(({ key }) => key === field)?.name}:{' '}
                     {formState[field]}
                   </Text>
@@ -334,8 +337,8 @@ const UpdateRecordScreen = ({ route }) => {
         <DialogActions>
           <Button
             title='Ok'
-            compact
-            variant='text'
+            style={{ padding: 5 }}
+            variant='contained'
             onPress={() => {
               setVisible(false);
               navigation.navigate('Current Session Queue');
@@ -426,37 +429,3 @@ const styles = StyleSheet.create({
 });
 
 export default UpdateRecordScreen;
-
-// {!isStationOne && (
-//   <>
-//     {hasStationInfo && (
-//       <>
-//         {station.fields.map((field, index) => {
-//           console.log('hello', field, record[field.key]);
-//           console.log('field.key', field.key);
-//           if (
-//             record[field.key] === undefined ||
-//             record[field.key] === null
-//           ) {
-//             console.log('NO DATA FOR THIS FIELD', field);
-//             return (
-//               <React.Fragment key={index}>
-//               <Text style={styles.patientInfoItem}>
-//                 {field.name}:
-//               </Text>
-//               </React.Fragment>
-//             );
-//           } else {
-//             return (
-//               <React.Fragment key={index}>
-//               <Text style={styles.patientInfoItem}>
-//                 {field.name}: {record[field.key].toString()}
-//               </Text>
-//               </React.Fragment>
-//             );
-//           }
-//         })}
-//       </>
-//     )}
-//   </>
-// )}
