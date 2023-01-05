@@ -1,6 +1,8 @@
 import { Box, Button, Modal, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
 import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
+import { useSessionContext } from '../../contexts/SessionContext';
 import RecordModalInputRow from './RecordModalInputRow';
 
 export default function RecordModal({
@@ -14,10 +16,14 @@ export default function RecordModal({
     fieldKeyMap = {},
     onClose = () => { },
     onSave = () => { },
+    onDelete = () => { },
 }) {
 
+    const [confirmDelete, setConfirmDelete] = useState(false);
     const [update, setUpdate] = useState({});
-    const { customDataTypes } = useCustomDataTypesContext()
+    const { customDataTypes } = useCustomDataTypesContext();
+    const { sessionIsRunning } = useSessionContext();
+
 
     useEffect(() => {
         setUpdate({});
@@ -46,6 +52,17 @@ export default function RecordModal({
                 maxHeight: '80%',
                 overflowY: 'auto',
             }}>
+                <ConfirmModal
+                    open={confirmDelete}
+                    title="Delete Record"
+                    message="Are you sure you want to delete this record?"
+                    actionText="Delete"
+                    onClose={() => setConfirmDelete(false)}
+                    onSubmit={async () => {
+                        await window.api.deleteRecord(id);
+                        onDelete(id);
+                    }}
+                />
                 <Typography id="modal-modal-title" variant="h6" component="h2">
                     Update Record
                 </Typography>
@@ -64,48 +81,64 @@ export default function RecordModal({
                     ))}
                 </div>
                 <div className='w-full flex justify-between'>
-                    <Button
-                        size="small"
-                        color="inherit"
-                        variant="contained"
-                        onClick={onClose}
-                    >
-                        Cancel
-                    </Button>
-                    <Button
-                        size="small"
-                        color="success"
-                        variant="contained"
-                        disabled={allFieldKeys.every(key => update[key] === undefined || (record?.[key] === update[key]))}
-                        onClick={async () => {
-                            const result = await window.api.updateRecord({
-                                record: { id, ...update },
-                                // puts only updated values in form into
-                                customData: customDataTypes
-                                    .reduce((customData, { type, unit }) => {
-                                        const usedField = allFields.find(field => field.type === type);
-                                        const shouldAddKey = (
-                                            (unit !== 'Custom')
-                                            &&
-                                            usedField
-                                            &&
-                                            (update[usedField.key] !== undefined)
-                                        );
+                    <div className='flex space-x-2'>
+                        <Button
+                            size="small"
+                            color="error"
+                            variant="contained"
+                            onClick={() => setConfirmDelete(true)}
+                            disabled={sessionIsRunning}
+                        >
+                            Delete
+                        </Button>
+                        {sessionIsRunning ? (
+                            <div className='text-red-600'>Please stop the session to delete record</div>
+                        ) : null}
+                    </div>
+                    <div className='flex space-x-2'>
+                        <Button
+                            size="small"
+                            color="inherit"
+                            variant="contained"
+                            onClick={onClose}
+                        >
+                            Cancel
+                        </Button>
+                        <Button
+                            size="small"
+                            color="success"
+                            variant="contained"
+                            disabled={allFieldKeys.every(key => update[key] === undefined || (record?.[key] === update[key]))}
+                            onClick={async () => {
+                                const result = await window.api.updateRecord({
+                                    record: { id, ...update },
+                                    // puts only updated values in form into
+                                    customData: customDataTypes
+                                        .reduce((customData, { type, unit }) => {
+                                            const usedField = allFields.find(field => field.type === type);
+                                            const shouldAddKey = (
+                                                (unit !== 'Custom')
+                                                &&
+                                                usedField
+                                                &&
+                                                (update[usedField.key] !== undefined)
+                                            );
 
-                                        return shouldAddKey ?
-                                            {
-                                                ...customData,
-                                                [usedField.key]: unitConversions[usedField.key],
-                                            }
-                                            :
-                                            customData;
-                                    }, {}),
-                            });
-                            onSave({ id, ...update });
-                        }}
-                    >
-                        Save
-                    </Button>
+                                            return shouldAddKey ?
+                                                {
+                                                    ...customData,
+                                                    [usedField.key]: unitConversions[usedField.key],
+                                                }
+                                                :
+                                                customData;
+                                        }, {}),
+                                });
+                                onSave({ id, ...update });
+                            }}
+                        >
+                            Save
+                        </Button>
+                    </div>
                 </div>
             </Box>
         </Modal >

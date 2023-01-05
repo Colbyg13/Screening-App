@@ -26,19 +26,25 @@ export default function StationInfo({
     return (
         <Card>
             <CardContent>
-                <div className='space-x-2'>
-                    <div className='text-2xl'>{name}</div>
-                    <div className='text-lg'>Fields:</div>
-                    {displayFields.map(({ name, type, value }) => (
-                        <Chip key={name} label={`${name}: ${isGeneral ? value : SESSION_DATA_TYPE_LABELS[type] || `${type} (${customDataTypeMap[type]})`} `} variant="outlined" />
-                    ))}
-                    {users.length ? (
-                        <>
-                            <div className='text-lg'>Connected Devices:</div>
-                            {users.map(({ username }) => (
-                                <Chip key={username} label={username} variant="outlined" />
+                <div>
+                    <div className='text-2xl mb-2'>{name}</div>
+                    <div>
+                        <div className='text-lg'>Fields</div>
+                        <div className='flex flex-wrap'>
+                            {displayFields.map(({ name, type, value }) => (
+                                <Chip className='mr-2 mb-2' key={name} label={`${name}: ${isGeneral ? value : SESSION_DATA_TYPE_LABELS[type] || `${type} (${customDataTypeMap[type]})`} `} variant="outlined" />
                             ))}
-                        </>
+                        </div>
+                    </div>
+                    {users.length ? (
+                        <div>
+                            <div className='text-lg'>Connected Devices</div>
+                            <div className='flex flex-wrap'>
+                                {users.map(({ username }) => (
+                                    <Chip className='mr-2 mb-2' key={username} label={username} variant="outlined" />
+                                ))}
+                            </div>
+                        </div>
                     ) : null}
                 </div>
             </CardContent>

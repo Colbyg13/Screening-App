@@ -94,6 +94,11 @@ export default function Records() {
     setSelectedRecord();
   }
 
+  function handleDelete(recordId) {
+    if (recordId) setRecords(records => records.filter(({ id }) => id !== recordId))
+    setSelectedRecord();
+  }
+
   const isConnectedToMongo = window.api.isConnectedToMongo();
 
   return isConnectedToMongo ? (
@@ -106,6 +111,7 @@ export default function Records() {
         allFields={allFields}
         onClose={handleOnClose}
         onSave={handleModalSave}
+        onDelete={handleDelete}
       />
       <div className='flex flex-col w-full h-full'>
         <RecordTitleBar

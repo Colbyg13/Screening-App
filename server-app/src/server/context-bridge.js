@@ -135,6 +135,17 @@ module.exports = APP => {
                 reject("Error updating patient record");
             })
         ),
+        deleteRecord: recordId => APP.db.collection("patients").findOneAndDelete({
+            id: recordId,
+        }),
+        deleteAllRecordsAndSessions: () => Promise.all([
+            APP.db.collection("patients").remove(),
+            APP.db.collection("sessions").remove(),
+            APP.db.collection('latestRecordID').findOneAndUpdate(
+                {},
+                { $set: { "latestID": 1 } },
+            )
+        ]),
         downloadRecords: (initialOutputPath, allFieldKeys = [], unitConversions = {}) => new Promise((resolve, reject) => {
 
             const outputPath = initialOutputPath.match(/.csv$/) ?
