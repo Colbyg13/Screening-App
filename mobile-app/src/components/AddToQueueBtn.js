@@ -19,6 +19,9 @@ const AddToQueueBtn = (props) => {
 const styles = StyleSheet.create({ 
   wrapper:  {
     flex: 1,
+    position: 'absolute',
+    bottom: 12,
+    right: 0,
   },
   btn: {
     alignSelf: 'flex-end',
