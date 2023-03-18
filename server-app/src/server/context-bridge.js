@@ -92,8 +92,6 @@ module.exports = APP => {
 
                                 APP.io.sockets.emit('record-created', newUserWithId);
 
-                                APP.sessionRecords = [...APP.sessionRecords, newUserWithId];
-
                                 resolve({ newId: latestID });
                             })
                     })
@@ -123,8 +121,6 @@ module.exports = APP => {
             .then(({ value: updatedRecord }) => {
 
                 if (APP.sessionIsRunning) {
-                    const oldRecord = APP.sessionRecords.find(({ id }) => id === record.id);
-                    if (oldRecord) APP.sessionRecords = replace(APP.sessionRecords, APP.sessionRecords.indexOf(oldRecord), updatedRecord);
                     APP.io.sockets.emit('record-updated', updatedRecord);
                 }
 
@@ -208,6 +204,21 @@ module.exports = APP => {
                     _id: session._id.toString(),
                 })));
             })),
+        getSessionTemplates: () => new Promise((resolve, reject) => APP.db.collection("sessionTemplates")
+            .find().toArray((err, templates) => {
+                if (err) {
+                    console.error(err);
+                    reject("Error finding templates");
+                }
+
+                resolve(templates);
+            })),
+        saveSessionTemplate: template => APP.db.collection("sessionTemplates")
+            .insertOne({
+                name: template.name,
+                sessionInfo: template.sessionInfo,
+                createdAt: new Date(),
+            }),
         getCustomDataTypes: () => new Promise((resolve, reject) => APP.db.collection("customDataTypes")
             .find().toArray((err, customDataTypes) => {
                 if (err) {
@@ -258,26 +269,15 @@ module.exports = APP => {
                 .then(sessionInfo => {
                     APP.sessionInfo = sessionInfo;
                 })
-                .then(() => APP.db.collection("patients")
-                    .find({ sessionId: ObjectId(sessionId) })
-                    .toArray((err, sessionRecords = []) => {
+                .then(() => {
+                    APP.sessionIsRunning = true;
 
-                        if (err) {
-                            console.error(err);
-                            rej("Error finding patient records");
-                        }
+                    APP.io.sockets.emit('session-started');
 
-                        APP.sessionRecords = sessionRecords;
-                        APP.sessionIsRunning = true;
-
-                        APP.io.sockets.emit('session-started');
-
-                        resolve({
-                            sessionInfo: APP.sessionInfo,
-                            sessionRecords: APP.sessionRecords,
-                        });
-
-                    }));
+                    resolve({
+                        sessionInfo: APP.sessionInfo,
+                    });
+                });
             else APP.db.collection("sessions")
                 .insertOne({
                     generalFields: normalizedGeneralFields,
@@ -291,7 +291,6 @@ module.exports = APP => {
                         stations: normalizedStations,
                     };
 
-                    APP.sessionRecords = [];
                     APP.sessionIsRunning = true;
                 }).then(() => {
 
@@ -318,7 +317,6 @@ module.exports = APP => {
 
                     resolve({
                         sessionInfo: APP.sessionInfo,
-                        sessionRecords: APP.sessionRecords,
                     });
                 });
         }),
@@ -326,7 +324,6 @@ module.exports = APP => {
             console.log('Stopping session...')
             if (APP.sessionIsRunning) {
                 APP.sessionInfo = undefined;
-                APP.sessionRecords = undefined;
                 APP.sessionIsRunning = false;
                 APP.io.sockets.emit('session-ended');
                 return 'Successfully stopped session';
@@ -339,17 +336,3 @@ module.exports = APP => {
 
     return APP;
 }
-
-function replace(arr, i, val) {
-    if (
-        (parseInt(i) !== i)
-        ||
-        (i < 0)
-    ) {
-        console.error(arguments);
-        throw new TypeError(`replace() index must be a positive integer, received ${i}`);
-    }
-    const newArr = arr.slice();
-    newArr[i] = val;
-    return newArr;
-};

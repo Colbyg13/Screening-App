@@ -1,9 +1,16 @@
-import { Button, Paper } from '@mui/material';
-import React from 'react';
+import { Button, IconButton, Paper } from '@mui/material';
+import React, { useState } from 'react';
 import { useSessionContext } from '../../../contexts/SessionContext';
 import StationFields from './StationFields';
+import FileDownloadDoneIcon from '@mui/icons-material/FileDownloadDone';
+import FolderIcon from '@mui/icons-material/Folder';
+import SessionTemplateModal from './SessionTemplateModal';
+import SessionSaveTemplateModal from './SessionSaveTemplateModal';
 
 export default function StationManager() {
+
+  const [openTemplateModal, setOpenTemplateModal] = useState(false);
+  const [openSaveTemplateModal, setOpenSaveTemplateModal] = useState(false);
 
   const {
     sessionInfo,
@@ -16,8 +23,27 @@ export default function StationManager() {
 
   return (
     <div className='h-screen flex flex-col p-8 pb-16 items-center overflow-y-scroll'>
-      <Paper>
-        <div className='w-fit bg-gray-50 space-y-4 py-8 px-16 rounded-md'>
+      <SessionTemplateModal
+        open={openTemplateModal}
+        onClose={() => setOpenTemplateModal(false)}
+      />
+      <SessionSaveTemplateModal
+        open={openSaveTemplateModal}
+        onClose={() => setOpenSaveTemplateModal(false)}
+      />
+      <Paper className='w-fit rounded-md'>
+        <div className='flex justify-between items-center px-4 border-b'>
+          <h2 className='text-2xl'>Templates</h2>
+          <div className='flex space-x-2'>
+            <IconButton onClick={() => setOpenTemplateModal(true)}>
+              <FolderIcon style={{ color: 'tan', width: 36, height: 36 }} />
+            </IconButton>
+            <IconButton onClick={() => setOpenSaveTemplateModal(true)}>
+              <FileDownloadDoneIcon style={{ color: 'green', width: 36, height: 36 }} />
+            </IconButton>
+          </div>
+        </div>
+        <div className=' space-y-4 py-8 px-16'>
           <StationFields
             isGeneral
             station={{

@@ -1,7 +1,7 @@
 import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
 import { IconButton, MenuItem, TextField } from '@mui/material';
-import React from 'react';
-import { ALL_SESSION_DATA_TYPES, SESSION_DATA_TYPE_LABELS } from '../../../constants/session-data-types';
+import React, { useEffect } from 'react';
+import { ALL_SESSION_DATA_TYPES, SESSION_DATA_TYPES, SESSION_DATA_TYPE_LABELS } from '../../../constants/session-data-types';
 import { useCustomDataTypesContext } from '../../../contexts/CustomDataContext';
 
 
@@ -32,6 +32,13 @@ export default function StationField({
     const handleNameChange = e => handleChange(e, 'name');
     const handleValueChange = e => handleChange(e, 'value');
     const handleTypeChange = e => handleChange(e, 'type');
+
+    useEffect(() => {
+      if (!allDataTypes.includes(type)) {
+        updateField(stationIndex, fieldIndex, { ...field, type: SESSION_DATA_TYPES.STRING })
+      }
+    }, [type])
+    
 
     return (
         <div className='flex space-x-2'>

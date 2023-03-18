@@ -1,3 +1,4 @@
+const { removeEmptyValues } = require("./utils/index.js")
 
 module.exports = APP => {
 
@@ -6,10 +7,23 @@ module.exports = APP => {
         res.json({ name: 'Test Computer' });
     });
 
-    APP.get('/api/v1/sessions/current', (req, res) => res.json({
-        sessionInfo: APP.sessionInfo,
-        sessionRecords: APP.sessionRecords,
-    }));
+    APP.get('/api/v1/sessions/current', (req, res) => {
+        if (!APP.sessionInfo) res.status(400).send("No session started");
+
+
+        APP.db.collection("patients").find({
+            sessionId: APP.sessionInfo._id,
+        }).toArray((err, sessionRecords) => {
+            if (err) {
+                console.error(err);
+                res.status(400).send("Error finding session records");
+            }
+            res.status(200).json({
+                sessionInfo: APP.sessionInfo,
+                sessionRecords,
+            });
+        });
+    });
 
     // CUSTOM DATA TYPES
     APP.get('/api/v1/custom-data-types', (req, res) => APP.db.collection("customDataTypes")
@@ -56,7 +70,7 @@ module.exports = APP => {
                         lastModified: new Date(),
                         sessionId: APP.sessionInfo._id,
                         ...generalInfo,
-                        ...record,
+                        ...removeEmptyValues(record),
                         customData,
                     };
 
@@ -73,8 +87,6 @@ module.exports = APP => {
 
                             // console.log('Emitting record-created', newUserWithId);
                             APP.io.sockets.emit('record-created', newUserWithId);
-
-                            APP.sessionRecords = [...APP.sessionRecords, newUserWithId];
 
                             res.json({ newId: latestID });
                         })
@@ -99,7 +111,7 @@ module.exports = APP => {
                 {
                     $set: {
                         lastModified: new Date(),
-                        ...record,
+                        ...removeEmptyValues(record),
                         // only updates the fields the record is tied to
                         ...Object.entries(customData).reduce((all, [key, value]) => ({
                             ...all,
@@ -112,11 +124,7 @@ module.exports = APP => {
             .then(({ value: updatedRecord }) => {
 
                 if (APP.sessionIsRunning) {
-                    const oldRecord = APP.sessionRecords.find(({ id }) => id === record.id);
-                    if (oldRecord) {
-                        APP.sessionRecords = replace(APP.sessionRecords, APP.sessionRecords.indexOf(oldRecord), updatedRecord);
-                        APP.io.sockets.emit('record-updated', updatedRecord);
-                    }
+                    APP.io.sockets.emit('record-updated', updatedRecord);
                 }
 
                 if (!updatedRecord) res.status(400).send('Unable to update record');
@@ -132,18 +140,4 @@ module.exports = APP => {
     console.log('-- completed setting up routes --');
 
     return APP;
-};
-
-function replace(arr, i, val) {
-    if (
-        (parseInt(i) !== i)
-        ||
-        (i < 0)
-    ) {
-        console.error(arguments);
-        throw new TypeError(`replace() index must be a positive integer, received ${i}`);
-    }
-    const newArr = arr.slice();
-    newArr[i] = val;
-    return newArr;
 };

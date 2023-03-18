@@ -82,7 +82,6 @@ export default function RecordModalInputRow({
                     onChange={({ target: { value } }) => {
                         if (value) {
                             const [year, month, day] = value.split('-');
-                            console.log({ year, month, day, date: new Date(year, parseInt(month) - 1, day) });
                             onChange(new Date(year, parseInt(month) - 1, day));
                         }
                     }}

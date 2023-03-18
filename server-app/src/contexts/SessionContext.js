@@ -10,6 +10,10 @@ const SessionContext = createContext({
     sessionIsRunning: false,
     sessionInfo: {},
     sessionRecords: [],
+    getSessionList: () => { },
+    getSessionTemplates: () => { },
+    openSessionTemplate: () => { },
+    saveSessionTemplate: () => {},
     startSession: () => { },
     stopSession: () => { },
     addStation: () => { },
@@ -227,6 +231,34 @@ export default function SessionProvider({ children }) {
         }
     }
 
+    const getSessionTemplates = async () => {
+        try {
+            const response = await window.api.getSessionTemplates();
+            return response;
+        } catch (err) {
+            console.error(err)
+        }
+    }
+
+    const openSessionTemplate = template => {
+        const {
+            sessionInfo,
+        } = template;
+        setSessionInfo(sessionInfo);
+    }
+
+    const saveSessionTemplate = async (templateInfo) => {
+        const template = {
+            ...templateInfo,
+            sessionInfo,
+        };
+        try {
+            await window.api.saveSessionTemplate(template);
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
     const startSession = async (sessionId) => {
         try {
             const response = await window.api.startSession({
@@ -282,6 +314,9 @@ export default function SessionProvider({ children }) {
                 connectedUsersByStation,
                 sessionRecords,
                 getSessionList,
+                getSessionTemplates,
+                openSessionTemplate,
+                saveSessionTemplate,
                 startSession,
                 stopSession,
                 addStation,
