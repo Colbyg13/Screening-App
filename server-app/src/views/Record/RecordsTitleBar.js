@@ -37,7 +37,6 @@ export default function RecordTitleBar({
                 onClick={async () => {
                     console.log('DOWNLOADING')
                     const outputPath = window.api.showSaveDialog();
-                    console.log({ outputPath })
                     if (outputPath) {
                         setDownloading(true);
                         window.api.downloadRecords(outputPath, allFieldKeys, unitConversions)

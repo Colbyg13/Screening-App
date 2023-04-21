@@ -47,13 +47,20 @@ module.exports = APP => {
 
                 const convertedPatients = patients.map(({ customData, ...record }) => ({
                     ...record,
-                    ...Object.entries(unitConversions).reduce((all, [key, unit]) => ({
-                        ...all,
-                        [key]: record[key] === undefined ?
-                            undefined
-                            :
-                            convert(+record[key]).from(customData[key] || unit).to(unit),
-                    }), {})
+                    ...Object.entries(unitConversions).reduce((all, [key, unit]) => {
+                        if (record[key] === undefined) return all;
+
+                        try {
+                            const convertedValue = convert(+record[key]).from(customData[key] || unit).to(unit);
+                            return {
+                                ...all,
+                                [key]: convertedValue,
+                            }
+                        } catch (err) {
+                            console.error(`Could not convert ${record[key]} from ${customData[key]} to ${unit}`, err);
+                            return all;
+                        }
+                    }, {})
                 }));
 
                 resolve(convertedPatients);
@@ -137,6 +144,7 @@ module.exports = APP => {
         deleteAllRecordsAndSessions: () => Promise.all([
             APP.db.collection("patients").remove(),
             APP.db.collection("sessions").remove(),
+            APP.db.collection("fields").remove(),
             APP.db.collection('latestRecordID').findOneAndUpdate(
                 {},
                 { $set: { "latestID": 1 } },
@@ -211,7 +219,10 @@ module.exports = APP => {
                     reject("Error finding templates");
                 }
 
-                resolve(templates);
+                resolve(templates.map(template => ({
+                    ...template,
+                    _id: template._id.toString(),
+                })));
             })),
         saveSessionTemplate: template => APP.db.collection("sessionTemplates")
             .insertOne({
@@ -219,6 +230,9 @@ module.exports = APP => {
                 sessionInfo: template.sessionInfo,
                 createdAt: new Date(),
             }),
+        deleteSessionTemplate: templateId => APP.db.collection("sessionTemplates").findOneAndDelete({
+            _id: new ObjectId(templateId),
+        }),
         getCustomDataTypes: () => new Promise((resolve, reject) => APP.db.collection("customDataTypes")
             .find().toArray((err, customDataTypes) => {
                 if (err) {

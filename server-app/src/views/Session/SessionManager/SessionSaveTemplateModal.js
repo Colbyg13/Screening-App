@@ -1,5 +1,5 @@
 import { Box, Button, Modal, TextField, Typography } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSessionContext } from '../../../contexts/SessionContext';
 
 export default function SessionSaveTemplateModal({
@@ -11,6 +11,13 @@ export default function SessionSaveTemplateModal({
     } = useSessionContext();
 
     const [name, setName] = useState("");
+
+    useEffect(() => {
+        if (open) {
+            setName("")
+        }
+    }, [open])
+
 
     return (
         <Modal
