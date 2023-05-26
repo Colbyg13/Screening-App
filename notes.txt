@@ -1,0 +1,17 @@
+NOTES FOR SAMOA APP
+
+Upgrades wanted:
+- use multiple computers (cross computer db sharing).
+- Add signatures to records.
+- Have selected values for custom types (that can be converted).
+- Need ability to delete old templates (maybe store these in file system)
+- Error wrapping and feedback
+- Logging information to the computer for debugging (easy way to upload it)
+
+Problems:
+- Adding a record -  Dismissing the modal then saving will create a new record.
+- Ipad will continue to stack lots of fields for offline mode.
+- No support for different screen sizes.
+- Deleting all records needs to delete all fields.
+- White screen due to errors.
+
