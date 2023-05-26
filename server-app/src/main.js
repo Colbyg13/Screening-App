@@ -1,8 +1,6 @@
 const { app, BrowserWindow } = require('electron');
-const path = require('path');
 const remoteMain = require('@electron/remote/main');
 const isDev = require('electron-is-dev');
-
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (require('electron-squirrel-startup')) {

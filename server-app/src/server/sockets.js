@@ -1,5 +1,6 @@
 const { createServer } = require("http");
 const { Server } = require("socket.io");
+const { LOG_LEVEL, writeLog } = require("./utils/logger");
 
 module.exports = APP => {
     APP.server = createServer(APP);
@@ -13,7 +14,8 @@ module.exports = APP => {
     APP.io.on("connection", socket => {
         const username = socket.handshake.auth.username;
         const isAdmin = socket.handshake.auth.isAdmin;
-        console.log("User Connected", username);
+
+        writeLog(LOG_LEVEL.INFO, `User connected: ${username} ${isAdmin ? '(Admin)' : ''}`);
 
         socket.username = username;
         socket.isAdmin = isAdmin;
@@ -33,8 +35,8 @@ module.exports = APP => {
         }
 
         socket.on("connect-to-station", (data, callback) => {
-            console.log("connect-to-station");
             socket.stationId = data.stationId;
+            writeLog(LOG_LEVEL.INFO, `Connect to station: ${socket.username}-${socket.stationId}`)
             socket.broadcast.emit('join-station', {
                 username: socket.username,
                 stationId: socket.stationId,
@@ -42,7 +44,7 @@ module.exports = APP => {
         });
 
         socket.on("disconnect-from-station", (data, callback) => {
-            console.log("disconnect-from-station");
+            writeLog(LOG_LEVEL.INFO, `Disconnect from station: ${socket.username}-${socket.stationId}`)
             socket.stationId = undefined;
             socket.broadcast.emit('leave-station', {
                 username: socket.username,
@@ -50,12 +52,13 @@ module.exports = APP => {
         });
 
         socket.on('disconnect', () => {
-            console.log("disconnect");
+            writeLog(LOG_LEVEL.INFO, `Leaving: ${socket.username}-${socket.stationId}`)
             socket.emit('user-disconnect', {
                 username: socket.username,
             })
         })
 
+        writeLog(LOG_LEVEL.INFO, `Connected: ${socket.username}`)
         socket.broadcast.emit('user-connected', {
             username: socket.username
         })

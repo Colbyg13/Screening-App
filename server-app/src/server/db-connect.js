@@ -1,7 +1,7 @@
 const { MongoClient } = require("mongodb");
 const url = 'mongodb://127.0.0.1:27017';
 const DB_NAME = 'screening_app';
-
+const { LOG_LEVEL, writeLog} = require("./utils/logger");
 
 module.exports = async APP => {
 
@@ -12,19 +12,19 @@ module.exports = async APP => {
         });
 
         APP.db = client.db(DB_NAME);
-        console.log("Connected to DB", DB_NAME)
+        APP.connectedToDB = true;
+
+        writeLog(LOG_LEVEL.INFO, `Connected to DB: ${DB_NAME}`);
         // insert last record for patient ids if not exists
         const lastRecord = APP.db.collection('latestRecordID');
         const result = await lastRecord.countDocuments();
-        console.log("RESULT", result, typeof (result));
         if (result === 0) {
             lastRecord.insertOne({ latestID: 1 });
             localStorage.clear();
         }
 
         // defined fields to sort on
-
-        APP.db.collection("fields").bulkWrite([{
+        const defaultFields = [{
             name: 'Id',
             type: 'string',
             key: 'id',
@@ -32,10 +32,6 @@ module.exports = async APP => {
             name: 'Created',
             type: 'date',
             key: 'createdAt',
-            // }, {
-            //     name: 'Last Modified',
-            //     type: 'Date',
-            //     key: 'lastModified',
         }].map(field => ({
             updateOne: {
                 filter: { key: field.key },
@@ -44,13 +40,15 @@ module.exports = async APP => {
                     $set: field,
                 }
             }
-        })));
+        }));
+
+        APP.db.collection("fields").bulkWrite(defaultFields);
 
     } catch (err) {
-        console.error(err)
+        writeLog(LOG_LEVEL.ERROR, `Could not connect to DB: ${err}`);
     }
-
-    console.log('-- completed connecting DB --');
+    
+    writeLog(LOG_LEVEL.INFO, '-- completed connecting DB --');
 
     return APP;
 }

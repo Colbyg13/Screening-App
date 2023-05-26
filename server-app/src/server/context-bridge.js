@@ -5,15 +5,12 @@ const { ObjectId } = require("mongodb");
 const { normalizeFields } = require("./utils");
 const fs = require('fs');
 const { default: convert } = require("../utils/convert");
+const { LOG_LEVEL, writeLog } = require("./utils/logger");
 
 module.exports = APP => {
     contextBridge.exposeInMainWorld("api", {
-        apiExample: () => {
-            console.log('You just used the example API')
-            return 1;
-        },
         // SERVER FUNCTIONS
-        getIP: ip.address,
+        getIP: () => ip.address(undefined, "ipv4"),
         isConnectedToMongo: () => !!APP.db,
         showMessage: ({ title, message, type }) => dialog.showMessageBox(null, { title, message, type }),
         showSaveDialog: () => {

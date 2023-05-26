@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require('cors');
+const { LOG_LEVEL, writeLog } = require("./utils/logger");
 
 module.exports = APP => {
 
@@ -7,7 +8,7 @@ module.exports = APP => {
 
     APP.use(express.json());
 
-    console.log('-- completed middlewares --');
+    writeLog(LOG_LEVEL.INFO, '-- completed middlewares --');
 
     return APP;
 }

@@ -1,4 +1,5 @@
-const { removeEmptyValues } = require("./utils/index.js")
+const { removeEmptyValues } = require("./utils/index.js");
+const { LOG_LEVEL, writeLog } = require("./utils/logger");
 
 module.exports = APP => {
 
@@ -15,7 +16,7 @@ module.exports = APP => {
             sessionId: APP.sessionInfo._id,
         }).toArray((err, sessionRecords) => {
             if (err) {
-                console.error(err);
+                writeLog(LOG_LEVEL.ERROR, `Error finding session records, ${err}`);
                 res.status(400).send("Error finding session records");
             }
             res.status(200).json({
@@ -29,7 +30,7 @@ module.exports = APP => {
     APP.get('/api/v1/custom-data-types', (req, res) => APP.db.collection("customDataTypes")
         .find().toArray((err, customDataTypes) => {
             if (err) {
-                console.error(err);
+                writeLog(LOG_LEVEL.ERROR, `Error finding custom data types, ${err}`);
                 res.status(400).send("Error finding custom data types");
             }
             res.status(200).json(customDataTypes);
@@ -39,7 +40,7 @@ module.exports = APP => {
     APP.get('/api/v1/patients', (req, res) => APP.db.collection("patients")
         .find().toArray((err, patients) => {
             if (err) {
-                console.error(err);
+                writeLog(LOG_LEVEL.ERROR, `Error finding patient records, ${err}`);
                 res.status(400).send("Error finding patient records");
             }
             res.status(200).json({ patients });
@@ -92,7 +93,7 @@ module.exports = APP => {
                         })
                 })
                 .catch(err => {
-                    console.error(err);
+                    writeLog(LOG_LEVEL.ERROR, `Error finding patient record, ${err}`)
                     res.status(400).send("Error creating patient record");
                 });
         }
@@ -132,12 +133,12 @@ module.exports = APP => {
                 res.json({ record: updatedRecord });
             })
             .catch(err => {
-                console.error(err);
+                writeLog(LOG_LEVEL.ERROR, `Error updating patient record, ${err}`)
                 res.status(400).send("Error updating patient record");
             });
     });
 
-    console.log('-- completed setting up routes --');
+    writeLog(LOG_LEVEL.INFO, '-- completed setting up routes --');
 
     return APP;
 };
