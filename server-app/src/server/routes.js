@@ -9,7 +9,10 @@ module.exports = APP => {
     });
 
     APP.get('/api/v1/sessions/current', (req, res) => {
-        if (!APP.sessionInfo) res.status(400).send("No session started");
+        if (!APP.sessionInfo) {
+            writeLog(LOG_LEVEL.ERROR, `No session started`);
+            res.status(400).send("No session started");
+        }
 
 
         APP.db.collection("patients").find({
@@ -97,7 +100,10 @@ module.exports = APP => {
                     res.status(400).send("Error creating patient record");
                 });
         }
-        else res.status(400).send("Session not started. Please start a session to create a record");
+        else {
+            writeLog(LOG_LEVEL.ERROR, `Session not started. Please start a session to create a record`)
+            res.status(400).send("Session not started. Please start a session to create a record");
+        }
     });
 
     APP.post('/api/v1/patients/update', (req, res) => {
@@ -128,7 +134,10 @@ module.exports = APP => {
                     APP.io.sockets.emit('record-updated', updatedRecord);
                 }
 
-                if (!updatedRecord) res.status(400).send('Unable to update record');
+                if (!updatedRecord) {
+                    writeLog(LOG_LEVEL.ERROR, `Unable to update record`)
+                    res.status(400).send('Unable to update record');
+                }
 
                 res.json({ record: updatedRecord });
             })

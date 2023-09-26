@@ -13,6 +13,7 @@ module.exports = APP => {
         getIP: () => ip.address(undefined, "ipv4"),
         isConnectedToMongo: () => !!APP.db,
         showMessage: ({ title, message, type }) => dialog.showMessageBox(null, { title, message, type }),
+        writeLog,
         showSaveDialog: () => {
             const date = new Date();
             const fileName = `records-${date.toLocaleDateString()}`.replace(/\//g, '-');
@@ -38,7 +39,7 @@ module.exports = APP => {
                 })),
             } : {}).sort(sort).limit(pageSize).skip(skip).toArray((err, patients) => {
                 if (err) {
-                    console.error(err);
+                    writeLog(LOG_LEVEL.ERROR, `Error getting records: ${err}`);
                     reject("Error finding patient records");
                 }
 
@@ -54,7 +55,7 @@ module.exports = APP => {
                                 [key]: convertedValue,
                             }
                         } catch (err) {
-                            console.error(`Could not convert ${record[key]} from ${customData[key]} to ${unit}`, err);
+                            writeLog(LOG_LEVEL.ERROR, `Could not convert ${record[key]} from ${customData[key]} to ${unit}: ${err}`);
                             return all;
                         }
                     }, {})
@@ -100,7 +101,7 @@ module.exports = APP => {
                             })
                     })
                     .catch(err => {
-                        console.error(err);
+                        writeLog(LOG_LEVEL.ERROR, `Error creating record: err: ${err}, record: ${record}`);
                         reject("Error creating patient record");
                     });
             }
@@ -131,7 +132,7 @@ module.exports = APP => {
                 resolve({ record: updatedRecord });
             })
             .catch(err => {
-                console.error(err);
+                writeLog(LOG_LEVEL.ERROR, `Error updating record: err: ${err}, record: ${record}, customData: ${customData}`);
                 reject("Error updating patient record");
             })
         ),
@@ -175,65 +176,64 @@ module.exports = APP => {
                 writeStream.end();
             });
             stream.on('error', err => {
-                console.error(err);
+                writeLog(LOG_LEVEL.ERROR, `An error occurred when trying to download the records: ${err}`);
                 reject('An error occurred when trying to download the records.');
             });
 
             writeStream.on('close', () => {
-                console.log('Close');
                 resolve('Download Completed');
             });
 
             writeStream.on('error', function (err) {
-                console.log(err);
+                writeLog(LOG_LEVEL.ERROR, `An error occurred when trying to download the records: ${err}`);
                 reject('An error occurred when trying to download the records.');
             });
         }),
         getFields: () => new Promise((resolve, reject) => APP.db.collection("fields")
             .find().toArray((err, fields) => {
                 if (err) {
-                    console.error(err);
-                    reject("Error finding patient records");
+                    writeLog(LOG_LEVEL.ERROR, `Error getting fields: ${err}`);
+                    reject("Error getting fields");
                 }
                 resolve(fields);
             })),
         getSessionList: () => new Promise((resolve, reject) => APP.db.collection("sessions")
             .find().toArray((err, sessions) => {
                 if (err) {
-                    console.error(err);
+                    writeLog(LOG_LEVEL.ERROR, `Error getting session list: ${err}`);
                     reject("Error finding sessions");
                 }
-
+                
                 resolve(sessions.map(session => ({
                     ...session,
                     _id: session._id.toString(),
                 })));
             })),
-        getSessionTemplates: () => new Promise((resolve, reject) => APP.db.collection("sessionTemplates")
+            getSessionTemplates: () => new Promise((resolve, reject) => APP.db.collection("sessionTemplates")
             .find().toArray((err, templates) => {
                 if (err) {
-                    console.error(err);
+                    writeLog(LOG_LEVEL.ERROR, `Error getting session templates: ${err}`);
                     reject("Error finding templates");
                 }
-
+                
                 resolve(templates.map(template => ({
                     ...template,
                     _id: template._id.toString(),
                 })));
             })),
-        saveSessionTemplate: template => APP.db.collection("sessionTemplates")
+            saveSessionTemplate: template => APP.db.collection("sessionTemplates")
             .insertOne({
                 name: template.name,
                 sessionInfo: template.sessionInfo,
                 createdAt: new Date(),
             }),
-        deleteSessionTemplate: templateId => APP.db.collection("sessionTemplates").findOneAndDelete({
-            _id: new ObjectId(templateId),
-        }),
-        getCustomDataTypes: () => new Promise((resolve, reject) => APP.db.collection("customDataTypes")
+            deleteSessionTemplate: templateId => APP.db.collection("sessionTemplates").findOneAndDelete({
+                _id: new ObjectId(templateId),
+            }),
+            getCustomDataTypes: () => new Promise((resolve, reject) => APP.db.collection("customDataTypes")
             .find().toArray((err, customDataTypes) => {
                 if (err) {
-                    console.error(err);
+                    writeLog(LOG_LEVEL.ERROR, `Error getting custom data types: ${err}`);
                     reject("Error finding custom data types");
                 }
 

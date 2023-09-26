@@ -32,7 +32,7 @@ export default function Settings() {
                     />
                 </div>
                 <div>
-                    <h2 className='text-xl mt-4 mb-2'>Credits</h2>
+                    <h2 className='text-xl mt-4 mb-2'>Developers</h2>
                     <div>Andrew Giles - andrewgiles@gilezapps.com</div>
                     <div>Colby Gardiner - colbygardiner13@gmail.com</div>
                 </div>
@@ -42,7 +42,7 @@ export default function Settings() {
                         <div className='text-red-600'>Cannot delete records while session is running.</div>
                     ) : null}
                     <Button
-                        type="submit"
+                        type="button"
                         size="large"
                         color="error"
                         variant="contained"
