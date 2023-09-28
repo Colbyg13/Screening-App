@@ -221,18 +221,18 @@ export default function SessionProvider({ children }) {
     async function joinStation(stationId) {
         console.log('join station');
         setSelectedStationId(stationId);
-        socket.emit('connect-to-station', { stationId });
+        socket.emit('station-join', { stationId });
     }
 
     async function leaveStation() {
         console.log('leave station');
         setSelectedStationId();
-        socket.emit('disconnect-from-station');
+        socket.emit('station-leave');
     }
 
     async function disconnectFromSession() {
         console.log('Disconnecting from session...');
-        socket.emit('disconnect-from-station');
+        socket.emit('station-leave');
         socket.off('session-info-update');
         setSessionInfo();
         setSessionRecords([]);

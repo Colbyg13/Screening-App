@@ -16,7 +16,11 @@ export class ErrorBoundary extends React.Component {
     }
 
     componentDidCatch(error, info) {
-        window.api.writeLog(LOG_LEVEL.ERROR, `Error in react: ${error} @ ${info.componentStack}`);
+        try {
+            window.api.writeLog(LOG_LEVEL.ERROR, `Error in react: ${error} @ ${info.componentStack}`);
+        } catch (error) {
+            console.error("Could not write error", error);
+        }
     }
 
     render() {

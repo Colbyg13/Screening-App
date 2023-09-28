@@ -24,8 +24,12 @@ export default function SessionInfo() {
                     color="primary"
                     variant="contained"
                     onClick={async () => {
-                        const { newId: offlineId } = await window.api.createRecord();
-                        setOfflineId(offlineId);
+                        try {
+                            const { newId: offlineId } = await window.api.createRecord();
+                            setOfflineId(offlineId);
+                        } catch (error) {
+                            console.error("Could not get offline id from context bridge", error);
+                        }
                     }}
                 >
                     Next Offline ID

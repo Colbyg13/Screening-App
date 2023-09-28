@@ -24,16 +24,20 @@ export default function CustomDataTypesProvider({ children }) {
         [dataType.type]: dataType,
     }), {}), [customDataTypes]);
 
-    const fetchData = () => {
+    const fetchData = async () => {
         setLoading(true);
-        window.api.getCustomDataTypes().then(customDataTypes => {
+        try {
+            const customDataTypes = await window.api.getCustomDataTypes();
             setCustomDataTypes(customDataTypes);
+        } catch (error) {
+            console.error("Could not get custom data types", error);
+        } finally {
             setLoading(false);
-        });
+        }
     }
 
     useEffect(() => {
-        fetchData()
+        fetchData();
     }, []);
 
     return (

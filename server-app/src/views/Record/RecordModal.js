@@ -59,8 +59,12 @@ export default function RecordModal({
                     actionText="Delete"
                     onClose={() => setConfirmDelete(false)}
                     onSubmit={async () => {
-                        await window.api.deleteRecord(id);
-                        onDelete(id);
+                        try {
+                            await window.api.deleteRecord(id);
+                            onDelete(id);
+                        } catch (error) {
+                            console.error("Could not delete record", error);
+                        }
                     }}
                 />
                 <Typography id="modal-modal-title" variant="h6" component="h2">
@@ -110,30 +114,34 @@ export default function RecordModal({
                             variant="contained"
                             disabled={allFieldKeys.every(key => update[key] === undefined || (record?.[key] === update[key]))}
                             onClick={async () => {
-                                const result = await window.api.updateRecord({
-                                    record: { id, ...update },
-                                    // puts only updated values in form into
-                                    customData: customDataTypes
-                                        .reduce((customData, { type, unit }) => {
-                                            const usedField = allFields.find(field => field.type === type);
-                                            const shouldAddKey = (
-                                                (unit !== 'Custom')
-                                                &&
-                                                usedField
-                                                &&
-                                                (update[usedField.key] !== undefined)
-                                            );
+                                try {
+                                    await window.api.updateRecord({
+                                        record: { id, ...update },
+                                        // puts only updated values in form into
+                                        customData: customDataTypes
+                                            .reduce((customData, { type, unit }) => {
+                                                const usedField = allFields.find(field => field.type === type);
+                                                const shouldAddKey = (
+                                                    (unit !== 'Custom')
+                                                    &&
+                                                    usedField
+                                                    &&
+                                                    (update[usedField.key] !== undefined)
+                                                );
 
-                                            return shouldAddKey ?
-                                                {
-                                                    ...customData,
-                                                    [usedField.key]: unitConversions[usedField.key],
-                                                }
-                                                :
-                                                customData;
-                                        }, {}),
-                                });
-                                onSave({ id, ...update });
+                                                return shouldAddKey ?
+                                                    {
+                                                        ...customData,
+                                                        [usedField.key]: unitConversions[usedField.key],
+                                                    }
+                                                    :
+                                                    customData;
+                                            }, {}),
+                                    });
+                                    onSave({ id, ...update });
+                                } catch (error) {
+                                    console.error("Could not update record", error);
+                                }
                             }}
                         >
                             Save

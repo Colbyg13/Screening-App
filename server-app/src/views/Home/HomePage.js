@@ -1,11 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { ROUTES } from '../../components/Navbar/Navbar';
 import HomeLinkButton from './HomeLinkButton';
 import img from '../../assets/healthylogo.png';
 
 export default function HomePage() {
 
-    const isConnectedToMongo = window.api.isConnectedToMongo();
+    const [isConnectedToDB, setIsConnectedToDB] = useState(false);
+
+    useEffect(() => {
+        try {
+            const isConnectedToMongo = window.api.isConnectedToMongo();
+            setIsConnectedToDB(isConnectedToMongo)
+        } catch (error) {
+            console.error("Could not get db connection from context bridge", error);
+        }
+    }, []);
+
 
     return (
         <div className="w-full h-full overflow-y-auto pb-16 p-8 flex flex-col space-y-8">
@@ -18,7 +28,7 @@ export default function HomePage() {
                     />
                 ))}
             </div>
-            {isConnectedToMongo ? null : (
+            {isConnectedToDB ? null : (
                 <div className='p-2 bg-red-500 text-white'>
                     <span>Could not connect to MongoDB. Make sure you have it downloaded: </span>
                     <span className='text-sky-300 underline'>https://www.mongodb.com/try/download/community</span>

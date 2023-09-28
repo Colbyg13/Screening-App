@@ -13,7 +13,7 @@ const SessionContext = createContext({
     getSessionList: () => { },
     getSessionTemplates: () => { },
     openSessionTemplate: () => { },
-    saveSessionTemplate: () => {},
+    saveSessionTemplate: () => { },
     startSession: () => { },
     stopSession: () => { },
     addStation: () => { },
@@ -50,7 +50,7 @@ export default function SessionProvider({ children }) {
      * (it should not cut the session when the view leaves)
      */
 
-    const [sessionIsRunning, setSessionIsRunning] = useState(window.api.getIsSessionRunning());
+    const [sessionIsRunning, setSessionIsRunning] = useState(false);
 
     const [sessionInfo, setSessionInfo] = useState(JSON.parse(localStorage.getItem(sessionInfoStorageKey)) || initialSystemInfo);
     const [sessionLogs, setSessionLogs] = useState([]);
@@ -67,6 +67,17 @@ export default function SessionProvider({ children }) {
             user,
         ]
     }), {}), [connectedUsers]);
+
+    useEffect(() => {
+        try {
+            const isSessionRunning = window.api.getIsSessionRunning();
+
+            setSessionIsRunning(isSessionRunning);
+        } catch (error) {
+            console.error("Could not get session is running from context bridge", error);
+        }
+    }, []);
+
 
     // Updates local storage when sessionInfo is updated
     useEffect(() => {
@@ -148,7 +159,7 @@ export default function SessionProvider({ children }) {
                 socket.off('record-updated');
             };
         }
-    }, [sessionIsRunning])
+    }, [sessionIsRunning]);
 
 
     const addStation = () => setSessionInfo(sessionInfo => ({
@@ -290,16 +301,26 @@ export default function SessionProvider({ children }) {
                 })),
             });
             setSessionRecords(newSessionRecords);
-            setSessionIsRunning(window.api.getIsSessionRunning());
         } catch (err) {
             console.error(err)
-            setSessionIsRunning(window.api.getIsSessionRunning());
+        } finally {
+            try {
+                setSessionIsRunning(window.api.getIsSessionRunning());
+            } catch (error) {
+                console.error("Could not set session is running to window api");
+                setSessionIsRunning(false);
+            }
         }
     }
 
     const stopSession = () => {
-        window.api.stopSession();
-        setSessionIsRunning(window.api.getIsSessionRunning());
+        try {
+            window.api.stopSession();
+            setSessionIsRunning(window.api.getIsSessionRunning());
+        }  catch (error) {
+            console.error("Could not stop session", error);
+            setSessionIsRunning(false);
+        }
         setSessionLogs([]);
         setSessionRecords([]);
     }

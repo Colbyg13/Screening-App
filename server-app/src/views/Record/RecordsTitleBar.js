@@ -12,9 +12,13 @@ export default function RecordTitleBar({
     const [totalRecordCount, setTotalRecordCount] = useState();
 
     useEffect(() => {
-        window.api.getRecordCount()
-            .then(count => setTotalRecordCount(count))
-            .catch(err => console.error({ err }));
+        try {
+            window.api.getRecordCount()
+                .then(count => setTotalRecordCount(count))
+                .catch(err => console.error({ err }));
+        } catch (error) {
+            console.error("Could not get record count from context bridge", error);
+        }
     }, []);
 
     return (
@@ -36,20 +40,24 @@ export default function RecordTitleBar({
                 disabled={downloading || !totalRecordCount}
                 onClick={async () => {
                     console.log('DOWNLOADING')
-                    const outputPath = window.api.showSaveDialog();
-                    if (outputPath) {
-                        setDownloading(true);
-                        window.api.downloadRecords(outputPath, allFieldKeys, unitConversions)
-                            .then(() => {
-                                console.log('Download Complete');
-                                setDownloading(false);
-                                window.api.showMessage({ title: 'Download Complete', message: 'Your download is complete.', type: 'info' })
-                            })
-                            .catch(err => {
-                                console.log({ err })
-                                setDownloading(false);
-                                window.api.showMessage({ title: 'Download Failed', message: 'Your download has failed to complete. Please try again.', type: 'error' })
-                            })
+                    try {
+                        const outputPath = window.api.showSaveDialog();
+                        if (outputPath) {
+                            setDownloading(true);
+                            window.api.downloadRecords(outputPath, allFieldKeys, unitConversions)
+                                .then(() => {
+                                    console.log('Download Complete');
+                                    setDownloading(false);
+                                    window.api.showMessage({ title: 'Download Complete', message: 'Your download is complete.', type: 'info' })
+                                })
+                                .catch(err => {
+                                    console.log({ err })
+                                    setDownloading(false);
+                                    window.api.showMessage({ title: 'Download Failed', message: 'Your download has failed to complete. Please try again.', type: 'error' })
+                                })
+                        }
+                    } catch (error) {
+                        console.log("Could not download records", error);
                     }
                 }}
             >

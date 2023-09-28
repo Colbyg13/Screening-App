@@ -59,10 +59,14 @@ export default function CustomFields() {
             onSubmit={async e => {
                 e.preventDefault();
                 setLoading(true);
-                await window.api.saveCustomDataTypes({
-                    customDataTypes,
-                    dataTypeIdsToDelete,
-                });
+                try {
+                    await window.api.saveCustomDataTypes({
+                        customDataTypes,
+                        dataTypeIdsToDelete,
+                    });
+                } catch (error) {
+                    console.error("Could not save custom data types");
+                }
                 fetchData();
                 setLoading(false);
             }}

@@ -27,9 +27,13 @@ export default function useFieldKeys() {
 
     useEffect(() => {
         // gets the most up to date fields from DB
-        window.api.getFields().then(fields => {
-            if (fields) setAllFields(fields);
-        });
+        try {
+            window.api.getFields().then(fields => {
+                if (fields) setAllFields(fields);
+            });
+        } catch (error) {
+            console.error("Could not get fields from context bridge", error);
+        }
     }, []);
 
 

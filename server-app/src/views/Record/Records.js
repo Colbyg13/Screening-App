@@ -13,6 +13,7 @@ const recordPageSize = 100;
 
 export default function Records() {
 
+  const [isConnectedToDB, setIsConnectedToDB] = useState(false);
   const [loading, setLoading] = useState(false);
   const [records, setRecords] = useState([]);
   const [skip, setSkip] = useState(0);
@@ -39,21 +40,35 @@ export default function Records() {
   }
 
   useEffect(() => {
+    try {
+      const isConnectedToMongo = window.api.isConnectedToMongo();
+      setIsConnectedToDB(isConnectedToMongo);
+    } catch (error) {
+      console.error("Could not get db connection from context bridge", error);
+    }
+  }, [])
+
+
+  useEffect(() => {
     // used for getting our records from the database when sort or skip are updated
     if (!reachedEndOfRecords || !skip) {
       setLoading(true);
       // console.log({ sort, skip, search })
-      window.api.getRecords(search, sort, skip, recordPageSize, unitConversions)
-        .then(fetchedRecords => {
-          if (fetchedRecords.length) {
-            // add the new records to end of list if skip > 0
-            setRecords(records => skip ? [...records, ...fetchedRecords] : fetchedRecords);
-            if (reachedEndOfRecords) setReachedEndOfRecords(false);
-          } else {
-            setReachedEndOfRecords(true);
-          }
-          setLoading(false);
-        });
+      try {
+        window.api.getRecords(search, sort, skip, recordPageSize, unitConversions)
+          .then(fetchedRecords => {
+            if (fetchedRecords.length) {
+              // add the new records to end of list if skip > 0
+              setRecords(records => skip ? [...records, ...fetchedRecords] : fetchedRecords);
+              if (reachedEndOfRecords) setReachedEndOfRecords(false);
+            } else {
+              setReachedEndOfRecords(true);
+            }
+            setLoading(false);
+          });
+      } catch (error) {
+        console.error("Could not get records", error);
+      }
     }
   }, [sort, skip, search, reachedEndOfRecords, unitConversions]);
 
@@ -99,9 +114,9 @@ export default function Records() {
     setSelectedRecord();
   }
 
-  const isConnectedToMongo = window.api.isConnectedToMongo();
 
-  return isConnectedToMongo ? (
+
+  return isConnectedToDB ? (
     <>
       <RecordModal
         record={selectedRecord}

@@ -14,7 +14,13 @@ export default function Settings() {
                 open={showModal}
                 message="Are you sure you want to delete all records?"
                 onClose={() => setShowModal(false)}
-                onSubmit={window.api.deleteAllRecordsAndSessions}
+                onSubmit={() => {
+                    try {
+                        window.api.deleteAllRecordsAndSessions()
+                    } catch (error) {
+                        console.error("Could not delete all records and sessions", error);
+                    }
+                }}
                 title="Delete All Records"
                 actionText="Delete"
                 deadmanText="delete"

@@ -96,7 +96,11 @@ export default function SessionTemplateModal({
                 actionText="Delete"
                 onClose={() => setSelectedTemplateIdToDelete()}
                 onSubmit={async () => {
-                    await window.api.deleteSessionTemplate(selectedTemplateIdToDelete);
+                    try {
+                        await window.api.deleteSessionTemplate(selectedTemplateIdToDelete);
+                    } catch (error) {
+                        console.error("Could not delete session template", error);
+                    }
                     getSessionTemplates()
                         .then(templates => {
                             const sortedTemplates = templates.sort(({ createdAt: a }, { createdAt: b }) => a < b ? 1 : -1)

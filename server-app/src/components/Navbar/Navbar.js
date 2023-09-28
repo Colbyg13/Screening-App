@@ -6,7 +6,7 @@ import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined';
 import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
 import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
 import { List } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useSessionContext } from '../../contexts/SessionContext';
 import NavbarItem from './NavbarItem';
@@ -51,6 +51,19 @@ export default function Navbar() {
   const { sessionIsRunning } = useSessionContext();
 
   const [open, setOpen] = useState(true);
+  const [ip, setIP] = useState("");
+
+  useEffect(() => {
+    if (!ip) {
+      try {
+        const ip = window.api.getIP();
+        setIP(ip);
+      } catch (error) {
+        console.error("Could not get ip from server", error);
+      }
+    }
+  })
+
 
   return (
     <div className="relative h-full min-w-fit shadow-lg border-r border-gray-600 flex flex-col justify-between">
@@ -110,7 +123,7 @@ export default function Navbar() {
         </List>
       </div>
       {open ? (
-        <div className='absolute bottom-1 left-0 right-0 text-center text-sm'>IPv4: {window.api.getIP()}</div>
+        <div className='absolute bottom-1 left-0 right-0 text-center text-sm'>IPv4: {ip}</div>
       ) : null}
     </div>
   )
