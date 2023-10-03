@@ -8,13 +8,17 @@ export default function HomePage() {
     const [isConnectedToDB, setIsConnectedToDB] = useState(false);
 
     useEffect(() => {
+        getDBStatus();
+    }, []);
+
+    async function getDBStatus() {
         try {
-            const isConnectedToMongo = window.api.isConnectedToMongo();
-            setIsConnectedToDB(isConnectedToMongo)
+            const isConnected = await window.api.getDBStatus();
+            setIsConnectedToDB(isConnected)
         } catch (error) {
             console.error("Could not get db connection from context bridge", error);
         }
-    }, []);
+    }
 
 
     return (

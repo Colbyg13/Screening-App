@@ -8,6 +8,9 @@ import RecordList from './RecordList';
 import RecordModal from './RecordModal';
 import RecordsHeader from './RecordsHeader';
 import RecordTitleBar from './RecordsTitleBar';
+import { serverURL } from '../../constants/server';
+import axios from 'axios';
+import { LOG_LEVEL } from '../../constants/log-levels';
 
 const recordPageSize = 100;
 
@@ -40,37 +43,49 @@ export default function Records() {
   }
 
   useEffect(() => {
+    getDBStatus();
+  }, []);
+
+  async function getDBStatus() {
     try {
-      const isConnectedToMongo = window.api.isConnectedToMongo();
-      setIsConnectedToDB(isConnectedToMongo);
+      const isConnected = await window.api.getDBStatus();
+      setIsConnectedToDB(isConnected);
     } catch (error) {
       console.error("Could not get db connection from context bridge", error);
     }
-  }, [])
+  }
 
 
   useEffect(() => {
     // used for getting our records from the database when sort or skip are updated
     if (!reachedEndOfRecords || !skip) {
-      setLoading(true);
-      // console.log({ sort, skip, search })
-      try {
-        window.api.getRecords(search, sort, skip, recordPageSize, unitConversions)
-          .then(fetchedRecords => {
-            if (fetchedRecords.length) {
-              // add the new records to end of list if skip > 0
-              setRecords(records => skip ? [...records, ...fetchedRecords] : fetchedRecords);
-              if (reachedEndOfRecords) setReachedEndOfRecords(false);
-            } else {
-              setReachedEndOfRecords(true);
-            }
-            setLoading(false);
-          });
-      } catch (error) {
-        console.error("Could not get records", error);
-      }
+      getRecords({ sort, skip, search, reachedEndOfRecords, unitConversions });
+
     }
   }, [sort, skip, search, reachedEndOfRecords, unitConversions]);
+
+  async function getRecords({ sort, skip, search, reachedEndOfRecords, unitConversions }) {
+    setLoading(true);
+    try {
+      const result = await axios.get(`${serverURL}/api/v1/records`, { params: { search, sort, skip, recordPageSize, unitConversions } });
+      console.log({ result });
+      const records = result.data;
+
+      if (records.length) {
+        if (reachedEndOfRecords) setReachedEndOfRecords(false);
+
+        // only include the previous if skip is not 0
+        setRecords(previousRecords => skip === 0 ? records : [...previousRecords, records]);
+      } else {
+        setReachedEndOfRecords(true);
+      }
+    } catch (error) {
+      console.error("Could not get records from server", error);
+      window.api.writeLog(LOG_LEVEL.ERROR, `Could not get records from server: ${error}`);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   function handleScroll(e) {
 

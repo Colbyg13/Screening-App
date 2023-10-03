@@ -1,4 +1,7 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { serverURL } from "../constants/server";
+import axios from "axios";
+import { LOG_LEVEL } from "../constants/log-levels";
 
 const CustomDataTypesContext = createContext({
     loading: false,
@@ -27,10 +30,11 @@ export default function CustomDataTypesProvider({ children }) {
     const fetchData = async () => {
         setLoading(true);
         try {
-            const customDataTypes = await window.api.getCustomDataTypes();
-            setCustomDataTypes(customDataTypes);
+            const result = await axios.get(`${serverURL}/api/v1/dataTypes`);
+            setCustomDataTypes(result.data);
         } catch (error) {
             console.error("Could not get custom data types", error);
+            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get custom data types: ${error}`);
         } finally {
             setLoading(false);
         }

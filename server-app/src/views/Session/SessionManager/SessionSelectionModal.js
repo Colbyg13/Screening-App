@@ -19,13 +19,16 @@ export default function SessionSelectionModal({
         if (open) {
             setLoading(true);
             getSessionList()
-                .then(sessionList => {
-                    const sortedSessionList = sessionList.sort(({ createdAt: a }, { createdAt: b }) => a < b ? 1 : -1)
-                    setSessionList(sortedSessionList);
-                    setLoading(false);
+                .then((sessionList = []) => {
+                    if (sessionList) {
+                        const sortedSessionList = sessionList.sort(({ createdAt: a }, { createdAt: b }) => a < b ? 1 : -1)
+                        setSessionList(sortedSessionList);
+                    }
                 })
                 .catch(err => {
                     console.error(err);
+                })
+                .finally(() => {
                     setLoading(false);
                 })
         }

@@ -4,29 +4,41 @@ const DB_NAME = 'screening_app';
 const { LOG_LEVEL, writeLog } = require("./utils/logger");
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const database = client.db(DB_NAME);
 
 async function connectToMongo() {
     try {
         await client.connect();
-        writeLog(LOG_LEVEL.INFO, `Connected to DB: ${DB_NAME}`);
-        const db = client.db();
-
+        writeLog(LOG_LEVEL.INFO, `Connected to Mongo`);
 
         // SETUP TASKS
-        await ensureDocumentsExist(db);
-        await createIndexes(db);
+        await createMandatoryCollections();
+        await ensureDocumentsExist();
+        await createIndexes();
 
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error connecting to DB: ${DB_NAME}`);
+        writeLog(LOG_LEVEL.ERROR, `Error connecting to DB: ${error}`);
     }
 }
 
+async function createMandatoryCollections() {
+    writeLog(LOG_LEVEL.INFO, 'Creating needed collections...');
+    try {
+        const collections = await database.listCollections().toArray();
+        if (!collections.some(({ name }) => name === 'records')) {
+            await database.createCollection('records');
+        }
+    } catch (error) {
+        writeLog(LOG_LEVEL.ERROR, `Error creating collections: ${error}`);
+    }
+    writeLog(LOG_LEVEL.INFO, 'Finished creating needed collections.');
+}
 
-async function ensureDocumentsExist(db) {
+async function ensureDocumentsExist() {
     writeLog(LOG_LEVEL.INFO, 'Ensuring collection has needed documents...');
 
     // CHECK FIELDS
-    const collection = db.collection('fields');
+    const fieldsCollection = database.collection('fields');
 
     // Check if a document exists and create it if necessary
     const documentsToEnsure = [
@@ -35,35 +47,31 @@ async function ensureDocumentsExist(db) {
     ];
 
     for (const document of documentsToEnsure) {
-        const existingDocument = await collection.findOne(document);
+        const filter = { key: document.key };
+        const update = { $setOnInsert: document };
 
-        if (!existingDocument) {
-            // Document doesn't exist, create it
-            await collection.insertOne(document);
-        }
+        await fieldsCollection.updateOne(filter, update, { upsert: true });
     }
 
     // CHECK ID
-    const lastRecord = APP.db.collection('latestRecordID');
+    const lastRecord = database.collection('latestRecordID');
     const result = await lastRecord.countDocuments();
     if (result === 0) {
-        lastRecord.insertOne({ latestID: 1 });
-        localStorage.clear();
+        await lastRecord.insertOne({ latestID: 1 });
     }
 
     writeLog(LOG_LEVEL.INFO, 'Finished ensuring collection has needed documents...');
 
 }
 
-async function createIndexes(db) {
+async function createIndexes() {
     writeLog(LOG_LEVEL.INFO, 'Creating indexes...');
 
-    const collection = db.collection('records');
+    const recordsCollection = database.collection('records');
 
-    // Example: Create an index on a field called 'name'
-    const indexExists = await collection.indexExists('id');
+    const indexExists = await recordsCollection.indexExists('id');
     if (!indexExists) {
-        await collection.createIndex({
+        await recordsCollection.createIndex({
             id: 1
         });
     }
@@ -73,5 +81,4 @@ async function createIndexes(db) {
 
 connectToMongo();
 
-// Export the MongoDB client to use it in other parts of your application
-module.exports = { client };
+module.exports = { database };

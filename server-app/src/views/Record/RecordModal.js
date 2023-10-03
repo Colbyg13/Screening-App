@@ -1,6 +1,9 @@
 import { Box, Button, Modal, Typography } from '@mui/material';
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
+import { LOG_LEVEL } from '../../constants/log-levels';
+import { serverURL } from '../../constants/server';
 import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 import { useSessionContext } from '../../contexts/SessionContext';
 import RecordModalInputRow from './RecordModalInputRow';
@@ -22,7 +25,7 @@ export default function RecordModal({
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [update, setUpdate] = useState({});
     const { customDataTypes } = useCustomDataTypesContext();
-    const { sessionIsRunning } = useSessionContext();
+    const { sessionIsRunning, sessionInfo } = useSessionContext();
 
 
     useEffect(() => {
@@ -60,10 +63,11 @@ export default function RecordModal({
                     onClose={() => setConfirmDelete(false)}
                     onSubmit={async () => {
                         try {
-                            await window.api.deleteRecord(id);
+                            await axios.delete(`${serverURL}/api/v1/record/${id}`);
                             onDelete(id);
                         } catch (error) {
-                            console.error("Could not delete record", error);
+                            console.error("Could not delete record.", error);
+                            window.api.writeLog(LOG_LEVEL.ERROR, `Could not delete record: ${error}`);
                         }
                     }}
                 />
@@ -114,33 +118,36 @@ export default function RecordModal({
                             variant="contained"
                             disabled={allFieldKeys.every(key => update[key] === undefined || (record?.[key] === update[key]))}
                             onClick={async () => {
-                                try {
-                                    await window.api.updateRecord({
-                                        record: { id, ...update },
-                                        // puts only updated values in form into
-                                        customData: customDataTypes
-                                            .reduce((customData, { type, unit }) => {
-                                                const usedField = allFields.find(field => field.type === type);
-                                                const shouldAddKey = (
-                                                    (unit !== 'Custom')
-                                                    &&
-                                                    usedField
-                                                    &&
-                                                    (update[usedField.key] !== undefined)
-                                                );
 
-                                                return shouldAddKey ?
-                                                    {
-                                                        ...customData,
-                                                        [usedField.key]: unitConversions[usedField.key],
-                                                    }
-                                                    :
-                                                    customData;
-                                            }, {}),
-                                    });
+                                const payload = {
+                                    record: { id, ...record },
+                                    sessionId: sessionInfo._id,
+                                    customData: customDataTypes.reduce((customData, { type, unit }) => {
+                                        const usedField = allFields.find(field => field.type === type);
+                                        const shouldAddKey = (
+                                            (unit !== 'Custom')
+                                            &&
+                                            usedField
+                                            &&
+                                            (update[usedField.key] !== undefined)
+                                        );
+
+                                        return shouldAddKey ?
+                                            {
+                                                ...customData,
+                                                [usedField.key]: unitConversions[usedField.key],
+                                            }
+                                            :
+                                            customData;
+                                    }, {}),
+                                }
+
+                                try {
+                                    await axios.post(`${serverURL}/api/v1/record`, payload);
                                     onSave({ id, ...update });
                                 } catch (error) {
-                                    console.error("Could not update record", error);
+                                    console.error("Could not update record.", error);
+                                    window.api.writeLog(LOG_LEVEL.ERROR, `Could not update record: ${error}`);
                                 }
                             }}
                         >

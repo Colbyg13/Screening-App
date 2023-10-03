@@ -6,6 +6,9 @@ import { usePrompt } from '../../hooks/prompt';
 import replace from '../../utils/replace';
 import BaseFields from './BaseFields';
 import UserDefinedFields from './UserDefinedFields';
+import { serverURL } from '../../constants/server';
+import axios from 'axios';
+import { LOG_LEVEL } from '../../constants/log-levels';
 
 const baseDataType = {
     type: '',
@@ -60,14 +63,15 @@ export default function CustomFields() {
                 e.preventDefault();
                 setLoading(true);
                 try {
-                    await window.api.saveCustomDataTypes({
+                    await axios.post(`${serverURL}/api/v1/dataTypes`, {
                         customDataTypes,
                         dataTypeIdsToDelete,
                     });
+                    fetchData();
                 } catch (error) {
-                    console.error("Could not save custom data types");
+                    console.error("Could not save custom data types.", error);
+                    window.api.writeLog(LOG_LEVEL.ERROR, `Could not save custom data types: ${error}`);
                 }
-                fetchData();
                 setLoading(false);
             }}
         >

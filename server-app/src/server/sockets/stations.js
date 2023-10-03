@@ -13,7 +13,7 @@ module.exports = (io) => {
         socket.on("station-join", (data, callback) => {
             socket.stationId = data.stationId;
             writeLog(LOG_LEVEL.INFO, `Station Join: ${socket.username}-${socket.stationId}`);
-            socket.broadcast.emit('join-station', {
+            socket.broadcast.emit('station-join', {
                 username: socket.username,
                 stationId: socket.stationId,
             });
@@ -22,7 +22,7 @@ module.exports = (io) => {
         socket.on("station-leave", (data, callback) => {
             writeLog(LOG_LEVEL.INFO, `Station Leave: ${socket.username}-${socket.stationId}`);
             socket.stationId = undefined;
-            socket.broadcast.emit('leave-station', {
+            socket.broadcast.emit('station-leave', {
                 username: socket.username,
             });
         });

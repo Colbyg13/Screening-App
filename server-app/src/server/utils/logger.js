@@ -36,7 +36,6 @@ function writeLog(logLevel, message) {
     if (fs.existsSync(pathToLog)) {
         const logStats = fs.statSync(pathToLog);
 
-        console.log("Stats: ", logStats)
         if (logStats.size > 10_000_000) {
             console.log("File full. removing backup and recreating new log file...")
             if (fs.existsSync(pathToBackup)) {

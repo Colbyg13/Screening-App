@@ -1,8 +1,11 @@
-import { Box, Chip, IconButton, Modal, Typography } from '@mui/material';
-import React, { useEffect, useState } from 'react'
-import { useSessionContext } from '../../../contexts/SessionContext';
 import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
+import { Box, Chip, IconButton, Modal, Typography } from '@mui/material';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import ConfirmModal from '../../../components/ConfirmModal/ConfirmModal';
+import { LOG_LEVEL } from '../../../constants/log-levels';
+import { serverURL } from '../../../constants/server';
+import { useSessionContext } from '../../../contexts/SessionContext';
 
 export default function SessionTemplateModal({
     open,
@@ -20,7 +23,7 @@ export default function SessionTemplateModal({
     useEffect(() => {
         if (open) {
             getSessionTemplates()
-                .then(templates => {
+                .then((templates = []) => {
                     const sortedTemplates = templates.sort(({ createdAt: a }, { createdAt: b }) => a < b ? 1 : -1)
                     setTemplates(sortedTemplates);
                 })
@@ -97,12 +100,14 @@ export default function SessionTemplateModal({
                 onClose={() => setSelectedTemplateIdToDelete()}
                 onSubmit={async () => {
                     try {
-                        await window.api.deleteSessionTemplate(selectedTemplateIdToDelete);
+                        await axios.delete(`${serverURL}/api/v1/sessionTemplates/${id}`);
+                        onDelete(id);
                     } catch (error) {
-                        console.error("Could not delete session template", error);
+                        console.error("Could not delete session template.", error);
+                        window.api.writeLog(LOG_LEVEL.ERROR, `Could not delete session template: ${error}`);
                     }
                     getSessionTemplates()
-                        .then(templates => {
+                        .then((templates = []) => {
                             const sortedTemplates = templates.sort(({ createdAt: a }, { createdAt: b }) => a < b ? 1 : -1)
                             setTemplates(sortedTemplates);
                         })

@@ -1,5 +1,8 @@
 import { Button, CircularProgress } from '@mui/material';
+import axios from 'axios';
 import React, { useEffect, useState } from 'react';
+import { LOG_LEVEL } from '../../constants/log-levels';
+import { serverURL } from '../../constants/server';
 import RecordSearch from './RecordSearch';
 
 export default function RecordTitleBar({
@@ -12,14 +15,19 @@ export default function RecordTitleBar({
     const [totalRecordCount, setTotalRecordCount] = useState();
 
     useEffect(() => {
-        try {
-            window.api.getRecordCount()
-                .then(count => setTotalRecordCount(count))
-                .catch(err => console.error({ err }));
-        } catch (error) {
-            console.error("Could not get record count from context bridge", error);
-        }
+        getRecordCount();
     }, []);
+
+    async function getRecordCount() {
+        try {
+            const result = await axios.get(`${serverURL}/api/v1/records`, { params: { count: true } });
+            console.log({ result });
+            setTotalRecordCount(result.data);
+        } catch (error) {
+            console.error("Could not get records from server", error);
+            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get records from server: ${error}`);
+        }
+    }
 
     return (
         <div className='pt-8 px-2 pb-2 bg-green-500 flex justify-between items-center'>

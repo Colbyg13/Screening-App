@@ -1,6 +1,9 @@
 
+import axios from 'axios';
 import { useEffect, useMemo, useState } from 'react';
+import { LOG_LEVEL } from '../../../constants/log-levels';
 import { ALL_REQUIRED_STATION_FIELD_KEYS, REQUIRED_STATION_FIELDS } from '../../../constants/required-station-fields';
+import { serverURL } from '../../../constants/server';
 
 const fieldKeysStorageKey = 'fieldKeys';
 
@@ -26,15 +29,19 @@ export default function useFieldKeys() {
     }, [allFields]);
 
     useEffect(() => {
-        // gets the most up to date fields from DB
-        try {
-            window.api.getFields().then(fields => {
-                if (fields) setAllFields(fields);
-            });
-        } catch (error) {
-            console.error("Could not get fields from context bridge", error);
-        }
+        getFields();
     }, []);
+
+    async function getFields() {
+        try {
+            const result = await axios.get(`${serverURL}/api/v1/fields`);
+            console.log({ result });
+            setAllFields(result.data);
+        } catch (error) {
+            console.error("Could not get fields from server", error);
+            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get fields from server: ${error}`);
+        }
+    }
 
 
     return {
