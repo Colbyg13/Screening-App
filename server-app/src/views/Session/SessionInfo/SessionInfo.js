@@ -10,13 +10,16 @@ import StationInfoList from './StationInfoList';
 
 export default function SessionInfo() {
 
-    const { stopSession, sessionInfo } = useSessionContext();
+    const { stopSession, sessionId } = useSessionContext();
     const [offlineId, setOfflineId] = useState();
 
     async function getNextOfflineId() {
         try {
-            const result = await axios.post(`${serverURL}/api/v1/record`, {
-                sessionId: sessionInfo._id,
+            console.log({ sessionId })
+            const result = await axios.post(`${serverURL}/api/v1/records`, {
+                record: {
+                    sessionId,
+                },
             });
             console.log({ result })
             const offlineId = result.data.id;

@@ -5,11 +5,10 @@ import { LOG_LEVEL } from '../../../constants/log-levels';
 import { ALL_REQUIRED_STATION_FIELD_KEYS, REQUIRED_STATION_FIELDS } from '../../../constants/required-station-fields';
 import { serverURL } from '../../../constants/server';
 
-const fieldKeysStorageKey = 'fieldKeys';
+export default function useFields() {
 
-export default function useFieldKeys() {
-
-    const [allFields, setAllFields] = useState(JSON.parse(localStorage.getItem(fieldKeysStorageKey)) || []);
+    const [loading, setLoading] = useState(true);
+    const [allFields, setAllFields] = useState([]);
 
     const allFieldKeys = useMemo(() => allFields.map(({ key }) => key), [allFields]);
     const fieldKeyMap = useMemo(() => allFields.reduce((all, field) => ({
@@ -24,15 +23,11 @@ export default function useFieldKeys() {
     ], [allFieldKeys]);
 
     useEffect(() => {
-        // updates the local storage when allFields are updated
-        localStorage.setItem(fieldKeysStorageKey, JSON.stringify(allFields));
-    }, [allFields]);
-
-    useEffect(() => {
         getFields();
     }, []);
 
     async function getFields() {
+        setLoading(true);
         try {
             const result = await axios.get(`${serverURL}/api/v1/fields`);
             console.log({ result });
@@ -41,10 +36,11 @@ export default function useFieldKeys() {
             console.error("Could not get fields from server", error);
             window.api.writeLog(LOG_LEVEL.ERROR, `Could not get fields from server: ${error}`);
         }
+        setLoading(false);
     }
 
-
     return {
+        loading,
         sortedFieldKeys,
         allFields,
         allFieldKeys,

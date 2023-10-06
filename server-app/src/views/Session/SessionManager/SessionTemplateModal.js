@@ -22,16 +22,20 @@ export default function SessionTemplateModal({
 
     useEffect(() => {
         if (open) {
-            getSessionTemplates()
-                .then((templates = []) => {
-                    const sortedTemplates = templates.sort(({ createdAt: a }, { createdAt: b }) => a < b ? 1 : -1)
-                    setTemplates(sortedTemplates);
-                })
-                .catch(err => {
-                    console.error(err);
-                })
+            reloadSessionTemplates();
         }
     }, [open]);
+
+    function reloadSessionTemplates() {
+        getSessionTemplates()
+            .then((templates = []) => {
+                const sortedTemplates = templates.sort(({ createdAt: a }, { createdAt: b }) => a < b ? 1 : -1)
+                setTemplates(sortedTemplates);
+            })
+            .catch(err => {
+                console.error(err);
+            })
+    }
 
     return (
         <>
@@ -71,7 +75,7 @@ export default function SessionTemplateModal({
                                 }}
                             >
                                 <div>
-                                    <div>Session: {template.name} ({template.createdAt.toLocaleString()})</div>
+                                    <div>Session: {template.name} ({template.createdAt?.toLocaleString()})</div>
                                     <div className='flex'>
                                         {template.sessionInfo?.generalFields.map(({ name, value }) => (
                                             <Chip key={name} label={`${name}: ${value}`} variant="outlined" />
@@ -100,20 +104,13 @@ export default function SessionTemplateModal({
                 onClose={() => setSelectedTemplateIdToDelete()}
                 onSubmit={async () => {
                     try {
-                        await axios.delete(`${serverURL}/api/v1/sessionTemplates/${id}`);
-                        onDelete(id);
+                        await axios.delete(`${serverURL}/api/v1/sessionTemplates/${selectedTemplateIdToDelete}`);
+                        setSelectedTemplateIdToDelete();
+                        reloadSessionTemplates();
                     } catch (error) {
                         console.error("Could not delete session template.", error);
                         window.api.writeLog(LOG_LEVEL.ERROR, `Could not delete session template: ${error}`);
                     }
-                    getSessionTemplates()
-                        .then((templates = []) => {
-                            const sortedTemplates = templates.sort(({ createdAt: a }, { createdAt: b }) => a < b ? 1 : -1)
-                            setTemplates(sortedTemplates);
-                        })
-                        .catch(err => {
-                            console.error(err);
-                        })
                 }}
             />
         </>

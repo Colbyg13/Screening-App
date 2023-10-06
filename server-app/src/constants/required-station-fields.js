@@ -5,20 +5,18 @@ const NAME = {
     type: SESSION_DATA_TYPES.STRING,
     key: 'name',
 };
-const DOB = {
-    name: 'DOB',
+
+const CREATED_AT = {
+    name: 'Created At',
     type: SESSION_DATA_TYPES.DATE,
-    key: 'dob',
-};
+    key: 'createdAt',
+}
 
 export const REQUIRED_STATION_FIELDS = {
+    [CREATED_AT.key]: CREATED_AT,
     [NAME.key]: NAME,
-    // [DOB.key]: DOB,
 };
 
-export const ALL_REQUIRED_STATION_FIELDS = [
-    NAME,
-    // DOB,
-];
+export const ALL_REQUIRED_STATION_FIELDS = Object.values(REQUIRED_STATION_FIELDS);
 
 export const ALL_REQUIRED_STATION_FIELD_KEYS = ALL_REQUIRED_STATION_FIELDS.map(({ key }) => key);

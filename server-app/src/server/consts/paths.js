@@ -6,13 +6,6 @@ const applicationName = 'HealthySamoa';
 const applicationPath = path.join(appDataPath, applicationName);
 const logsPath = path.join(applicationPath, "logs");
 
-console.log({
-    appDataPath,
-    applicationName,
-    applicationPath,
-    logsPath,
-})
-
 module.exports = {
     applicationPath,
     logsPath,

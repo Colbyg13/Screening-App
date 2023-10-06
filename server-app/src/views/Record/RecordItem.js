@@ -5,6 +5,7 @@ export default function RecordItem({
     record,
     search,
     allFieldKeys = [],
+    fieldKeyMap = {},
     index,
     handleRecordClick,
 }) {
@@ -20,19 +21,21 @@ export default function RecordItem({
                     <RecordSection
                         recordKey={key}
                         search={search}
-                        value={record[key] instanceof Date ?
-                            record[key].toLocaleDateString()
+                        value={record[key] === undefined ? ''
                             :
-                            typeof record[key] === 'boolean' ?
-                                !!record[key] ? 'Yes' : 'No'
+                            fieldKeyMap[key]?.type === "date" ?
+                                new Date(record[key]).toLocaleDateString()
                                 :
-                                typeof record[key] === 'number' ?
-                                    `${record[key]}`.match(/^\d+\.\d+$/) ?
-                                        Math.round(+record[key] * 100) /100
-                                        :
-                                        record[key]
+                                fieldKeyMap[key]?.type === 'bool' ?
+                                    !!record[key] ? 'Yes' : 'No'
                                     :
-                                    record[key] || ''}
+                                    fieldKeyMap[key]?.type === 'number' ?
+                                        `${record[key]}`.match(/^\d+\.\d+$/) ?
+                                            Math.round(+record[key] * 100) / 100
+                                            :
+                                            record[key]
+                                        :
+                                        record[key]}
                     />
                 </td>
             ))}

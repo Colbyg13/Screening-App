@@ -21,8 +21,10 @@ export default function RecordModalInputRow({
 
     const label = fieldName || fieldKey
     const customDataType = customDataTypeMap[fieldType]
-    const fieldPostfix = unitConversions[fieldKey] ?
-        `(${unitConversions[fieldKey]})`
+    const unit = unitConversions[fieldKey];
+    const hasUnitConversion = !!unit;
+    const fieldPostfix = hasUnitConversion ?
+        `(${unit})`
         :
         '';
 
@@ -56,10 +58,10 @@ export default function RecordModalInputRow({
                 </TextField>
             ) : fieldType === SESSION_DATA_TYPES.BOOL ? (
                 <Switch
-                    checked={value}
+                    checked={!!value}
                     onChange={() => onChange(!value)}
                 />
-            ) : fieldType === SESSION_DATA_TYPES.NUMBER ? (
+            ) : fieldType === SESSION_DATA_TYPES.NUMBER || hasUnitConversion ? (
                 <TextField
                     type="number"
                     className='w-56'
@@ -103,10 +105,11 @@ export default function RecordModalInputRow({
 }
 
 function formatDate(date) {
-    var d = date instanceof Date ? date : new Date(date),
-        month = '' + (d.getMonth() + 1),
-        day = '' + d.getDate(),
-        year = d.getFullYear();
+    const d = date instanceof Date ? date : new Date(date);
+
+    let month = '' + (d.getMonth() + 1);
+    let day = '' + d.getDate();
+    let year = d.getFullYear();
 
     if (month.length < 2)
         month = '0' + month;

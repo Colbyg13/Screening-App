@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { database } = require('../db');
 const { LOG_LEVEL, writeLog } = require("../utils/logger");
+const { ObjectId } = require('mongodb');
 
 router.get('/', async (req, res) => {
     writeLog(LOG_LEVEL.INFO, `Getting sessions`);
@@ -29,7 +30,7 @@ router.get('/:sessionId', async (req, res) => {
     try {
 
         const sessionCol = database.collection('sessions');
-        const session = await sessionCol.findOne({ _id: sessionId });
+        const session = await sessionCol.findOne({ _id: new ObjectId(sessionId) });
 
         res.status(200).json(session);
     } catch (error) {

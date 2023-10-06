@@ -20,7 +20,7 @@ export default function RecordTitleBar({
 
     async function getRecordCount() {
         try {
-            const result = await axios.get(`${serverURL}/api/v1/records`, { params: { count: true } });
+            const result = await axios.get(`${serverURL}/api/v1/records`, { params: { getCount: true } });
             console.log({ result });
             setTotalRecordCount(result.data);
         } catch (error) {

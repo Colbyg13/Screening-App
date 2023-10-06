@@ -1,5 +1,5 @@
 const { MongoClient } = require("mongodb");
-const uri = 'mongodb://127.0.0.1:27017';
+const uri = 'mongodb://localhost:27017';
 const DB_NAME = 'screening_app';
 const { LOG_LEVEL, writeLog } = require("./utils/logger");
 
@@ -42,8 +42,8 @@ async function ensureDocumentsExist() {
 
     // Check if a document exists and create it if necessary
     const documentsToEnsure = [
-        { key: 'id' },
-        { key: 'createdAt' },
+        { key: 'id', name: 'Id', type: "string" },
+        { key: 'createdAt', name: 'Created At', type: "date" },
     ];
 
     for (const document of documentsToEnsure) {

@@ -66,7 +66,7 @@ export default function Navbar() {
 
 
   return (
-    <div className="relative h-full min-w-fit shadow-lg border-r border-gray-600 flex flex-col justify-between">
+    <div className="relative h-full min-w-fit shadow-lg border-r border-gray-600 flex flex-col justify-between text-lg">
       <List>
         <NavbarItem
           open={open}

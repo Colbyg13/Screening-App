@@ -2,24 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { ROUTES } from '../../components/Navbar/Navbar';
 import HomeLinkButton from './HomeLinkButton';
 import img from '../../assets/healthylogo.png';
+import { useSessionContext } from '../../contexts/SessionContext';
 
 export default function HomePage() {
 
-    const [isConnectedToDB, setIsConnectedToDB] = useState(false);
-
-    useEffect(() => {
-        getDBStatus();
-    }, []);
-
-    async function getDBStatus() {
-        try {
-            const isConnected = await window.api.getDBStatus();
-            setIsConnectedToDB(isConnected)
-        } catch (error) {
-            console.error("Could not get db connection from context bridge", error);
-        }
-    }
-
+    const { isConnectedToDB } = useSessionContext();
 
     return (
         <div className="w-full h-full overflow-y-auto pb-16 p-8 flex flex-col space-y-8">

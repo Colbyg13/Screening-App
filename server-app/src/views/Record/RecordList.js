@@ -4,6 +4,7 @@ import RecordItem from './RecordItem'
 export default function RecordList({
     search,
     records = [],
+    fieldKeyMap = {},
     allFieldKeys = [],
     handleRecordClick,
 }) {
@@ -15,6 +16,7 @@ export default function RecordList({
                     index={i}
                     search={search}
                     record={record}
+                    fieldKeyMap={fieldKeyMap}
                     allFieldKeys={allFieldKeys}
                     handleRecordClick={handleRecordClick}
                 />

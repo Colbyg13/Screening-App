@@ -7,15 +7,12 @@ import axios from "axios";
 import { serverURL } from "../constants/server";
 import { LOG_LEVEL } from "../constants/log-levels";
 
-export const socket = io(serverURL, {
-    auth: { username: 'Computer', isAdmin: true }
-});
-
-
 const SessionContext = createContext({
+    socket: null,
     sessionIsRunning: false,
+    sessionId: null,
     sessionInfo: {},
-    sessionRecords: [],
+    sessionLogs: [],
     getSessionList: () => { },
     getSessionTemplates: () => { },
     openSessionTemplate: () => { },
@@ -56,13 +53,15 @@ export default function SessionProvider({ children }) {
      * (it should not cut the session when the view leaves)
      */
 
+    const [isConnectedToDB, setIsConnectedToDB] = useState(true);
+
+    const [socket, setSocket] = useState(null);
+
     const [sessionIsRunning, setSessionIsRunning] = useState(false);
     const [sessionId, setSessionId] = useState(null);
 
     const [sessionInfo, setSessionInfo] = useState(JSON.parse(localStorage.getItem(sessionInfoStorageKey)) || initialSystemInfo);
     const [sessionLogs, setSessionLogs] = useState([]);
-
-    const [sessionRecords, setSessionRecords] = useState([]);
 
     const [connectedUsers, setConnectedUsers] = useState([]);
 
@@ -74,15 +73,15 @@ export default function SessionProvider({ children }) {
         ]
     }), {}), [connectedUsers]);
 
-
     useEffect(() => {
         if (sessionId !== null) {
             getSessionInfo(sessionId);
-            getSessionRecords(sessionId);
         } else {
-            setSessionRecords([]);
             setSessionLogs([]);
-            setConnectedUsers([]);
+            setConnectedUsers(users => users.map(user => ({
+                ...user,
+                stationId: undefined,
+            })))
         }
     }, [sessionId]);
 
@@ -91,91 +90,88 @@ export default function SessionProvider({ children }) {
         localStorage.setItem(sessionInfoStorageKey, JSON.stringify(sessionInfo));
     }, [sessionInfo]);
 
+
     useEffect(() => {
+        getDBStatus();
+    }, []);
+
+    useEffect(() => {
+        const socket = io(serverURL, {
+            auth: { username: 'Computer', isAdmin: true }
+        });
+
+        setSocket(socket);
+
         socket.on('connect', () => {
-            // console.log('Connected to server');
+            console.log('Client connected to server');
             addSessionLog('You are connected to the session');
-
-            socket.on('session-info', data => {
-                console.log('session', data);
-                const {
-                    sessionIsRunning,
-                    sessionId,
-                } = data;
-
-                setSessionIsRunning(sessionIsRunning);
-                setSessionId(sessionId);
-            });
-
-            socket.on('record-created', createdRecord => {
-                addSessionLog(`record created with id: ${createdRecord.id}, name: ${createdRecord.name}, dob: ${createdRecord.dob}`, LOG_TYPES.RECORD_CREATED);
-                setSessionRecords((records = []) => [...records, createdRecord]);
-            });
-            socket.on('record-updated', updatedRecord => {
-                addSessionLog(`updated record id: ${updatedRecord.id}`, LOG_TYPES.RECORD_UPDATED);
-                setSessionRecords(records => {
-                    const oldRecord = records.find(({ id }) => id === updatedRecord.id);
-                    return replace(records, records.indexOf(oldRecord), updatedRecord);
-                });
-            });
-            socket.on('station-join', data => {
-                // console.log('station-join', data);
-                addSessionLog(`User ${data.username} joined station ${data.stationId}`, LOG_TYPES.JOIN_STATION);
-                setConnectedUsers(users => users.map(user => user.username === data.username ? {
-                    ...user,
-                    stationId: data.stationId,
-                } : user));
-            });
-            socket.on('station-leave', data => {
-                console.log('station-leave', data);
-                addSessionLog(`User ${data.username} left their station`, LOG_TYPES.LEAVE_STATION);
-                setConnectedUsers(users => users.map(user => user.username === data.username ? {
-                    ...user,
-                    stationId: undefined,
-                } : user));
-            });
-            socket.on('user-connected', newUser => {
-                addSessionLog(`User ${newUser.username} connected to server`, LOG_TYPES.CONNECTED);
-                console.log('user-connected', newUser);
-                setConnectedUsers(users => [...users, newUser])
-            });
-            socket.on('user-disconnect', user => {
-                addSessionLog(`User ${user.username} disconnected server`, LOG_TYPES.DISCONNECTED);
-                console.log('user-disconnect', user);
-                setConnectedUsers(users => users.filter(({ username }) => user.username !== username))
-            });
-            socket.on('users', data => {
-                console.log('users', data);
-                setConnectedUsers(data);
-            });
         });
 
-        socket.on('disconnect', () => {
-            console.log('Disconnected from server');
-            socket.off('station-join');
-            socket.off('station-leave');
-            socket.off('user-connected');
-            socket.off('user-disconnect');
-            socket.off('users');
-            socket.off('session');
-            socket.off('record-created');
-            socket.off('record-updated');
+        socket.on('session-info', data => {
+            console.log('Got Session Info', data);
+            const {
+                sessionIsRunning,
+                sessionId,
+            } = data;
+
+            setSessionIsRunning(sessionIsRunning);
+            setSessionId(sessionId);
         });
 
-        socket.connect();
+        socket.on('record-created', createdRecord => {
+            addSessionLog(`record created with id: ${createdRecord.id}, name: ${createdRecord.name ?? ''}`, LOG_TYPES.RECORD_CREATED);
+        });
+
+        socket.on('station-join', data => {
+            // console.log('station-join', data);
+            addSessionLog(`User ${data.username} joined station ${data.stationId}`, LOG_TYPES.JOIN_STATION);
+            setConnectedUsers(users => users.map(user => user.username === data.username ? {
+                ...user,
+                stationId: data.stationId,
+            } : user));
+        });
+
+        socket.on('station-leave', data => {
+            console.log('station-leave', data);
+            addSessionLog(`User ${data.username} left their station`, LOG_TYPES.LEAVE_STATION);
+            setConnectedUsers(users => users.map(user => user.username === data.username ? {
+                ...user,
+                stationId: undefined,
+            } : user));
+        });
+
+        socket.on('user-connected', newUser => {
+            addSessionLog(`User ${newUser.username} connected to server`, LOG_TYPES.CONNECTED);
+            console.log('user-connected', newUser);
+            setConnectedUsers(users => [...users, newUser])
+        });
+
+        socket.on('user-disconnect', user => {
+            addSessionLog(`User ${user.username} disconnected server`, LOG_TYPES.DISCONNECTED);
+            console.log('user-disconnect', user);
+            setConnectedUsers(users => users.filter(({ username }) => user.username !== username))
+        });
+
+        socket.on('users', data => {
+            console.log('users', data);
+            setConnectedUsers(data);
+        });
 
         return () => {
-            socket.off('connect');
-            socket.off('disconnect');
-            socket.off('station-join');
-            socket.off('station-leave');
-            socket.off('user-connected');
-            socket.off('users');
-            socket.off('session');
-            socket.off('record-created');
-            socket.off('record-updated');
+            socket.disconnect();
         };
     }, []);
+
+
+    async function getDBStatus() {
+        try {
+            const isConnected = await window.api.getDBStatus();
+            setIsConnectedToDB(isConnected)
+        } catch (error) {
+            console.error("Could not get db connection from context bridge", error);
+            setIsConnectedToDB(false)
+        }
+    }
 
     function addSessionLog(log, type = LOG_TYPES.GENERAL) {
         setSessionLogs(logs => [
@@ -261,29 +257,22 @@ export default function SessionProvider({ children }) {
         try {
             const result = await axios.get(`${serverURL}/api/v1/sessions/${sessionId}`);
             console.log({ result });
-            setSessionInfo(result.data);
+            if (result.data) {
+                // Need to remove required fields so there are no duplicates
+                const nonRequiredSession = removeRequiredFields(result.data);
+                setSessionInfo(nonRequiredSession);
+            }
         } catch (error) {
             console.error("Could not get session from server", error);
             window.api.writeLog(LOG_LEVEL.ERROR, `Could not get session from server: ${error}`);
         }
     }
 
-    async function getSessionRecords(sessionId) {
-        try {
-            const result = await axios.get(`${serverURL}/api/v1/records`, { params: { find: { sessionId } } });
-            console.log({ result });
-            setSessionRecords(result.data);
-        } catch (error) {
-            console.error("Could not get records from server", error);
-            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get records from server: ${error}`);
-        }
-    }
-
     async function getSessionTemplates() {
         try {
-            const result = await axios.get(`${serverURL}/api/v1/sessionsTemplates`);
-            console.log({ result })
-            return result.data;
+            const result = await axios.get(`${serverURL}/api/v1/sessionTemplates`);
+            const sessionTemplates = result.data;
+            return sessionTemplates.map(template => ({ ...template, createdAt: new Date(template.createdAt) }));
         } catch (error) {
             console.error("Could not get session template list from server.", error);
             window.api.writeLog(LOG_LEVEL.ERROR, `Could not get session template list from server: ${error}`);
@@ -294,16 +283,20 @@ export default function SessionProvider({ children }) {
         const {
             sessionInfo,
         } = template;
-        setSessionInfo(sessionInfo);
+        const nonRequiredSession = removeRequiredFields(sessionInfo);
+        setSessionInfo(nonRequiredSession);
     }
 
     async function saveSessionTemplate(templateInfo) {
+        console.log("SAVING SESSION TEMPLATE")
         const template = {
             ...templateInfo,
             sessionInfo,
         };
         try {
-            await axios.post(`${serverURL}/api/v1/sessionsTemplates`, template);
+            console.log("Sending Template")
+            await axios.post(`${serverURL}/api/v1/sessionTemplates`, template);
+            console.log("Template Sent")
         } catch (error) {
             console.error("Could not save session template.", error);
             window.api.writeLog(LOG_LEVEL.ERROR, `Could not save session template: ${error}`);
@@ -313,8 +306,9 @@ export default function SessionProvider({ children }) {
 
     async function getSessionList() {
         try {
-            const result = await axios.get(`${serverURL}/api/v1/sessions/${sessionId}`);
-            return result.data;
+            const result = await axios.get(`${serverURL}/api/v1/sessions`);
+            const sessionList = result.data;
+            return sessionList.map(session => ({ ...session, createdAt: new Date(session.createdAt) }));
         } catch (error) {
             console.error("Could not get session list from server.", error);
             window.api.writeLog(LOG_LEVEL.ERROR, `Could not get session list from server: ${error}`);
@@ -338,21 +332,28 @@ export default function SessionProvider({ children }) {
             })),
         };
 
-        socket.emit("session-start", sessionData);
+        if (socket) {
+            socket.emit("session-start", sessionData);
+        }
     }
 
     function stopSession() {
-        socket.emit("session-stop");
+        console.log("STOPPING SESSION", socket)
+        if (socket) {
+            socket.emit("session-stop");
+        }
     }
 
     return (
         <SessionContext.Provider
             value={{
+                isConnectedToDB,
+                socket,
                 sessionIsRunning,
+                sessionId,
                 sessionInfo,
                 sessionLogs,
                 connectedUsersByStation,
-                sessionRecords,
                 getSessionList,
                 getSessionTemplates,
                 openSessionTemplate,
@@ -369,4 +370,21 @@ export default function SessionProvider({ children }) {
             {children}
         </SessionContext.Provider>
     );
+}
+
+function removeRequiredFields(session = {}) {
+    const {
+        stations = []
+    } = session;
+
+    const cleanedStations = stations.map((station) => ({
+        ...station,
+        fields: (station.fields ?? []).filter(({ key }) => !REQUIRED_STATION_FIELDS[key])
+    }));
+
+    return {
+        ...session,
+        stations: cleanedStations,
+    }
+
 }
