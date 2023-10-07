@@ -1,9 +1,9 @@
-const { contextBridge } = require("electron");
+const { contextBridge, app, ipcRenderer } = require("electron");
 const { dialog } = require("@electron/remote");
 const ip = require('ip');
 const { database } = require('./db');
 const { writeLog, LOG_LEVEL } = require("./utils/logger");
-const { default: convert } = require("../utils/convert");
+const { default: convert, getBaseUnit } = require("../utils/convert");
 const fs = require('fs');
 
 let dbStatus = false;
@@ -42,10 +42,20 @@ contextBridge.exposeInMainWorld("api", {
         });
     },
     deleteAllRecordsAndSessions: () => new Promise(async (res, rej) => {
+        writeLog(LOG_LEVEL.INFO, `Deleting all Records and Sessions`);
         try {
-            await database.collection("records").drop();
-            await database.collection("sessions").drop();
-            await database.collection("fields").drop();
+            const collectionsToDrop = [
+                "records",
+                "sessions",
+                "fields",
+            ];
+
+            for (const collection of collectionsToDrop) {
+                await database.collection(collection).drop();
+                await database.createCollection(collection);
+            }
+
+            // reset the latestID
             await database.collection('latestRecordID').findOneAndUpdate(
                 {},
                 { $set: { "latestID": 1 } },
@@ -54,31 +64,53 @@ contextBridge.exposeInMainWorld("api", {
             localStorage.clear();
 
             res('Success');
-        } catch (error) {
+        } catch (err) {
+            writeLog(LOG_LEVEL.ERROR, `could not delete all records and sessions ${err}`);
             rej('Could not delete all records and sessions');
         }
     }),
-    downloadRecords: (initialOutputPath, allFieldKeys = [], unitConversions = {}) => new Promise((resolve, reject) => {
+    factoryReset: () => new Promise(async (res, rej) => {
+        writeLog(LOG_LEVEL.INFO, `Factory Resetting`);
+        try {
+            await database.dropDatabase();
+            localStorage.clear();
 
+            ipcRenderer.sendSync('reload-app');
+            res('Success');
+        } catch (err) {
+            writeLog(LOG_LEVEL.ERROR, `could not complete a factory reset ${err}`);
+            rej('Could not factory reset');
+        }
+    }),
+    downloadRecords: (initialOutputPath, allFieldKeys = [], unitConversions = {}) => new Promise((resolve, reject) => {
+        writeLog(LOG_LEVEL.INFO, `Downloading Records`);
 
         function convertRecordFromBaseUnits(record) {
             const completeUnitConversion = {
                 ...record.customData,
                 ...unitConversions
             }
-            const convertedRecord = Object.entries(completeUnitConversion).reduce((convertedRecord, [key, unit]) => {
-                const value = +record[key];
-                if (value !== NaN) {
+
+            const convertedRecord = {};
+
+            for (const [key, value] of Object.entries(record)) {
+                if (typeof value === 'boolean') {
+                    convertedRecord[key] = value ? 'Yes' : 'No'
+                    continue;
+                }
+
+                // check for unit conversion
+                const unit = completeUnitConversion[key];
+                if (unit) {
                     const baseUnit = getBaseUnit(unit);
                     if (baseUnit !== unit) {
-                        return {
-                            ...convertedRecord,
-                            [key]: convert(value).from(baseUnit).to(unit),
-                        };
+                        convertedRecord[key] = convert(value).from(baseUnit).to(unit)
+                        continue;
                     }
                 }
-                return convertedRecord;
-            }, record);
+
+                convertedRecord[key] = value;
+            }
 
             return convertedRecord;
         }
@@ -93,6 +125,7 @@ contextBridge.exposeInMainWorld("api", {
         const writeStream = fs.createWriteStream(outputPath, { flags: 'w' });
         const stream = database.collection('records').find().stream();
 
+        // Creates the csv headers
         writeStream.write(`${allFieldKeys.map(key => unitConversions[key] ? `${key} (${unitConversions[key]})` : key).join(',')}\n`);
 
         stream.on('data', doc => {
@@ -100,7 +133,6 @@ contextBridge.exposeInMainWorld("api", {
             writeStream.write(`${allFieldKeys.map(key => record[key] ?? '').join(',')}\n`)
         });
         stream.on('end', () => {
-            console.log('record stream ended');
             writeLog(LOG_LEVEL.INFO, `record stream ended`);
             writeStream.end();
         });

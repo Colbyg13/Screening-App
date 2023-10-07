@@ -1,6 +1,12 @@
 require('dotenv').config();
 module.exports = {
-  packagerConfig: {},
+  packagerConfig: {
+    shortcuts: {
+      name: 'Healthy Samoa',
+      // Specify the path to your desktop shortcut icon (e.g., .ico file)
+      icon: './icons/icon.ico',
+    },
+  },
   rebuildConfig: {},
   config: {
     forge: {

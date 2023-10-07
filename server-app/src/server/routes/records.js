@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
         }
         const convertedRecord = Object.entries(completeUnitConversion).reduce((convertedRecord, [key, unit]) => {
             const value = +record[key];
-            if (value !== NaN) {
+            if (!isNaN(value)) {
                 const baseUnit = getBaseUnit(unit);
                 if (baseUnit !== unit) {
                     return {
@@ -95,8 +95,8 @@ router.get('/', async (req, res) => {
 
         const records = await recordsCol.find(find)
             .sort(sort)
-            .limit(pageSize)
             .skip(skip)
+            .limit(pageSize)
             .toArray();
 
         const convertedRecords = records.map(convertRecordFromBaseUnits);
@@ -140,10 +140,8 @@ router.post('/', async (req, res) => {
     function convertRecordToBaseUnits(record) {
         const convertedRecord = Object.entries(customData ?? {}).reduce((convertedRecord, [key, unit]) => {
             const value = +record[key];
-            console.log({value});
-            if (value !== NaN) {
+            if (!isNaN(value)) {
                 const baseUnit = getBaseUnit(unit);
-                console.log({baseUnit, unit});
                 return {
                     ...convertedRecord,
                     [key]: baseUnit === unit ? value : convert(value).from(unit).to(baseUnit),
@@ -151,8 +149,6 @@ router.post('/', async (req, res) => {
             }
             return convertedRecord;
         }, record);
-
-        console.log({ convertedRecord });
 
         return convertedRecord;
     }

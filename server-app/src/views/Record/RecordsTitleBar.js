@@ -21,7 +21,6 @@ export default function RecordTitleBar({
     async function getRecordCount() {
         try {
             const result = await axios.get(`${serverURL}/api/v1/records`, { params: { getCount: true } });
-            console.log({ result });
             setTotalRecordCount(result.data);
         } catch (error) {
             console.error("Could not get records from server", error);
@@ -47,25 +46,22 @@ export default function RecordTitleBar({
                 type="button"
                 disabled={downloading || !totalRecordCount}
                 onClick={async () => {
-                    console.log('DOWNLOADING')
                     try {
                         const outputPath = window.api.showSaveDialog();
                         if (outputPath) {
                             setDownloading(true);
                             window.api.downloadRecords(outputPath, allFieldKeys, unitConversions)
                                 .then(() => {
-                                    console.log('Download Complete');
                                     setDownloading(false);
                                     window.api.showMessage({ title: 'Download Complete', message: 'Your download is complete.', type: 'info' })
                                 })
                                 .catch(err => {
-                                    console.log({ err })
                                     setDownloading(false);
-                                    window.api.showMessage({ title: 'Download Failed', message: 'Your download has failed to complete. Please try again.', type: 'error' })
+                                    window.api.showMessage({ title: 'Download Failed', message: `Your download has failed to complete. ${err}`, type: 'error' })
                                 })
                         }
                     } catch (error) {
-                        console.log("Could not download records", error);
+                        console.error("Could not download records", error);
                     }
                 }}
             >

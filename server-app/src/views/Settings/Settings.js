@@ -5,15 +5,16 @@ import { useSessionContext } from '../../contexts/SessionContext';
 
 export default function Settings() {
 
-    const [showModal, setShowModal] = useState(false);
+    const [showDeleteRecordModal, setShowDeleteRecordModal] = useState(false);
+    const [showFactoryResetModal, setShowFactoryResetModal] = useState(false);
     const { sessionIsRunning } = useSessionContext();
 
     return (
         <div className='flex w-full max-h-screen px-8 pt-8 pb-16 space-x-8 overflow-auto'>
             <ConfirmModal
-                open={showModal}
+                open={showDeleteRecordModal}
                 message="Are you sure you want to delete all records?"
-                onClose={() => setShowModal(false)}
+                onClose={() => setShowDeleteRecordModal(false)}
                 onSubmit={() => {
                     try {
                         window.api.deleteAllRecordsAndSessions()
@@ -24,6 +25,22 @@ export default function Settings() {
                 title="Delete All Records"
                 actionText="Delete"
                 deadmanText="delete"
+
+            />
+            <ConfirmModal
+                open={showFactoryResetModal}
+                message="Are you sure you want to Factory Reset?"
+                onClose={() => setShowFactoryResetModal(false)}
+                onSubmit={() => {
+                    try {
+                        window.api.factoryReset()
+                    } catch (error) {
+                        console.error("Could not complete the factory reset", error);
+                    }
+                }}
+                title="Factory Reset"
+                actionText="Reset"
+                deadmanText="reset"
 
             />
             <div className='py-4 px-8 w-full h-full bg-white rounded-md shadow-md'>
@@ -47,16 +64,28 @@ export default function Settings() {
                     {sessionIsRunning ? (
                         <div className='text-red-600'>Cannot delete records while session is running.</div>
                     ) : null}
-                    <Button
-                        type="button"
-                        size="large"
-                        color="error"
-                        variant="contained"
-                        onClick={() => setShowModal(true)}
-                        disabled={sessionIsRunning}
-                    >
-                        <span>Delete All Records</span>
-                    </Button>
+                    <div className='flex flex-col space-y-2 w-60'>
+                        <Button
+                            type="button"
+                            size="large"
+                            color="error"
+                            variant="contained"
+                            onClick={() => setShowDeleteRecordModal(true)}
+                            disabled={sessionIsRunning}
+                        >
+                            <span>Delete All Records</span>
+                        </Button>
+                        <Button
+                            type="button"
+                            size="large"
+                            color="error"
+                            variant="contained"
+                            onClick={() => setShowFactoryResetModal(true)}
+                            disabled={sessionIsRunning}
+                        >
+                            <span>Factory Reset</span>
+                        </Button>
+                    </div>
                 </div>
             </div>
         </div >

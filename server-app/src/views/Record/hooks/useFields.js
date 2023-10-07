@@ -2,7 +2,7 @@
 import axios from 'axios';
 import { useEffect, useMemo, useState } from 'react';
 import { LOG_LEVEL } from '../../../constants/log-levels';
-import { ALL_REQUIRED_STATION_FIELD_KEYS, REQUIRED_STATION_FIELDS } from '../../../constants/required-station-fields';
+import { ALL_REQUIRED_DB_FIELD_KEYS, REQUIRED_DB_FIELDS } from '../../../constants/required-station-fields';
 import { serverURL } from '../../../constants/server';
 
 export default function useFields() {
@@ -18,8 +18,8 @@ export default function useFields() {
 
     const sortedFieldKeys = useMemo(() => [
         'id',
-        ...ALL_REQUIRED_STATION_FIELD_KEYS,
-        ...allFieldKeys.filter(key => !REQUIRED_STATION_FIELDS[key] && (key !== 'id')),
+        ...ALL_REQUIRED_DB_FIELD_KEYS,
+        ...allFieldKeys.filter(key => !REQUIRED_DB_FIELDS[key] && (key !== 'id')),
     ], [allFieldKeys]);
 
     useEffect(() => {
@@ -30,7 +30,6 @@ export default function useFields() {
         setLoading(true);
         try {
             const result = await axios.get(`${serverURL}/api/v1/fields`);
-            console.log({ result });
             setAllFields(result.data);
         } catch (error) {
             console.error("Could not get fields from server", error);

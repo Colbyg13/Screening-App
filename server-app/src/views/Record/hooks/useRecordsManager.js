@@ -54,6 +54,7 @@ export default function useRecordsManager() {
         const margin = 100;
         // loads more when reaching the end of the page
         const bottom = scrollHeight - scrollTop - margin <= clientHeight;
+
         if (!loadingRecords && !atEndOfRecords && bottom) {
             getNextPage();
         }

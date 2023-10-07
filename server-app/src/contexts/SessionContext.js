@@ -1,11 +1,11 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import replace from "../utils/replace";
-import { io } from "socket.io-client";
-import LOG_TYPES from "../constants/log-types";
-import { ALL_REQUIRED_STATION_FIELDS, REQUIRED_STATION_FIELDS } from "../constants/required-station-fields";
 import axios from "axios";
-import { serverURL } from "../constants/server";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { io } from "socket.io-client";
 import { LOG_LEVEL } from "../constants/log-levels";
+import LOG_TYPES from "../constants/log-types";
+import { ALL_REQUIRED_STATION_FIELDS, REQUIRED_DB_FIELDS } from "../constants/required-station-fields";
+import { serverURL } from "../constants/server";
+import replace from "../utils/replace";
 
 const SessionContext = createContext({
     socket: null,
@@ -103,12 +103,10 @@ export default function SessionProvider({ children }) {
         setSocket(socket);
 
         socket.on('connect', () => {
-            console.log('Client connected to server');
             addSessionLog('You are connected to the session');
         });
 
         socket.on('session-info', data => {
-            console.log('Got Session Info', data);
             const {
                 sessionIsRunning,
                 sessionId,
@@ -123,7 +121,6 @@ export default function SessionProvider({ children }) {
         });
 
         socket.on('station-join', data => {
-            // console.log('station-join', data);
             addSessionLog(`User ${data.username} joined station ${data.stationId}`, LOG_TYPES.JOIN_STATION);
             setConnectedUsers(users => users.map(user => user.username === data.username ? {
                 ...user,
@@ -132,7 +129,6 @@ export default function SessionProvider({ children }) {
         });
 
         socket.on('station-leave', data => {
-            console.log('station-leave', data);
             addSessionLog(`User ${data.username} left their station`, LOG_TYPES.LEAVE_STATION);
             setConnectedUsers(users => users.map(user => user.username === data.username ? {
                 ...user,
@@ -142,18 +138,15 @@ export default function SessionProvider({ children }) {
 
         socket.on('user-connected', newUser => {
             addSessionLog(`User ${newUser.username} connected to server`, LOG_TYPES.CONNECTED);
-            console.log('user-connected', newUser);
             setConnectedUsers(users => [...users, newUser])
         });
 
         socket.on('user-disconnect', user => {
             addSessionLog(`User ${user.username} disconnected server`, LOG_TYPES.DISCONNECTED);
-            console.log('user-disconnect', user);
             setConnectedUsers(users => users.filter(({ username }) => user.username !== username))
         });
 
         socket.on('users', data => {
-            console.log('users', data);
             setConnectedUsers(data);
         });
 
@@ -256,7 +249,6 @@ export default function SessionProvider({ children }) {
     async function getSessionInfo(sessionId) {
         try {
             const result = await axios.get(`${serverURL}/api/v1/sessions/${sessionId}`);
-            console.log({ result });
             if (result.data) {
                 // Need to remove required fields so there are no duplicates
                 const nonRequiredSession = removeRequiredFields(result.data);
@@ -288,15 +280,12 @@ export default function SessionProvider({ children }) {
     }
 
     async function saveSessionTemplate(templateInfo) {
-        console.log("SAVING SESSION TEMPLATE")
         const template = {
             ...templateInfo,
             sessionInfo,
         };
         try {
-            console.log("Sending Template")
             await axios.post(`${serverURL}/api/v1/sessionTemplates`, template);
-            console.log("Template Sent")
         } catch (error) {
             console.error("Could not save session template.", error);
             window.api.writeLog(LOG_LEVEL.ERROR, `Could not save session template: ${error}`);
@@ -338,7 +327,6 @@ export default function SessionProvider({ children }) {
     }
 
     function stopSession() {
-        console.log("STOPPING SESSION", socket)
         if (socket) {
             socket.emit("session-stop");
         }
@@ -379,7 +367,7 @@ function removeRequiredFields(session = {}) {
 
     const cleanedStations = stations.map((station) => ({
         ...station,
-        fields: (station.fields ?? []).filter(({ key }) => !REQUIRED_STATION_FIELDS[key])
+        fields: (station.fields ?? []).filter(({ key }) => !REQUIRED_DB_FIELDS[key])
     }));
 
     return {

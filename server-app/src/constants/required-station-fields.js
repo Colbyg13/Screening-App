@@ -13,10 +13,18 @@ const CREATED_AT = {
 }
 
 export const REQUIRED_STATION_FIELDS = {
-    [CREATED_AT.key]: CREATED_AT,
     [NAME.key]: NAME,
 };
 
+export const REQUIRED_DB_FIELDS = {
+    [CREATED_AT.key]: CREATED_AT,
+    [NAME.key]: NAME,
+}
+
 export const ALL_REQUIRED_STATION_FIELDS = Object.values(REQUIRED_STATION_FIELDS);
 
+export const ALL_REQUIRED_DB_FIELDS = Object.values(REQUIRED_DB_FIELDS);
+
 export const ALL_REQUIRED_STATION_FIELD_KEYS = ALL_REQUIRED_STATION_FIELDS.map(({ key }) => key);
+
+export const ALL_REQUIRED_DB_FIELD_KEYS = ALL_REQUIRED_DB_FIELDS.map(({ key }) => key);

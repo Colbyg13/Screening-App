@@ -22,11 +22,16 @@ async function connectToMongo() {
 }
 
 async function createMandatoryCollections() {
+
+    const mandatoryCollections = ["records", "sessions", "fields"]
+
     writeLog(LOG_LEVEL.INFO, 'Creating needed collections...');
     try {
         const collections = await database.listCollections().toArray();
-        if (!collections.some(({ name }) => name === 'records')) {
-            await database.createCollection('records');
+        for (const collection of mandatoryCollections) {
+            if (!collections.some(({ name }) => name === collection)) {
+                await database.createCollection(collection);
+            }
         }
     } catch (error) {
         writeLog(LOG_LEVEL.ERROR, `Error creating collections: ${error}`);

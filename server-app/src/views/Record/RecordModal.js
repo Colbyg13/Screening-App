@@ -138,13 +138,6 @@ export default function RecordModal({
                                         customData;
                                 }, {});
 
-                                console.log({
-                                    customDataToUpdate,
-                                    customDataTypes,
-                                    allFields,
-                                    update,
-                                })
-
                                 const payload = {
                                     record: { id, sessionId: record.sessionId, ...update },
                                     customData: customDataToUpdate,

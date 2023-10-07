@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { ALL_REQUIRED_STATION_FIELD_KEYS, REQUIRED_STATION_FIELDS } from "../../../constants/required-station-fields";
+import { ALL_REQUIRED_DB_FIELD_KEYS, REQUIRED_DB_FIELDS } from "../../../constants/required-station-fields";
 
 const initialSortArr = [['id', -1]];
 
@@ -18,8 +18,8 @@ export default function useSort({
     useEffect(() => {
         setSortArr([
             ['id', -1],
-            ...ALL_REQUIRED_STATION_FIELD_KEYS.map(key => [key, 1]),
-            ...allFieldKeys.filter(key => !REQUIRED_STATION_FIELDS[key] && (key !== 'id')).map(key => [key, 1]),
+            ...ALL_REQUIRED_DB_FIELD_KEYS.map(key => [key, 1]),
+            ...allFieldKeys.filter(key => !REQUIRED_DB_FIELDS[key] && (key !== 'id')).map(key => [key, 1]),
         ]);
     }, [allFieldKeys]);
 

@@ -1,5 +1,6 @@
 import React from 'react'
 import RecordSection from './RecordSection';
+import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 
 export default function RecordItem({
     record,
@@ -9,6 +10,8 @@ export default function RecordItem({
     index,
     handleRecordClick,
 }) {
+
+    const { customDataTypeMap } = useCustomDataTypesContext();
 
     const even = index % 2 === 0;
 
@@ -29,7 +32,7 @@ export default function RecordItem({
                                 fieldKeyMap[key]?.type === 'bool' ?
                                     !!record[key] ? 'Yes' : 'No'
                                     :
-                                    fieldKeyMap[key]?.type === 'number' ?
+                                    fieldKeyMap[key]?.type === 'number' || customDataTypeMap[fieldKeyMap[key]?.type] ?
                                         `${record[key]}`.match(/^\d+\.\d+$/) ?
                                             Math.round(+record[key] * 100) / 100
                                             :

@@ -1,39 +1,49 @@
 import axios from 'axios';
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { LOG_LEVEL } from '../../../constants/log-levels';
 import { serverURL } from "../../../constants/server";
 import replace from '../../../utils/replace';
 
 export default function useRecords({ sort, search, unitConversions, dependenciesLoaded }) {
 
-    const [page, setPage] = useState(0);
+    const [cancelTokenSource, setCancelTokenSource] = useState(null);
+    const recordBlockRef = useRef(false);
+    const pageRef = useRef(0);
+
 
     const [loading, setLoading] = useState(true);
     const [records, setRecords] = useState([]);
     const [atEndOfRecords, setAtEndOfRecords] = useState(false);
 
-    const [freshLoad, setFreshLoad] = useState(true);
-
     const [selectedRecord, setSelectedRecord] = useState();
 
     useEffect(() => {
-        setPage(0);
-        setFreshLoad(true);
+        getRecords(0);
+        pageRef.current = 0;
     }, [sort, search, unitConversions]);
 
-    useEffect(() => {
-        if (dependenciesLoaded && freshLoad) {
-            getRecords();
-            setFreshLoad(false);
+    async function getNextPage() {
+        if (!recordBlockRef.current) {
+            pageRef.current += 1;
+            recordBlockRef.current = true;
+            await getRecords(pageRef.current);
+            recordBlockRef.current = false;
         }
-    }, [dependenciesLoaded, freshLoad]);
-
-    function getNextPage() {
-        setPage(page => page + 1);
     }
 
-    async function getRecords() {
+    async function getRecords(page) {
+        if (!dependenciesLoaded) return;
+
         setLoading(true);
+
+        // cancel precious requests
+        if (cancelTokenSource) {
+            cancelTokenSource.cancel('Request canceled due to a new request');
+        }
+
+        const newCancelTokenSource = axios.CancelToken.source();
+        setCancelTokenSource(newCancelTokenSource);
+
         try {
             const result = await axios.get(`${serverURL}/api/v1/records`, {
                 params: {
@@ -47,7 +57,7 @@ export default function useRecords({ sort, search, unitConversions, dependencies
 
             if (records.length) {
                 // only include the previous if page is not 0
-                setRecords(previousRecords => page === 0 ? records : [...previousRecords, records]);
+                setRecords(previousRecords => page === 0 ? records : [...previousRecords, ...records]);
                 setAtEndOfRecords(false);
             } else {
                 setAtEndOfRecords(true);

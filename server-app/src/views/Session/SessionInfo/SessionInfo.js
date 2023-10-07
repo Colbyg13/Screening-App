@@ -15,13 +15,11 @@ export default function SessionInfo() {
 
     async function getNextOfflineId() {
         try {
-            console.log({ sessionId })
             const result = await axios.post(`${serverURL}/api/v1/records`, {
                 record: {
                     sessionId,
                 },
             });
-            console.log({ result })
             const offlineId = result.data.id;
             setOfflineId(offlineId);
         } catch (error) {
