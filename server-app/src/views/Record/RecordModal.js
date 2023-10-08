@@ -6,6 +6,7 @@ import { LOG_LEVEL } from '../../constants/log-levels';
 import { serverURL } from '../../constants/server';
 import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 import { useSessionContext } from '../../contexts/SessionContext';
+import { useSnackBarContext } from '../../contexts/SnackbarContext';
 import RecordModalInputRow from './RecordModalInputRow';
 
 export default function RecordModal({
@@ -21,6 +22,8 @@ export default function RecordModal({
     onSave = () => { },
     onDelete = () => { },
 }) {
+
+    const { addSnackBar } = useSnackBarContext();
 
     const [confirmDelete, setConfirmDelete] = useState(false);
     const [update, setUpdate] = useState({});
@@ -64,10 +67,22 @@ export default function RecordModal({
                     onSubmit={async () => {
                         try {
                             await axios.delete(`${serverURL}/api/v1/records/${id}`);
+                            addSnackBar({
+                                title: 'Success',
+                                message: `Record deleted`,
+                                variant: 'success',
+                                timeout: 2500,
+                            });
                             onDelete(id);
                         } catch (error) {
                             console.error("Could not delete record.", error);
                             window.api.writeLog(LOG_LEVEL.ERROR, `Could not delete record: ${error}`);
+                            addSnackBar({
+                                title: 'Error',
+                                message: `Could not delete record: ${error}`,
+                                variant: 'danger',
+                                timeout: 2500,
+                            });
                         }
                     }}
                 />
@@ -145,10 +160,22 @@ export default function RecordModal({
 
                                 try {
                                     await axios.post(`${serverURL}/api/v1/records`, payload);
+                                    addSnackBar({
+                                        title: 'Success',
+                                        message: `Record updated`,
+                                        variant: 'success',
+                                        timeout: 2500,
+                                    });
                                     onSave(payload.record);
                                 } catch (error) {
                                     console.error("Could not update record.", error);
                                     window.api.writeLog(LOG_LEVEL.ERROR, `Could not update record: ${error}`);
+                                    addSnackBar({
+                                        title: 'Error',
+                                        message: `Could not update record: ${error}`,
+                                        variant: 'danger',
+                                        timeout: 2500,
+                                    });
                                 }
                             }}
                         >

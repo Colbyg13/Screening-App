@@ -6,6 +6,7 @@ import LOG_TYPES from "../constants/log-types";
 import { ALL_REQUIRED_STATION_FIELDS, REQUIRED_DB_FIELDS } from "../constants/required-station-fields";
 import { serverURL } from "../constants/server";
 import replace from "../utils/replace";
+import { useSnackBarContext } from "./SnackbarContext";
 
 const SessionContext = createContext({
     socket: null,
@@ -52,6 +53,8 @@ export default function SessionProvider({ children }) {
      * The user should be able to use the whole application while the session is going
      * (it should not cut the session when the view leaves)
      */
+
+    const { addSnackBar } = useSnackBarContext();
 
     const [isConnectedToDB, setIsConnectedToDB] = useState(true);
 
@@ -257,6 +260,12 @@ export default function SessionProvider({ children }) {
         } catch (error) {
             console.error("Could not get session from server", error);
             window.api.writeLog(LOG_LEVEL.ERROR, `Could not get session from server: ${error}`);
+            addSnackBar({
+                title: 'Error',
+                message: `Could not get session from server: ${error}`,
+                variant: 'danger',
+                timeout: 2500,
+            });
         }
     }
 
@@ -268,6 +277,12 @@ export default function SessionProvider({ children }) {
         } catch (error) {
             console.error("Could not get session template list from server.", error);
             window.api.writeLog(LOG_LEVEL.ERROR, `Could not get session template list from server: ${error}`);
+            addSnackBar({
+                title: 'Error',
+                message: `Could not get session template list from server: ${error}`,
+                variant: 'danger',
+                timeout: 2500,
+            });
         }
     }
 
@@ -286,10 +301,21 @@ export default function SessionProvider({ children }) {
         };
         try {
             await axios.post(`${serverURL}/api/v1/sessionTemplates`, template);
+            addSnackBar({
+                title: 'Success',
+                message: `Session template successfully saved`,
+                variant: 'success',
+                timeout: 2500,
+            });
         } catch (error) {
             console.error("Could not save session template.", error);
             window.api.writeLog(LOG_LEVEL.ERROR, `Could not save session template: ${error}`);
-
+            addSnackBar({
+                title: 'Error',
+                message: `Could not save session template: ${error}`,
+                variant: 'danger',
+                timeout: 2500,
+            });
         }
     }
 
@@ -301,7 +327,12 @@ export default function SessionProvider({ children }) {
         } catch (error) {
             console.error("Could not get session list from server.", error);
             window.api.writeLog(LOG_LEVEL.ERROR, `Could not get session list from server: ${error}`);
-
+            addSnackBar({
+                title: 'Error',
+                message: `Could not get session list from server: ${error}`,
+                variant: 'danger',
+                timeout: 2500,
+            });
         }
     }
 

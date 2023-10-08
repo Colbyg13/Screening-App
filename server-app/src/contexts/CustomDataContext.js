@@ -1,7 +1,8 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { serverURL } from "../constants/server";
 import axios from "axios";
+import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { LOG_LEVEL } from "../constants/log-levels";
+import { serverURL } from "../constants/server";
+import { useSnackBarContext } from "./SnackbarContext";
 
 const CustomDataTypesContext = createContext({
     loading: false,
@@ -13,6 +14,8 @@ const CustomDataTypesContext = createContext({
 export const useCustomDataTypesContext = () => useContext(CustomDataTypesContext);
 
 export default function CustomDataTypesProvider({ children }) {
+
+    const { addSnackBar } = useSnackBarContext();
 
     const [customDataTypes, setCustomDataTypes] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -35,6 +38,12 @@ export default function CustomDataTypesProvider({ children }) {
         } catch (error) {
             console.error("Could not get custom data types", error);
             window.api.writeLog(LOG_LEVEL.ERROR, `Could not get custom data types: ${error}`);
+            addSnackBar({
+                title: 'Error',
+                message: `Error getting custom data types. ${error}`,
+                variant: 'danger',
+                timeout: 2500,
+            });
         } finally {
             setLoading(false);
         }

@@ -3,6 +3,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { LOG_LEVEL } from '../../constants/log-levels';
 import { serverURL } from '../../constants/server';
+import { useSnackBarContext } from '../../contexts/SnackbarContext';
 import RecordSearch from './RecordSearch';
 
 export default function RecordTitleBar({
@@ -10,6 +11,8 @@ export default function RecordTitleBar({
     updateSearch,
     allFieldKeys,
 }) {
+
+    const { addSnackBar } = useSnackBarContext();
 
     const [downloading, setDownloading] = useState(false);
     const [totalRecordCount, setTotalRecordCount] = useState();
@@ -25,6 +28,12 @@ export default function RecordTitleBar({
         } catch (error) {
             console.error("Could not get records from server", error);
             window.api.writeLog(LOG_LEVEL.ERROR, `Could not get records from server: ${error}`);
+            addSnackBar({
+                title: 'Error',
+                message: `Could not get records from server: ${error}`,
+                variant: 'danger',
+                timeout: 2500,
+            });
         }
     }
 

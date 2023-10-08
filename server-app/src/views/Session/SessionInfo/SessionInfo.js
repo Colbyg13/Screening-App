@@ -4,11 +4,14 @@ import React, { useState } from 'react';
 import { LOG_LEVEL } from '../../../constants/log-levels';
 import { serverURL } from '../../../constants/server';
 import { useSessionContext } from '../../../contexts/SessionContext';
+import { useSnackBarContext } from '../../../contexts/SnackbarContext';
 import OfflineIdModal from './OfflineIdModal';
 import SessionInfoConsole from './SessionInfoConsole';
 import StationInfoList from './StationInfoList';
 
 export default function SessionInfo() {
+
+    const { addSnackBar } = useSnackBarContext();
 
     const { stopSession, sessionId } = useSessionContext();
     const [offlineId, setOfflineId] = useState();
@@ -25,6 +28,12 @@ export default function SessionInfo() {
         } catch (error) {
             console.error("Could get new offline id.", error);
             window.api.writeLog(LOG_LEVEL.ERROR, `Could get new offline id: ${error}`);
+            addSnackBar({
+                title: 'Error',
+                message: `Could not get new offline id: ${error}`,
+                variant: 'danger',
+                timeout: 2500,
+            });
         }
     }
 

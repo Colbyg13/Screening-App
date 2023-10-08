@@ -6,11 +6,15 @@ import ConfirmModal from '../../../components/ConfirmModal/ConfirmModal';
 import { LOG_LEVEL } from '../../../constants/log-levels';
 import { serverURL } from '../../../constants/server';
 import { useSessionContext } from '../../../contexts/SessionContext';
+import { useSnackBarContext } from '../../../contexts/SnackbarContext';
 
 export default function SessionTemplateModal({
     open,
     onClose,
 }) {
+
+    const { addSnackBar } = useSnackBarContext();
+
     const {
         getSessionTemplates,
         openSessionTemplate,
@@ -105,11 +109,23 @@ export default function SessionTemplateModal({
                 onSubmit={async () => {
                     try {
                         await axios.delete(`${serverURL}/api/v1/sessionTemplates/${selectedTemplateIdToDelete}`);
+                        addSnackBar({
+                            title: 'Success',
+                            message: `Session template successfully deleted`,
+                            variant: 'success',
+                            timeout: 2500,
+                        });
                         setSelectedTemplateIdToDelete();
                         reloadSessionTemplates();
                     } catch (error) {
                         console.error("Could not delete session template.", error);
                         window.api.writeLog(LOG_LEVEL.ERROR, `Could not delete session template: ${error}`);
+                        addSnackBar({
+                            title: 'Error',
+                            message: `Could not delete session template: ${error}`,
+                            variant: 'danger',
+                            timeout: 2500,
+                        });
                     }
                 }}
             />

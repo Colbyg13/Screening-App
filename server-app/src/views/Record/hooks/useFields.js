@@ -4,8 +4,11 @@ import { useEffect, useMemo, useState } from 'react';
 import { LOG_LEVEL } from '../../../constants/log-levels';
 import { ALL_REQUIRED_DB_FIELD_KEYS, REQUIRED_DB_FIELDS } from '../../../constants/required-station-fields';
 import { serverURL } from '../../../constants/server';
+import { useSnackBarContext } from '../../../contexts/SnackbarContext';
 
 export default function useFields() {
+
+    const { addSnackBar } = useSnackBarContext();
 
     const [loading, setLoading] = useState(true);
     const [allFields, setAllFields] = useState([]);
@@ -34,6 +37,12 @@ export default function useFields() {
         } catch (error) {
             console.error("Could not get fields from server", error);
             window.api.writeLog(LOG_LEVEL.ERROR, `Could not get fields from server: ${error}`);
+            addSnackBar({
+                title: 'Error',
+                message: `Could not get fields from server: ${error}`,
+                variant: 'danger',
+                timeout: 2500,
+            });
         }
         setLoading(false);
     }

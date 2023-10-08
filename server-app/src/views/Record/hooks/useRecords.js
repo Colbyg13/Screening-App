@@ -2,9 +2,12 @@ import axios from 'axios';
 import { useEffect, useRef, useState } from "react";
 import { LOG_LEVEL } from '../../../constants/log-levels';
 import { serverURL } from "../../../constants/server";
+import { useSnackBarContext } from '../../../contexts/SnackbarContext';
 import replace from '../../../utils/replace';
 
 export default function useRecords({ sort, search, unitConversions, dependenciesLoaded }) {
+
+    const { addSnackBar } = useSnackBarContext();
 
     const [cancelTokenSource, setCancelTokenSource] = useState(null);
     const recordBlockRef = useRef(false);
@@ -65,6 +68,12 @@ export default function useRecords({ sort, search, unitConversions, dependencies
         } catch (error) {
             console.error("Could not get records from server", error);
             window.api.writeLog(LOG_LEVEL.ERROR, `Could not get records from server: ${error}`);
+            addSnackBar({
+                title: 'Error',
+                message: `Could not get records from server: ${error}`,
+                variant: 'danger',
+                timeout: 2500,
+            });
         } finally {
             setLoading(false);
         }

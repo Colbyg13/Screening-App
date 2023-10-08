@@ -1,14 +1,15 @@
 import { Button, CircularProgress } from '@mui/material';
+import axios from 'axios';
 import _ from 'lodash';
 import React, { useEffect, useState } from 'react';
+import { LOG_LEVEL } from '../../constants/log-levels';
+import { serverURL } from '../../constants/server';
 import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
+import { useSnackBarContext } from '../../contexts/SnackbarContext';
 import { usePrompt } from '../../hooks/prompt';
 import replace from '../../utils/replace';
 import BaseFields from './BaseFields';
 import UserDefinedFields from './UserDefinedFields';
-import { serverURL } from '../../constants/server';
-import axios from 'axios';
-import { LOG_LEVEL } from '../../constants/log-levels';
 
 const baseDataType = {
     type: '',
@@ -16,6 +17,8 @@ const baseDataType = {
 }
 
 export default function CustomFields() {
+
+    const { addSnackBar } = useSnackBarContext();
 
     const {
         customDataTypes: initialDataTypes = [],
@@ -67,10 +70,22 @@ export default function CustomFields() {
                         customDataTypes,
                         dataTypeIdsToDelete,
                     });
+                    addSnackBar({
+                        title: 'Success',
+                        message: `Custom data types successfully saved`,
+                        variant: 'success',
+                        timeout: 2500,
+                    });
                     fetchData();
                 } catch (error) {
                     console.error("Could not save custom data types.", error);
                     window.api.writeLog(LOG_LEVEL.ERROR, `Could not save custom data types: ${error}`);
+                    addSnackBar({
+                        title: 'Error',
+                        message: `Could not save custom data types: ${error}`,
+                        variant: 'danger',
+                        timeout: 2500,
+                    });
                 }
                 setLoading(false);
             }}
