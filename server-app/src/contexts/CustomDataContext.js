@@ -37,13 +37,13 @@ export default function CustomDataTypesProvider({ children }) {
             setCustomDataTypes(result.data);
         } catch (error) {
             console.error("Could not get custom data types", error);
-            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get custom data types: ${error}`);
             addSnackBar({
                 title: 'Error',
                 message: `Error getting custom data types. ${error}`,
                 variant: 'danger',
                 timeout: 2500,
             });
+            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get custom data types: ${error}`);
         } finally {
             setLoading(false);
         }

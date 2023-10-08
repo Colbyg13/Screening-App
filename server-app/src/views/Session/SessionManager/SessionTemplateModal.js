@@ -119,13 +119,13 @@ export default function SessionTemplateModal({
                         reloadSessionTemplates();
                     } catch (error) {
                         console.error("Could not delete session template.", error);
-                        window.api.writeLog(LOG_LEVEL.ERROR, `Could not delete session template: ${error}`);
                         addSnackBar({
                             title: 'Error',
                             message: `Could not delete session template: ${error}`,
                             variant: 'danger',
                             timeout: 2500,
                         });
+                        window.api.writeLog(LOG_LEVEL.ERROR, `Could not delete session template: ${error}`);
                     }
                 }}
             />

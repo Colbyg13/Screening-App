@@ -36,13 +36,13 @@ export default function useFields() {
             setAllFields(result.data);
         } catch (error) {
             console.error("Could not get fields from server", error);
-            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get fields from server: ${error}`);
             addSnackBar({
                 title: 'Error',
                 message: `Could not get fields from server: ${error}`,
                 variant: 'danger',
                 timeout: 2500,
             });
+            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get fields from server: ${error}`);
         }
         setLoading(false);
     }

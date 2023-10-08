@@ -15,7 +15,11 @@ setup();
 
 unhandled({
     logger: error => {
-        writeLog(LOG_LEVEL.ERROR, `Uncaught Exception: ${error}`)
+        try {
+            writeLog(LOG_LEVEL.ERROR, `Uncaught Exception: ${error}`);
+        } catch (error) {
+            console.error("Could not write log");
+        }
     },
     showDialog: true,
     reportButton: false,

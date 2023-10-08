@@ -27,13 +27,13 @@ export default function SessionInfo() {
             setOfflineId(offlineId);
         } catch (error) {
             console.error("Could get new offline id.", error);
-            window.api.writeLog(LOG_LEVEL.ERROR, `Could get new offline id: ${error}`);
             addSnackBar({
                 title: 'Error',
                 message: `Could not get new offline id: ${error}`,
                 variant: 'danger',
                 timeout: 2500,
             });
+            window.api.writeLog(LOG_LEVEL.ERROR, `Could get new offline id: ${error}`);
         }
     }
 

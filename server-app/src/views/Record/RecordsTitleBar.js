@@ -27,13 +27,13 @@ export default function RecordTitleBar({
             setTotalRecordCount(result.data);
         } catch (error) {
             console.error("Could not get records from server", error);
-            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get records from server: ${error}`);
             addSnackBar({
                 title: 'Error',
                 message: `Could not get records from server: ${error}`,
                 variant: 'danger',
                 timeout: 2500,
             });
+            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get records from server: ${error}`);
         }
     }
 

@@ -76,13 +76,13 @@ export default function RecordModal({
                             onDelete(id);
                         } catch (error) {
                             console.error("Could not delete record.", error);
-                            window.api.writeLog(LOG_LEVEL.ERROR, `Could not delete record: ${error}`);
                             addSnackBar({
                                 title: 'Error',
                                 message: `Could not delete record: ${error}`,
                                 variant: 'danger',
                                 timeout: 2500,
                             });
+                            window.api.writeLog(LOG_LEVEL.ERROR, `Could not delete record: ${error}`);
                         }
                     }}
                 />
@@ -169,13 +169,13 @@ export default function RecordModal({
                                     onSave(payload.record);
                                 } catch (error) {
                                     console.error("Could not update record.", error);
-                                    window.api.writeLog(LOG_LEVEL.ERROR, `Could not update record: ${error}`);
                                     addSnackBar({
                                         title: 'Error',
                                         message: `Could not update record: ${error}`,
                                         variant: 'danger',
                                         timeout: 2500,
                                     });
+                                    window.api.writeLog(LOG_LEVEL.ERROR, `Could not update record: ${error}`);
                                 }
                             }}
                         >

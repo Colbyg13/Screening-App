@@ -79,13 +79,13 @@ export default function CustomFields() {
                     fetchData();
                 } catch (error) {
                     console.error("Could not save custom data types.", error);
-                    window.api.writeLog(LOG_LEVEL.ERROR, `Could not save custom data types: ${error}`);
                     addSnackBar({
                         title: 'Error',
                         message: `Could not save custom data types: ${error}`,
                         variant: 'danger',
                         timeout: 2500,
                     });
+                    window.api.writeLog(LOG_LEVEL.ERROR, `Could not save custom data types: ${error}`);
                 }
                 setLoading(false);
             }}

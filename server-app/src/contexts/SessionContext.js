@@ -259,13 +259,13 @@ export default function SessionProvider({ children }) {
             }
         } catch (error) {
             console.error("Could not get session from server", error);
-            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get session from server: ${error}`);
             addSnackBar({
                 title: 'Error',
                 message: `Could not get session from server: ${error}`,
                 variant: 'danger',
                 timeout: 2500,
             });
+            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get session from server: ${error}`);
         }
     }
 
@@ -276,13 +276,13 @@ export default function SessionProvider({ children }) {
             return sessionTemplates.map(template => ({ ...template, createdAt: new Date(template.createdAt) }));
         } catch (error) {
             console.error("Could not get session template list from server.", error);
-            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get session template list from server: ${error}`);
             addSnackBar({
                 title: 'Error',
                 message: `Could not get session template list from server: ${error}`,
                 variant: 'danger',
                 timeout: 2500,
             });
+            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get session template list from server: ${error}`);
         }
     }
 
@@ -309,13 +309,13 @@ export default function SessionProvider({ children }) {
             });
         } catch (error) {
             console.error("Could not save session template.", error);
-            window.api.writeLog(LOG_LEVEL.ERROR, `Could not save session template: ${error}`);
             addSnackBar({
                 title: 'Error',
                 message: `Could not save session template: ${error}`,
                 variant: 'danger',
                 timeout: 2500,
             });
+            window.api.writeLog(LOG_LEVEL.ERROR, `Could not save session template: ${error}`);
         }
     }
 
@@ -326,13 +326,13 @@ export default function SessionProvider({ children }) {
             return sessionList.map(session => ({ ...session, createdAt: new Date(session.createdAt) }));
         } catch (error) {
             console.error("Could not get session list from server.", error);
-            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get session list from server: ${error}`);
             addSnackBar({
                 title: 'Error',
                 message: `Could not get session list from server: ${error}`,
                 variant: 'danger',
                 timeout: 2500,
             });
+            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get session list from server: ${error}`);
         }
     }
 
