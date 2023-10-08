@@ -1,7 +1,7 @@
 {
   "name": "healthy-samoa-server-app",
   "productName": "Healthy Samoa Server App",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Server app for Healthy Samoa's Screening App",
   "main": ".webpack/main",
   "scripts": {
