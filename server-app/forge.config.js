@@ -3,8 +3,7 @@ module.exports = {
   packagerConfig: {
     shortcuts: {
       name: 'Healthy Samoa',
-      // Specify the path to your desktop shortcut icon (e.g., .ico file)
-      icon: './icons/icon.ico',
+      icon: './icons/icon',
     },
   },
   rebuildConfig: {},
@@ -12,7 +11,11 @@ module.exports = {
     forge: {
       packagerConfig: {
         icon: './icons/icon',
-      }
+      },
+      shortcuts: {
+        name: 'Healthy Samoa',
+        icon: './icons/icon',
+      },
     }
   },
   publishers: [

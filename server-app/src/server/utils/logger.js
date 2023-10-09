@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const { logsPath, applicationPath } = require("../consts/paths")
 
 const LOG_LEVEL = {
     INFO: 'Info',
@@ -11,7 +10,14 @@ const LOG_LEVEL = {
 const logFile = 'server.log'
 const backupLogFile = 'server-backup.log'
 
-function writeLog(logLevel, message) {
+let logsPath = '';
+const applicationPath = '';
+
+async function writeLog(logLevel, message) {
+
+    if (!applicationPath || !logsPath) {
+        await setPaths();
+    }
 
     const pathToLog = path.join(logsPath, logFile);
     const pathToBackup = path.join(logsPath, backupLogFile);
@@ -52,7 +58,11 @@ function writeLog(logLevel, message) {
     });
 }
 
-function setup() {
+async function setup() {
+
+    if (!applicationPath || !logsPath) {
+        await setPaths();
+    }
     // sets up file system
     // ROOT
     console.log("Checking application exists", applicationPath)
@@ -66,6 +76,13 @@ function setup() {
         console.log("Making Logs dir...")
         fs.mkdirSync(logsPath)
     }
+}
+
+async function setPaths() {
+    const appDataPath = await ipcRenderer.invoke('get-path');
+    const applicationName = 'HealthySamoa';
+    applicationPath = path.join(appDataPath, applicationName);
+    logsPath = path.join(applicationPath, "logs");
 }
 
 module.exports = {

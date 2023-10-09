@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
+const { app, BrowserWindow, ipcMain, remote } = require('electron');
 const remoteMain = require('@electron/remote/main');
 const isDev = require('electron-is-dev');
 
@@ -45,6 +45,10 @@ ipcMain.on('reload-app', () => {
   app.exit();
 });
 
+ipcMain.handle('get-path', async (event, arg) => {
+  // Handle the action and return a result
+  return app.getPath("appData");
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

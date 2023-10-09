@@ -1,9 +1,12 @@
 {
-  "name": "healthy-samoa-server-app",
-  "productName": "Healthy Samoa Server App",
+  "name": "records-keep",
+  "productName": "Healthy Samoa",
   "version": "1.0.3",
-  "description": "Server app for Healthy Samoa's Screening App",
+  "description": "Server for keeping records",
   "main": ".webpack/main",
+  "build": {
+    "icon": "icon: './icons/icon.png"
+  },
   "scripts": {
     "start": "electron-forge start",
     "package": "electron-forge package",
