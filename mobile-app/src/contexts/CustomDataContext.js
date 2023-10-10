@@ -1,7 +1,7 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import axios from "axios";
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
-import { useSessionContext } from "./SessionContext";
+import { useServerContext } from "./ServerContext";
 
 const CUSTOM_DATA_STORAGE_KEY = 'customData';
 
@@ -16,7 +16,8 @@ export const useCustomDataTypesContext = () => useContext(CustomDataTypesContext
 
 export default function CustomDataTypesProvider({ children }) {
 
-    const { isConnected, serverIp } = useSessionContext();
+
+    const { serverIp } = useServerContext();
 
     const [customDataTypes, setCustomDataTypes] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -46,13 +47,12 @@ export default function CustomDataTypesProvider({ children }) {
     useEffect(() => {
         // gets data from db and uses that
         if (serverIp) fetchData();
-    }, [serverIp, isConnected]);
+    }, [serverIp]);
     //Grabs custom data information directly from the database. 
     async function fetchData() {
         setLoading(true);
         try {
-            console.log({ serverIp })
-            const url = `${serverIp}/api/v1/custom-data-types`;
+            const url = `${serverIp}/api/v1/dataTypes`;
             const { data: customDataTypes = [] } = await axios.get(url, {
                 headers: {
                     'Cache-Control': 'no-cache',

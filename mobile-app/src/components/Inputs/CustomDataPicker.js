@@ -10,10 +10,10 @@ import { styles } from '../../style/styles';
  * @returns either a dropdown or a text input for number values. 
  */
 const CustomDataPicker = (props) => {
-  const [value, setValue ] = React.useState(undefined);
+  const [value, setValue] = React.useState(undefined);
   const field = props.field;
   const { customDataTypes } = useCustomDataTypesContext(); //grabs custom field info from DB
-  let customData = customDataTypes.filter((item) => {
+  let customData = customDataTypes.find((item) => {
     return item.type == field.type;
   });
 
@@ -23,16 +23,16 @@ const CustomDataPicker = (props) => {
     }
   }, [props.value]);
 
-  if (customData[0].values === null) {
+  if (customData?.values === undefined) {
     //Not a dropdown, return text input with label for units
     return (
       <View key={field.name} style={styles.row}>
         <Text style={styles.fieldName}>
-          {field.name}: ({customData[0].unit})
+          {field.name}: ({customData?.unit})
         </Text>
         <View>
           <TextInput
-            value={value}
+            value={`${value ?? ''}`}
             keyboardType='decimal-pad'
             returnKeyType='done'
             onSubmitEditing={Keyboard.dismiss}
@@ -48,7 +48,7 @@ const CustomDataPicker = (props) => {
     );
   } else {
     let items = [];
-    customData[0].values.forEach((element, index) => {
+    customData?.values.forEach((element, index) => {
       let obj = {
         label: element,
         value: element,
@@ -62,9 +62,9 @@ const CustomDataPicker = (props) => {
         <Text style={styles.fieldName}>{field.name}:</Text>
         <View>
           <SelectDropdown
-            buttonStyle={{width: '75%'}}
+            buttonStyle={{ width: '75%' }}
             defaultValue={value}
-            data={customData[0].values}
+            data={customData?.values}
             onSelect={(selectedItem, index) => {
               // console.log(selectedItem, index);
               props.updateForm(field, selectedItem);

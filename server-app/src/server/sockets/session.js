@@ -1,6 +1,7 @@
 const { LOG_LEVEL, writeLog } = require("../utils/logger");
 const { database } = require('../db');
 const { normalizeFields } = require("../utils/index");
+const { uniqueId } = require("lodash");
 
 let sessionState = {
     sessionIsRunning: false,
@@ -9,6 +10,7 @@ let sessionState = {
 
 module.exports = (io) => {
     io.on('connection', (socket) => {
+        const userId = uniqueId();
         const username = socket.handshake.auth.username;
         const isAdmin = socket.handshake.auth.isAdmin;
 
@@ -100,7 +102,8 @@ module.exports = (io) => {
             socket.stationId = data.stationId;
             writeLog(LOG_LEVEL.INFO, `Station Join: ${username}-${socket.stationId}`);
             io.emit('station-join', {
-                username: username,
+                userId,
+                username,
                 stationId: socket.stationId,
             });
         });
@@ -109,19 +112,22 @@ module.exports = (io) => {
             writeLog(LOG_LEVEL.INFO, `Station Leave: ${username}-${socket.stationId}`);
             socket.stationId = undefined;
             io.emit('station-leave', {
-                username: username,
+                userId,
+                username,
             });
         });
 
         socket.on('disconnect', () => {
             writeLog(LOG_LEVEL.INFO, `Station Disconnect: ${username}-${socket.stationId}`);
             io.emit('user-disconnect', {
-                username: username,
+                userId,
+                username,
             });
         });
 
         io.emit('user-connected', {
-            username: username
+            userId,
+            username,
         });
 
         const users = [];
@@ -135,6 +141,9 @@ module.exports = (io) => {
         }
 
         socket.emit("users", users);
-        socket.emit("session-info", sessionState);
+        socket.emit("session-info", {
+            ...sessionState,
+            initial: true,
+        });
     });
 };

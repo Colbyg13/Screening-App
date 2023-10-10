@@ -1,29 +1,22 @@
-import { TextInput, Pressable } from '@react-native-material/core';
 import {
-  Provider,
   Button,
-  Dialog,
-  DialogHeader,
-  DialogContent,
-  DialogActions,
-  Text,
+  Dialog, DialogActions, DialogContent, DialogHeader, Pressable, Text, TextInput
 } from '@react-native-material/core';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import {
-  View,
-  StyleSheet,
-  StatusBar,
   Keyboard,
-  ScrollView,
   SafeAreaView,
+  StatusBar,
+  StyleSheet,
+  View
 } from 'react-native';
-import { useSessionContext } from '../contexts/SessionContext';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import BoolInput from '../components/Inputs/BoolInput';
 import CustomDataPicker from '../components/Inputs/CustomDataPicker';
 import DatePicker from '../components/Inputs/DatePicker';
 import { useCustomDataTypesContext } from '../contexts/CustomDataContext';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useSessionContext } from '../contexts/SessionContext';
 
 //this screen is to update a record during an online station. Displays the previously selected values for the record if any exist. 
 const UpdateRecordScreen = ({ route }) => {
@@ -35,6 +28,7 @@ const UpdateRecordScreen = ({ route }) => {
     selectedStation: station,
     stations,
   } = useSessionContext();
+
   const isStationOne = station.id === 1;
   const [formState, setFormState] = useState({}); //used to keep track of inputs.
   const [dateStates, setDateStates] = useState({});
@@ -146,9 +140,9 @@ const UpdateRecordScreen = ({ route }) => {
 
         return shouldAddKey
           ? {
-              ...customData,
-              [usedField.key]: unit,
-            }
+            ...customData,
+            [usedField.key]: unit,
+          }
           : customData;
       }, {}),
     });
@@ -268,7 +262,7 @@ const UpdateRecordScreen = ({ route }) => {
         </View>
       </KeyboardAwareScrollView>
       <View style={styles.wrapper}>
-      <Pressable
+        <Pressable
           style={styles.btnCancel}
           pressEffect='ripple'
           pressEffectColor='#FCB8B8'
@@ -287,7 +281,7 @@ const UpdateRecordScreen = ({ route }) => {
         >
           <Text style={styles.btnText}>Submit</Text>
         </Pressable>
-      
+
       </View>
 
       <Dialog

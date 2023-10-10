@@ -68,7 +68,7 @@ router.get('/', async (req, res) => {
 
     if (sessionId !== undefined) {
         try {
-            const sessionRecords = await recordsCol.find({ sessionId: new ObjectId(sessionId) }).toArray();
+            const sessionRecords = await recordsCol.find({ sessionId }).toArray();
 
             const convertedRecords = sessionRecords.map(convertRecordFromBaseUnits);
             res.status(200).json(convertedRecords);
@@ -153,7 +153,25 @@ router.post('/', async (req, res) => {
         return convertedRecord;
     }
 
-    if (!sessionId) {
+    function convertRecordFromBaseUnits(record) {
+        const convertedRecord = Object.entries(record.customData ?? {}).reduce((convertedRecord, [key, unit]) => {
+            const value = +record[key];
+            if (!isNaN(value)) {
+                const baseUnit = getBaseUnit(unit);
+                if (baseUnit !== unit) {
+                    return {
+                        ...convertedRecord,
+                        [key]: convert(value).from(baseUnit).to(unit),
+                    };
+                }
+            }
+            return convertedRecord;
+        }, record);
+
+        return convertedRecord;
+    }
+
+    if (creatingRecord && !sessionId) {
         writeLog(LOG_LEVEL.ERROR, `Error updating record: Cannot create or update record without a sessionId`);
         res.status(400).json({ error: 'Cannot create or update record without a sessionId' });
         return;
@@ -186,10 +204,10 @@ router.post('/', async (req, res) => {
             const recordsCol = database.collection("records");
             const result = recordsCol.insertOne(newRecord);
 
-            const newRecordWithId = {
+            const newRecordWithId = convertRecordFromBaseUnits({
                 _id: result.insertedId,
                 ...newRecord,
-            };
+            });
 
             io.sockets.emit('record-created', newRecordWithId);
 
@@ -202,7 +220,9 @@ router.post('/', async (req, res) => {
 
         const recordUpdate = removeEmptyValues(convertRecordToBaseUnits({
             ...record,
-            _id: undefined, // need to remove so we don't override
+            // need to remove so we don't override
+            _id: undefined,
+            sessionId: undefined,
         }));
 
         try {
@@ -223,7 +243,7 @@ router.post('/', async (req, res) => {
                 { returnDocument: 'after' }
             );
 
-            const updatedRecord = result.value;
+            const updatedRecord = convertRecordFromBaseUnits(result.value);
 
             io.sockets.emit('record-updated', updatedRecord);
 

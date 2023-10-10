@@ -125,7 +125,7 @@ export default function SessionProvider({ children }) {
 
         socket.on('station-join', data => {
             addSessionLog(`User ${data.username} joined station ${data.stationId}`, LOG_TYPES.JOIN_STATION);
-            setConnectedUsers(users => users.map(user => user.username === data.username ? {
+            setConnectedUsers(users => users.map(user => user.userId === data.userId ? {
                 ...user,
                 stationId: data.stationId,
             } : user));
@@ -133,7 +133,7 @@ export default function SessionProvider({ children }) {
 
         socket.on('station-leave', data => {
             addSessionLog(`User ${data.username} left their station`, LOG_TYPES.LEAVE_STATION);
-            setConnectedUsers(users => users.map(user => user.username === data.username ? {
+            setConnectedUsers(users => users.map(user => user.userId === data.userId ? {
                 ...user,
                 stationId: undefined,
             } : user));
@@ -146,7 +146,7 @@ export default function SessionProvider({ children }) {
 
         socket.on('user-disconnect', user => {
             addSessionLog(`User ${user.username} disconnected server`, LOG_TYPES.DISCONNECTED);
-            setConnectedUsers(users => users.filter(({ username }) => user.username !== username))
+            setConnectedUsers(users => users.filter(({ userId }) => user.userId !== userId))
         });
 
         socket.on('users', data => {

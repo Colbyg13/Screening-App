@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const { ipcRenderer } = require('electron');
 
 const LOG_LEVEL = {
     INFO: 'Info',
@@ -11,7 +12,7 @@ const logFile = 'server.log'
 const backupLogFile = 'server-backup.log'
 
 let logsPath = '';
-const applicationPath = '';
+let applicationPath = '';
 
 async function writeLog(logLevel, message) {
 
@@ -26,7 +27,7 @@ async function writeLog(logLevel, message) {
 
     switch (logLevel) {
         case LOG_LEVEL.INFO:
-            console.info(log)
+            console.log(log)
             break;
         case LOG_LEVEL.WARN:
             console.warn(log)
@@ -79,10 +80,14 @@ async function setup() {
 }
 
 async function setPaths() {
-    const appDataPath = await ipcRenderer.invoke('get-path');
-    const applicationName = 'HealthySamoa';
-    applicationPath = path.join(appDataPath, applicationName);
-    logsPath = path.join(applicationPath, "logs");
+    try {
+        const appDataPath = await ipcRenderer.invoke('get-path');
+        const applicationName = 'HealthySamoa';
+        applicationPath = path.join(appDataPath, applicationName);
+        logsPath = path.join(applicationPath, "logs");
+    } catch (error) {
+        console.error("Error while invoking 'get-path':", error);
+    }
 }
 
 module.exports = {

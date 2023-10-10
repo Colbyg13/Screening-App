@@ -13,68 +13,71 @@ import OfflineUpdateRecordStep3 from './src/screens/Offline/OfflineUpdateRecordS
 import QueueScreen from './src/screens/QueueScreen';
 import StationSelectionScreen from './src/screens/StationSelectionScreen';
 import UpdateRecordScreen from './src/screens/UpdateRecordScreen';
+import ServerProvider from './src/contexts/ServerContext';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
     <Provider>
       <NavigationContainer>
-        <SessionProvider>
+        <ServerProvider>
           <CustomDataTypesProvider>
-            <Stack.Navigator
-              initialRouteName='Home'
-              screenOptions={{
-                headerRight: ServerStatus,
-              }}
-            >
-              <Stack.Screen
-                name='Home'
-                component={HomeScreen}
-                options={{ title: 'Home Screen' }}
-              />
-              <Stack.Screen
-                name='Station Selection'
-                component={StationSelectionScreen}
-                options={{ title: 'Stations' }}
-              />
-              <Stack.Screen
-                name='Current Session Queue'
-                component={QueueScreen}
-                options={{ title: 'Session' }}
-              />
-              <Stack.Screen
-                name='Add To Queue'
-                component={AddToOnlineQueue}
-                options={{ title: 'Add to Queue' }}
-              />
-              <Stack.Screen
-                name='Update Record'
-                component={UpdateRecordScreen}
-                options={{ title: 'Update Record' }}
-              />
-              <Stack.Screen
-                name='Offline Mode'
-                component={IpadOfflineModeStep1}
-                options={{ title: 'Offline Mode' }}
-              />
-              <Stack.Screen
-                name='Offline Records'
-                component={OfflineRecordsScreenStep2}
-                options={{ title: 'Offline Records' }}
-              />
-              <Stack.Screen
-                name='Offline Add Records'
-                component={OfflineAddRecordStep3}
-                options={{ title: 'Add Offline Record' }}
-              />
-              <Stack.Screen
-                name='Offline Update Records'
-                component={OfflineUpdateRecordStep3}
-                options={{ title: 'Update Offline Record' }}
-              />
-            </Stack.Navigator>
+            <SessionProvider>
+              <Stack.Navigator
+                initialRouteName='Home'
+                screenOptions={{
+                  headerRight: ServerStatus,
+                }}
+              >
+                <Stack.Screen
+                  name='Home'
+                  component={HomeScreen}
+                  options={{ title: 'Home Screen' }}
+                />
+                <Stack.Screen
+                  name='Station Selection'
+                  component={StationSelectionScreen}
+                  options={{ title: 'Stations' }}
+                />
+                <Stack.Screen
+                  name='Current Session Queue'
+                  component={QueueScreen}
+                  options={{ title: 'Session' }}
+                />
+                <Stack.Screen
+                  name='Add To Queue'
+                  component={AddToOnlineQueue}
+                  options={{ title: 'Add to Queue' }}
+                />
+                <Stack.Screen
+                  name='Update Record'
+                  component={UpdateRecordScreen}
+                  options={{ title: 'Update Record' }}
+                />
+                <Stack.Screen
+                  name='Offline Mode'
+                  component={IpadOfflineModeStep1}
+                  options={{ title: 'Offline Mode' }}
+                />
+                <Stack.Screen
+                  name='Offline Records'
+                  component={OfflineRecordsScreenStep2}
+                  options={{ title: 'Offline Records' }}
+                />
+                <Stack.Screen
+                  name='Offline Add Records'
+                  component={OfflineAddRecordStep3}
+                  options={{ title: 'Add Offline Record' }}
+                />
+                <Stack.Screen
+                  name='Offline Update Records'
+                  component={OfflineUpdateRecordStep3}
+                  options={{ title: 'Update Offline Record' }}
+                />
+              </Stack.Navigator>
+            </SessionProvider>
           </CustomDataTypesProvider>
-        </SessionProvider>
+        </ServerProvider>
       </NavigationContainer>
     </Provider>
   );

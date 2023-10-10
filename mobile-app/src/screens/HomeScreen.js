@@ -6,16 +6,10 @@ import { useSessionContext } from '../contexts/SessionContext';
 export const DEVICE_NAME_STORAGE_KEY = 'device-name';
 //This is the homescreen. It has offline buttons and an the ability to connect to a session once you are connected to a server. 
 const HomeScreen = ({ navigation }) => {
-  const { getSessionInfo, loading, uploadOfflineRecords, deviceName, setDeviceName } = useSessionContext();
+  const { uploadOfflineRecords, deviceName, setDeviceName, sessionIsRunning } = useSessionContext();
 
   const handleOnPress = async () => {
-    try {
-      await getSessionInfo(true);
-      
-      navigation.navigate('Station Selection');
-    } catch (e) {
-      console.warn(e);
-    }
+    navigation.navigate('Station Selection');
   };
 
   const offlineMode = () => {
@@ -49,8 +43,8 @@ const HomeScreen = ({ navigation }) => {
           style={{ width: 350, padding: 20, margin: 20 }}
           title='Connect to Session'
           color='#EDEDED'
+          disabled={!sessionIsRunning}
           titleStyle={{ fontSize: 22, fontWeight: 'bold' }}
-          loading={loading}
           loadingIndicatorPosition='trailing'
           onPress={handleOnPress}
         ></Button>

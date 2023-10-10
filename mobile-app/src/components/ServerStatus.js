@@ -2,24 +2,27 @@ import { ActivityIndicator, Button, Chip, Dialog, DialogActions, DialogContent, 
 import React, { useState } from 'react';
 import { Text } from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
+import { useServerContext } from '../contexts/ServerContext';
 
 //Shows if you are connected or not. Long press allows you to type in IP address. 
 export default function ServerStatus() {
+    const { serverLoading, tryFindingServer } = useServerContext();
+
     const {
         isConnected,
-        serverLoading,
-        tryFindingServer,
+        sessionIsRunning,
     } = useSessionContext();
+
 
     const [showModal, setShowModal] = useState(false);
     const [ipAddress, setIpAddress] = useState('');
 
     const handleLongPress = () => {
-        if (!serverLoading && !isConnected) tryFindingServer();
+        if (!serverLoading) tryFindingServer();
     }
 
     const handleOnPress = () => {
-        if (!isConnected) setShowModal(true);
+        setShowModal(true);
     }
 
     return (
@@ -53,15 +56,15 @@ export default function ServerStatus() {
             </Dialog>
             <Chip
                 style={{
-                    backgroundColor: isConnected ? 'lightgreen' : 'lightgray',
+                    backgroundColor: sessionIsRunning ? 'lightgreen' : isConnected ? 'lightblue' : 'lightgray',
                     borderWidth: 1,
-                    borderColor: isConnected ? 'green' : 'gray',
+                    borderColor: sessionIsRunning ? 'green' : isConnected ? 'blue' : 'gray',
                 }}
                 onPress={handleOnPress}
                 onLongPress={handleLongPress}
             >
                 {serverLoading ? <ActivityIndicator /> : null}
-                <Text>{isConnected ? 'connected' : 'offline'}</Text>
+                <Text>{sessionIsRunning ? 'started' : isConnected ? 'connected' : 'offline'}</Text>
             </Chip>
         </>
     );

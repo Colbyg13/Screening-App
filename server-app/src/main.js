@@ -46,7 +46,6 @@ ipcMain.on('reload-app', () => {
 });
 
 ipcMain.handle('get-path', async (event, arg) => {
-  // Handle the action and return a result
   return app.getPath("appData");
 });
 
