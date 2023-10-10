@@ -257,7 +257,6 @@ export default function SessionProvider({ children }) {
             return result.data;
         } catch (error) {
             console.warn(error)
-            throw new Error('Unable to send record');
         }
     }
 
