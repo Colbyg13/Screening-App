@@ -10,14 +10,14 @@ import { Pressable } from '@react-native-material/core';
 const AddToQueueBtn = (props) => {
   return (
     <View style={styles.wrapper}>
-      <Pressable style={styles.btn} onPress={props.onPress} pressEffect='ripple' pressEffectColor='#4c5e75'>
+      <Pressable style={styles.btn} onPress={props.onPress} pressEffectColor='#4c5e75'>
         <Text style={styles.btnText}>Add To Queue</Text>
       </Pressable>
     </View>
   )
 }
-const styles = StyleSheet.create({ 
-  wrapper:  {
+const styles = StyleSheet.create({
+  wrapper: {
     flex: 1,
     position: 'absolute',
     bottom: 12,
@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   },
   btnText: {
     fontSize: 22,
-  } 
+  }
 })
 
 export default AddToQueueBtn

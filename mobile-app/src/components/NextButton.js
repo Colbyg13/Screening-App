@@ -11,7 +11,7 @@ const NextButton = (props) => {
 
   return (
     <View >
-      <Pressable style={styles.btn} onPress={props.onPress} pressEffect='ripple' pressEffectColor='#4c5e75'>
+      <Pressable style={styles.btn} onPress={props.onPress}  pressEffectColor='#4c5e75'>
         <Text style={styles.btnText}>Next</Text>
       </Pressable>
     </View>

@@ -10,7 +10,7 @@ import { Pressable } from '@react-native-material/core';
 const AddOfflineRecordBtn = (props) => {
   return (
     <View style={styles.wrapper}>
-    <Pressable style={styles.btn} onPress={props.onPress} pressEffect='ripple' pressEffectColor='#4c5e75'>
+    <Pressable style={styles.btn} onPress={props.onPress}  pressEffectColor='#4c5e75'>
       <Text style={styles.btnText}>Add Record</Text>
     </Pressable>
   </View>

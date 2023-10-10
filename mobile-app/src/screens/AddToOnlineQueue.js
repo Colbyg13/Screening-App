@@ -221,7 +221,6 @@ const AddToOnlineQueue = ({ route }) => {
       <View style={styles.wrapper}>
         <Pressable
           style={styles.btnCancel}
-          pressEffect='ripple'
           pressEffectColor='#FCB8B8'
           onPress={() => {
             setFormState({});
@@ -232,7 +231,6 @@ const AddToOnlineQueue = ({ route }) => {
         </Pressable>
         <Pressable
           style={styles.btnSubmit}
-          pressEffect='ripple'
           pressEffectColor='#4c5e75'
           onPress={handleSubmit}
         >

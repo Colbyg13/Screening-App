@@ -243,7 +243,6 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
       <View style={styles.wrapper}>
         <Pressable
           style={styles.btnCancel}
-          pressEffect='ripple'
           pressEffectColor='#FCB8B8'
           onPress={() => {
             setFormState({});
@@ -258,7 +257,6 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
         </Pressable>
         <Pressable
           style={styles.btnCancel}
-          pressEffect='ripple'
           pressEffectColor='#FCB8B8'
           onPress={() => {
             setFormState({});
@@ -269,7 +267,6 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
         </Pressable>
         <Pressable
           style={styles.btnSubmit}
-          pressEffect='ripple'
           pressEffectColor='#4c5e75'
           onPress={handleSubmit}
         >

@@ -264,7 +264,6 @@ const UpdateRecordScreen = ({ route }) => {
       <View style={styles.wrapper}>
         <Pressable
           style={styles.btnCancel}
-          pressEffect='ripple'
           pressEffectColor='#FCB8B8'
           onPress={() => {
             setFormState({});
@@ -276,7 +275,6 @@ const UpdateRecordScreen = ({ route }) => {
         <Pressable
           onPress={handleSubmit}
           style={styles.btnSubmit}
-          pressEffect='ripple'
           pressEffectColor='#4c5e75'
         >
           <Text style={styles.btnText}>Submit</Text>

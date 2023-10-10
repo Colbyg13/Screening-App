@@ -11,7 +11,6 @@ const SessionQueueItem = (props) => {
       key={person.id}
       style={styles.item}
       onPress={props.onPress}
-      pressEffect='ripple'
       pressEffectColor='green'
     >
       <View style={styles.innerContent}>
