@@ -8,22 +8,22 @@ const StationsListItem = (props) => {
   // console.log(typeof(station));
   // console.log(station);
   return (
-    <View style={styles.pressableWrapper}>
-    <Pressable key={station.id} style={styles.item} onPress={props.onPress} pressEffect='ripple' pressEffectColor='green'>
-      <View style={styles.row}>
-        <Text style={styles.label}>{station.label}</Text>
-        <View style={styles.TitleAndFields}>
-        <Text style={styles.title}>{station.name}</Text>
-        {station.fields.map((item) => {
-          return (
-            <View key={item.name} style={styles.fieldsView}>
-              <Text style={styles.fieldsitem}>{item.name}</Text>
-            </View>
-          );
-        })}
+    <View>
+      <Pressable style={styles.item} onPress={props.onPress} pressEffectColor='green'>
+        <View style={styles.row}>
+          <Text style={styles.label}>{station.label}</Text>
+          <View style={styles.TitleAndFields}>
+            <Text style={styles.title}>{station.name}</Text>
+            {station.fields.map((item) => {
+              return (
+                <View key={item.name} style={styles.fieldsView}>
+                  <Text style={styles.fieldsitem}>{item.name}</Text>
+                </View>
+              );
+            })}
+          </View>
         </View>
-      </View>
-    </Pressable>
+      </Pressable>
     </View>
   );
 };
