@@ -6,7 +6,7 @@ export const PATIENT_RECORD_STATUS = {
 }
 
 export default class PatientRecord {
-    constructor(patientRecord, stationList) {
+    constructor(patientRecord, stationList = []) {
         Object.assign(this, patientRecord);
         this.progress = stationList.map(({ fields }) => {
             if (fields.every(({ key }) => patientRecord[key] !== undefined)) return PATIENT_RECORD_STATUS.COMPLETE;
