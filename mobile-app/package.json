@@ -1,6 +1,6 @@
 {
-  "name": "new-mobile",
-  "version": "1.0.0",
+  "name": "healthy-samoa",
+  "version": "1.0.3",
   "main": "node_modules/expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
