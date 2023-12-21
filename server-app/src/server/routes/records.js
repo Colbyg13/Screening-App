@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const { database } = require('../db');
 const { LOG_LEVEL, writeLog } = require('../utils/logger');
-const { removeEmptyValues } = require('../utils/index');
 const { ObjectId } = require('mongodb');
 const { default: convert, getBaseUnit } = require('../../utils/convert');
 const io = global.io;
@@ -134,7 +133,7 @@ router.post('/', async (req, res) => {
 
     const {
         record = {},
-        // need this separate if offline more or other reasons
+        // need this separate if offline mode or other reasons
         customData,
     } = req.body;
 
@@ -144,13 +143,11 @@ router.post('/', async (req, res) => {
     function convertRecordToBaseUnits(record) {
         const convertedRecord = Object.entries(customData ?? {}).reduce(
             (convertedRecord, [key, unit]) => {
-                const value = +record[key];
+                const value = record[key] === '' ? NaN : +record[key];
                 if (!isNaN(value)) {
                     const baseUnit = getBaseUnit(unit);
-                    return {
-                        ...convertedRecord,
-                        [key]: baseUnit === unit ? value : convert(value).from(unit).to(baseUnit),
-                    };
+                    convertedRecord[key] =
+                        baseUnit === unit ? value : convert(value).from(unit).to(baseUnit);
                 }
                 return convertedRecord;
             },
@@ -167,10 +164,7 @@ router.post('/', async (req, res) => {
                 if (!isNaN(value)) {
                     const baseUnit = getBaseUnit(unit);
                     if (baseUnit !== unit) {
-                        return {
-                            ...convertedRecord,
-                            [key]: convert(value).from(baseUnit).to(unit),
-                        };
+                        convertedRecord[key] = convert(value).from(baseUnit).to(unit);
                     }
                 }
                 return convertedRecord;
@@ -201,13 +195,10 @@ router.post('/', async (req, res) => {
             const sessionCol = database.collection('sessions');
             const sessionData = await sessionCol.findOne({ _id: new ObjectId(sessionId) });
 
-            const generalInfo = sessionData.generalFields.reduce(
-                (all, { key, value }) => ({
-                    ...all,
-                    [key]: value,
-                }),
-                {},
-            );
+            const generalInfo = sessionData.generalFields.reduce((generalInfo, { key, value }) => {
+                generalInfo[key] = value;
+                return generalInfo;
+            }, {});
 
             const newRecord = {
                 id: updatedRecordID.value.latestID,
@@ -216,7 +207,7 @@ router.post('/', async (req, res) => {
                 sessionId,
                 customData: customData ?? {},
                 ...generalInfo,
-                ...removeEmptyValues(convertRecordToBaseUnits(record)),
+                ...convertRecordToBaseUnits(record),
             };
 
             const recordsCol = database.collection('records');
@@ -235,14 +226,9 @@ router.post('/', async (req, res) => {
             res.status(500).json({ error: 'Could not update record due to Internal Server Error' });
         }
     } else {
-        const recordUpdate = removeEmptyValues(
-            convertRecordToBaseUnits({
-                ...record,
-                // need to remove so we don't override
-                _id: undefined,
-                sessionId: undefined,
-            }),
-        );
+        // we need to remove these attributes so we don't override them
+        const { _id, sessionId, ...recordRest } = record;
+        const recordUpdate = convertRecordToBaseUnits(recordRest);
 
         try {
             const recordsCol = database.collection('records');

@@ -130,14 +130,16 @@ const UpdateRecordScreen = ({ route }) => {
             customData: customDataTypes.reduce((customData, { type, unit }) => {
                 const usedField = station.fields.find(field => field.type === type);
                 const shouldAddKey =
-                    unit !== 'Custom' && usedField && formState[usedField.key] !== undefined;
+                    unit !== 'Custom' &&
+                    usedField &&
+                    formState[usedField.key] !== undefined &&
+                    formState[usedField.key] !== '';
 
-                return shouldAddKey
-                    ? {
-                          ...customData,
-                          [usedField.key]: unit,
-                      }
-                    : customData;
+                if (shouldAddKey) {
+                    customData[usedField.key] = unit;
+                }
+
+                return customData;
             }, {}),
         });
         setVisible(true);
