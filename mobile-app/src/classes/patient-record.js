@@ -8,9 +8,9 @@ export default class PatientRecord {
     constructor(patientRecord, stationList = []) {
         Object.assign(this, patientRecord);
         this.progress = stationList.map(({ fields }) => {
-            if (fields.every(({ key }) => patientRecord[key] !== undefined))
+            if (fields.every(({ key }) => isEmpty(patientRecord[key])))
                 return PATIENT_RECORD_STATUS.COMPLETE;
-            if (fields.some(({ key }) => patientRecord[key] !== undefined))
+            if (fields.some(({ key }) => isEmpty(patientRecord[key])))
                 return PATIENT_RECORD_STATUS.PARTIAL;
             return PATIENT_RECORD_STATUS.NONE;
         });
@@ -27,4 +27,8 @@ export default class PatientRecord {
     get isComplete() {
         return this.nextStationIndex === -1;
     }
+}
+
+function isEmpty(value) {
+    return value !== '' && value !== undefined && value !== null && value !== NaN;
 }
