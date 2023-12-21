@@ -7,6 +7,7 @@ import { serverURL } from '../../constants/server';
 import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 import { useSessionContext } from '../../contexts/SessionContext';
 import { useSnackBarContext } from '../../contexts/SnackbarContext';
+import { CUSTOM_DATA_TYPE } from '../CustomFields/UserDefinedFields';
 import RecordModalInputRow from './RecordModalInputRow';
 
 export default function RecordModal({
@@ -143,7 +144,7 @@ export default function RecordModal({
                                             field => field.type === type,
                                         );
                                         const shouldAddKey =
-                                            unit !== 'Custom' &&
+                                            unit !== CUSTOM_DATA_TYPE &&
                                             usedField &&
                                             update[usedField.key] !== undefined;
 
