@@ -2,6 +2,7 @@ import { MenuItem, Switch, TextField } from '@mui/material';
 import React from 'react';
 import { SESSION_DATA_TYPES } from '../../constants/session-data-types';
 import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
+import { CUSTOM_DATA_TYPE } from '../CustomFields/UserDefinedFields';
 
 export default function RecordModalInputRow({
     fieldKeyMap,
@@ -34,7 +35,7 @@ export default function RecordModalInputRow({
     return (
         <div className="flex">
             <span className="w-40">{title}:</span>
-            {customDataType === 'Custom' ? (
+            {customDataType === CUSTOM_DATA_TYPE ? (
                 <TextField
                     required
                     className="w-52"

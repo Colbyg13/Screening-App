@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useCustomDataTypesContext } from '../../../contexts/CustomDataContext';
+import { CUSTOM_DATA_TYPE } from '../../CustomFields/UserDefinedFields';
 
 export default function useUnitConversion({ allFields }) {
     const { customDataTypeMap, loading } = useCustomDataTypesContext();
@@ -10,7 +11,7 @@ export default function useUnitConversion({ allFields }) {
         const newUnitConversion = allFields
             .filter(
                 ({ type }) =>
-                    type && customDataTypeMap[type] && customDataTypeMap[type] !== 'Custom',
+                    type && customDataTypeMap[type] && customDataTypeMap[type] !== CUSTOM_DATA_TYPE,
             )
             .reduce(
                 (all, { key, type }) => ({

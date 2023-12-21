@@ -1,6 +1,6 @@
 import { Button, CircularProgress } from '@mui/material';
 import axios from 'axios';
-import _ from 'lodash';
+import { isEqual } from 'lodash';
 import React, { useEffect, useState } from 'react';
 import { LOG_LEVEL } from '../../constants/log-levels';
 import { serverURL } from '../../constants/server';
@@ -10,6 +10,7 @@ import { usePrompt } from '../../hooks/prompt';
 import replace from '../../utils/replace';
 import BaseFields from './BaseFields';
 import UserDefinedFields from './UserDefinedFields';
+import { v4 as uuidv4 } from 'uuid';
 
 const baseDataType = {
     type: '',
@@ -17,90 +18,102 @@ const baseDataType = {
 };
 
 export default function CustomFields() {
-    const { addSnackBar } = useSnackBarContext();
-
-    const { customDataTypes: initialDataTypes = [], fetchData } = useCustomDataTypesContext();
     const [loading, setLoading] = useState(false);
+
+    const { addSnackBar } = useSnackBarContext();
+    const { customDataTypes: initialDataTypes = [], fetchData } = useCustomDataTypesContext();
 
     const [customDataTypes, setCustomDataTypes] = useState(initialDataTypes);
     const [dataTypeIdsToDelete, setDataTypeIdsToDelete] = useState([]);
 
-    useEffect(() => {
-        setCustomDataTypes(initialDataTypes);
-    }, [initialDataTypes]);
-
     const hasChanges =
         initialDataTypes.length !== customDataTypes.length ||
-        !initialDataTypes.every((dataType, i) => _.isEqual(dataType, customDataTypes[i]));
+        !initialDataTypes.every((dataType, i) => isEqual(dataType, customDataTypes[i]));
 
-    const addCustomDataType = () => setCustomDataTypes(dataTypes => [...dataTypes, baseDataType]);
-    const updateCustomDataType = (update, index) =>
+    usePrompt('You have unsaved changes. Are you sure you want to leave?', hasChanges);
+
+    function addCustomDataType() {
+        setCustomDataTypes(dataTypes => [...dataTypes, { ...baseDataType, fakeId: uuidv4() }]);
+    }
+
+    function updateCustomDataType(update, index) {
         setCustomDataTypes(dataTypes =>
             replace(dataTypes, index, { ...dataTypes[index], ...update }),
         );
-    const deleteCustomDataType = index => {
+    }
+
+    function deleteCustomDataType(index) {
         setDataTypeIdsToDelete(idsToDelete =>
             [...idsToDelete, customDataTypes[index]._id].filter(Boolean),
         );
         setCustomDataTypes(dataTypes => dataTypes.filter((_, i) => i !== index));
-    };
-    const addCustomDataTypeValue = dataTypeIndex =>
+    }
+
+    function addCustomDataTypeValue(dataTypeIndex) {
         setCustomDataTypes(dataTypes =>
             replace(dataTypes, dataTypeIndex, {
                 ...dataTypes[dataTypeIndex],
                 values: [...dataTypes[dataTypeIndex].values, ''],
             }),
         );
-    const updateCustomDataTypeValue = (update, dataTypeIndex, valueIndex) =>
+    }
+
+    function updateCustomDataTypeValue(update, dataTypeIndex, valueIndex) {
         setCustomDataTypes(dataTypes =>
             replace(dataTypes, dataTypeIndex, {
                 ...dataTypes[dataTypeIndex],
                 values: replace(dataTypes[dataTypeIndex].values, valueIndex, update),
             }),
         );
-    const deleteCustomDataTypeValue = (dataTypeIndex, valueIndex) =>
+    }
+
+    function deleteCustomDataTypeValue(dataTypeIndex, valueIndex) {
         setCustomDataTypes(dataTypes =>
             replace(dataTypes, dataTypeIndex, {
                 ...dataTypes[dataTypeIndex],
                 values: dataTypes[dataTypeIndex].values.filter((_, i) => i !== valueIndex),
             }),
         );
+    }
 
-    usePrompt('You have unsaved changes. Are you sure you want to leave?', hasChanges);
+    async function handleSubmit(e) {
+        e.preventDefault();
+        setLoading(true);
+        try {
+            await axios.post(`${serverURL}/api/v1/dataTypes`, {
+                customDataTypes: customDataTypes.map(
+                    ({ fakeId, ...customDataType }) => customDataType,
+                ),
+                dataTypeIdsToDelete,
+            });
+            addSnackBar({
+                title: 'Success',
+                message: `Custom data types successfully saved`,
+                variant: 'success',
+                timeout: 2500,
+            });
+            fetchData();
+        } catch (error) {
+            console.error('Could not save custom data types.', error);
+            addSnackBar({
+                title: 'Error',
+                message: `Could not save custom data types: ${error}`,
+                variant: 'danger',
+                timeout: 2500,
+            });
+            window.api.writeLog(LOG_LEVEL.ERROR, `Could not save custom data types: ${error}`);
+        }
+        setLoading(false);
+    }
+
+    useEffect(() => {
+        setCustomDataTypes(initialDataTypes);
+    }, [initialDataTypes]);
 
     return (
         <form
             className="flex w-full max-h-screen px-8 pt-8 pb-16 space-x-8 overflow-auto"
-            onSubmit={async e => {
-                e.preventDefault();
-                setLoading(true);
-                try {
-                    await axios.post(`${serverURL}/api/v1/dataTypes`, {
-                        customDataTypes,
-                        dataTypeIdsToDelete,
-                    });
-                    addSnackBar({
-                        title: 'Success',
-                        message: `Custom data types successfully saved`,
-                        variant: 'success',
-                        timeout: 2500,
-                    });
-                    fetchData();
-                } catch (error) {
-                    console.error('Could not save custom data types.', error);
-                    addSnackBar({
-                        title: 'Error',
-                        message: `Could not save custom data types: ${error}`,
-                        variant: 'danger',
-                        timeout: 2500,
-                    });
-                    window.api.writeLog(
-                        LOG_LEVEL.ERROR,
-                        `Could not save custom data types: ${error}`,
-                    );
-                }
-                setLoading(false);
-            }}
+            onSubmit={handleSubmit}
         >
             <div className="h-full">
                 <UserDefinedFields
