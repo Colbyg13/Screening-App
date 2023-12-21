@@ -1,36 +1,33 @@
-const express = require('express');
-const router = express.Router();
-const { database } = require('../db');
-const { LOG_LEVEL, writeLog } = require("../utils/logger");
-const { ObjectId } = require('mongodb');
+const express = require('express')
+const router = express.Router()
+const { database } = require('../db')
+const { LOG_LEVEL, writeLog } = require('../utils/logger')
+const { ObjectId } = require('mongodb')
 
 router.get('/', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `Getting custom data types`);
+    writeLog(LOG_LEVEL.INFO, `Getting custom data types`)
     try {
+        const dataTypesCol = database.collection('customDataTypes')
+        const customData = await dataTypesCol.find().toArray()
 
-        const dataTypesCol = database.collection('customDataTypes');
-        const customData = await dataTypesCol.find().toArray();
-
-        res.status(200).json(customData);
+        res.status(200).json(customData)
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error getting custom data types ${error}`);
-        res.status(500).json({ error: 'Could not get custom data types due to Internal Server Error' });
+        writeLog(LOG_LEVEL.ERROR, `Error getting custom data types ${error}`)
+        res.status(500).json({
+            error: 'Could not get custom data types due to Internal Server Error',
+        })
     }
-});
+})
 
 router.post('/', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `Updating custom data types, ${JSON.stringify(req.body)}`);
+    writeLog(LOG_LEVEL.INFO, `Updating custom data types, ${JSON.stringify(req.body)}`)
 
     const {
-        body: {
-            customDataTypes,
-            dataTypeIdsToDelete,
-        }
-    } = req;
-
+        body: { customDataTypes, dataTypeIdsToDelete },
+    } = req
 
     try {
-        const dataTypesCol = database.collection('customDataTypes');
+        const dataTypesCol = database.collection('customDataTypes')
         await dataTypesCol.bulkWrite([
             ...customDataTypes.map(({ _id, ...dataType }) => ({
                 updateOne: {
@@ -38,21 +35,23 @@ router.post('/', async (req, res) => {
                     upsert: true,
                     update: {
                         $set: dataType,
-                    }
-                }
+                    },
+                },
             })),
             ...dataTypeIdsToDelete.map(_id => ({
                 deleteOne: {
                     filter: { _id: new ObjectId(_id) },
-                }
-            }))
+                },
+            })),
         ])
 
-        res.status(200).json({ message: "Success" });
+        res.status(200).json({ message: 'Success' })
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error getting custom data types ${error}`);
-        res.status(500).json({ error: 'Could not get custom data types due to Internal Server Error' });
+        writeLog(LOG_LEVEL.ERROR, `Error getting custom data types ${error}`)
+        res.status(500).json({
+            error: 'Could not get custom data types due to Internal Server Error',
+        })
     }
-});
+})
 
-module.exports = router;
+module.exports = router
