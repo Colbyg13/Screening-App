@@ -1,4 +1,4 @@
-import configureMeasurements, { allMeasures } from 'convert-units'
+import configureMeasurements, { allMeasures } from 'convert-units';
 
 const baseUnits = {
     acceleration: 'm/s2',
@@ -30,7 +30,7 @@ const baseUnits = {
     voltage: 'V',
     volume: 'm3',
     volumeFlowRate: 'm3/s',
-}
+};
 
 const glucose = {
     systems: {
@@ -59,30 +59,30 @@ const glucose = {
         ngsp: {
             ifcc: {
                 transform: function (x) {
-                    return Math.round(10.929 * (x - 2.15))
+                    return Math.round(10.929 * (x - 2.15));
                 },
             },
         },
         ifcc: {
             ngsp: {
                 transform: function (x) {
-                    return Math.round((0.0915 * x + 2.15) * 10) / 10
+                    return Math.round((0.0915 * x + 2.15) * 10) / 10;
                 },
             },
         },
     },
-}
+};
 
 const convert = configureMeasurements({
     ...allMeasures,
     glucose,
-})
+});
 
 export function getBaseUnit(unit) {
-    const category = convert().describe(unit).measure
-    const baseUnit = baseUnits[category]
+    const category = convert().describe(unit).measure;
+    const baseUnit = baseUnits[category];
 
-    return baseUnit
+    return baseUnit;
 }
 
-export default convert
+export default convert;

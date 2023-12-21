@@ -1,38 +1,38 @@
-import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
-import { Box, Chip, IconButton, Modal, Typography } from '@mui/material'
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import ConfirmModal from '../../../components/ConfirmModal/ConfirmModal'
-import { LOG_LEVEL } from '../../../constants/log-levels'
-import { serverURL } from '../../../constants/server'
-import { useSessionContext } from '../../../contexts/SessionContext'
-import { useSnackBarContext } from '../../../contexts/SnackbarContext'
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
+import { Box, Chip, IconButton, Modal, Typography } from '@mui/material';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import ConfirmModal from '../../../components/ConfirmModal/ConfirmModal';
+import { LOG_LEVEL } from '../../../constants/log-levels';
+import { serverURL } from '../../../constants/server';
+import { useSessionContext } from '../../../contexts/SessionContext';
+import { useSnackBarContext } from '../../../contexts/SnackbarContext';
 
 export default function SessionTemplateModal({ open, onClose }) {
-    const { addSnackBar } = useSnackBarContext()
+    const { addSnackBar } = useSnackBarContext();
 
-    const { getSessionTemplates, openSessionTemplate } = useSessionContext()
+    const { getSessionTemplates, openSessionTemplate } = useSessionContext();
 
-    const [templates, setTemplates] = useState([])
-    const [selectedTemplateIdToDelete, setSelectedTemplateIdToDelete] = useState()
+    const [templates, setTemplates] = useState([]);
+    const [selectedTemplateIdToDelete, setSelectedTemplateIdToDelete] = useState();
 
     useEffect(() => {
         if (open) {
-            reloadSessionTemplates()
+            reloadSessionTemplates();
         }
-    }, [open])
+    }, [open]);
 
     function reloadSessionTemplates() {
         getSessionTemplates()
             .then((templates = []) => {
                 const sortedTemplates = templates.sort(({ createdAt: a }, { createdAt: b }) =>
                     a < b ? 1 : -1,
-                )
-                setTemplates(sortedTemplates)
+                );
+                setTemplates(sortedTemplates);
             })
             .catch(err => {
-                console.error(err)
-            })
+                console.error(err);
+            });
     }
 
     return (
@@ -70,8 +70,8 @@ export default function SessionTemplateModal({ open, onClose }) {
                                 key={template._id}
                                 className="relative flex justify-between w-full p-3 border rounded-md cursor-pointer hover:bg-gray-100"
                                 onClick={() => {
-                                    openSessionTemplate(template)
-                                    onClose()
+                                    openSessionTemplate(template);
+                                    onClose();
                                 }}
                             >
                                 <div>
@@ -94,9 +94,9 @@ export default function SessionTemplateModal({ open, onClose }) {
                                 <div>
                                     <IconButton
                                         onClick={e => {
-                                            e.preventDefault()
-                                            e.stopPropagation()
-                                            setSelectedTemplateIdToDelete(template._id)
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            setSelectedTemplateIdToDelete(template._id);
                                         }}
                                     >
                                         <DeleteForeverOutlinedIcon
@@ -119,30 +119,30 @@ export default function SessionTemplateModal({ open, onClose }) {
                     try {
                         await axios.delete(
                             `${serverURL}/api/v1/sessionTemplates/${selectedTemplateIdToDelete}`,
-                        )
+                        );
                         addSnackBar({
                             title: 'Success',
                             message: `Session template successfully deleted`,
                             variant: 'success',
                             timeout: 2500,
-                        })
-                        setSelectedTemplateIdToDelete()
-                        reloadSessionTemplates()
+                        });
+                        setSelectedTemplateIdToDelete();
+                        reloadSessionTemplates();
                     } catch (error) {
-                        console.error('Could not delete session template.', error)
+                        console.error('Could not delete session template.', error);
                         addSnackBar({
                             title: 'Error',
                             message: `Could not delete session template: ${error}`,
                             variant: 'danger',
                             timeout: 2500,
-                        })
+                        });
                         window.api.writeLog(
                             LOG_LEVEL.ERROR,
                             `Could not delete session template: ${error}`,
-                        )
+                        );
                     }
                 }}
             />
         </>
-    )
+    );
 }

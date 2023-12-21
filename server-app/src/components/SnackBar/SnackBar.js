@@ -1,19 +1,19 @@
-import React, { useEffect, useRef } from 'react'
-import match from '../../utils/match'
+import React, { useEffect, useRef } from 'react';
+import match from '../../utils/match';
 
 export default function SnackBar({ variant, title, message, timeout, onClose = () => {} }) {
-    const timeoutRef = useRef()
+    const timeoutRef = useRef();
 
     useEffect(() => {
         if (timeout && onClose) {
             timeoutRef.current = setTimeout(() => {
-                onClose()
-            }, timeout)
+                onClose();
+            }, timeout);
         }
         return () => {
-            clearTimeout(timeoutRef.current)
-        }
-    }, [timeout, onClose])
+            clearTimeout(timeoutRef.current);
+        };
+    }, [timeout, onClose]);
 
     return (
         <div
@@ -48,5 +48,5 @@ export default function SnackBar({ variant, title, message, timeout, onClose = (
                 X
             </button>
         </div>
-    )
+    );
 }

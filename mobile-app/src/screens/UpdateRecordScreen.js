@@ -7,118 +7,118 @@ import {
     Pressable,
     Text,
     TextInput,
-} from '@react-native-material/core'
-import { useNavigation } from '@react-navigation/native'
-import React, { useEffect, useState } from 'react'
-import { Keyboard, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
-import BoolInput from '../components/Inputs/BoolInput'
-import CustomDataPicker from '../components/Inputs/CustomDataPicker'
-import DatePicker from '../components/Inputs/DatePicker'
-import { useCustomDataTypesContext } from '../contexts/CustomDataContext'
-import { useSessionContext } from '../contexts/SessionContext'
+} from '@react-native-material/core';
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { Keyboard, SafeAreaView, StatusBar, StyleSheet, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import BoolInput from '../components/Inputs/BoolInput';
+import CustomDataPicker from '../components/Inputs/CustomDataPicker';
+import DatePicker from '../components/Inputs/DatePicker';
+import { useCustomDataTypesContext } from '../contexts/CustomDataContext';
+import { useSessionContext } from '../contexts/SessionContext';
 
 //this screen is to update a record during an online station. Displays the previously selected values for the record if any exist.
 const UpdateRecordScreen = ({ route }) => {
-    const navigation = useNavigation()
-    const { customDataTypes } = useCustomDataTypesContext()
-    const record = route.params.item
-    const { sendRecord, selectedStation: station, stations } = useSessionContext()
+    const navigation = useNavigation();
+    const { customDataTypes } = useCustomDataTypesContext();
+    const record = route.params.item;
+    const { sendRecord, selectedStation: station, stations } = useSessionContext();
 
-    const isStationOne = station.id === 1
-    const [formState, setFormState] = useState({}) //used to keep track of inputs.
-    const [dateStates, setDateStates] = useState({})
-    const [fields, setFields] = useState([])
-    const numFields = station.fields.length
-    const [visible, setVisible] = useState(false) //opens the dialog/modal.
-    const [hasStationInfo, setHasStationInfo] = useState(false) //displays current data for station in patient record section if available
+    const isStationOne = station.id === 1;
+    const [formState, setFormState] = useState({}); //used to keep track of inputs.
+    const [dateStates, setDateStates] = useState({});
+    const [fields, setFields] = useState([]);
+    const numFields = station.fields.length;
+    const [visible, setVisible] = useState(false); //opens the dialog/modal.
+    const [hasStationInfo, setHasStationInfo] = useState(false); //displays current data for station in patient record section if available
 
     const defaultState = () => {
-        let newFields = []
+        let newFields = [];
         for (let i = 0; i < numFields; i++) {
-            const varName = station.fields[i].key
+            const varName = station.fields[i].key;
             if (record.hasOwnProperty(varName)) {
                 setFormState(prevState => ({
                     ...prevState,
                     [varName]: record[station.fields[i].key],
-                }))
+                }));
             } else {
                 if (station.fields[i].type === 'date') {
-                    let showname = `show${varName}`
-                    setDateStates(prevState => ({ ...prevState, [showname]: false }))
+                    let showname = `show${varName}`;
+                    setDateStates(prevState => ({ ...prevState, [showname]: false }));
                 }
                 if (station.fields[i].type === 'bool') {
-                    setFormState(prevState => ({ ...prevState, [varName]: false }))
+                    setFormState(prevState => ({ ...prevState, [varName]: false }));
                 } else {
-                    setFormState(prevState => ({ ...prevState, [varName]: '' }))
+                    setFormState(prevState => ({ ...prevState, [varName]: '' }));
                 }
             }
-            newFields.push(varName)
+            newFields.push(varName);
         }
-        setFields(newFields)
-    }
+        setFields(newFields);
+    };
 
     const checkForStationInfo = () => {
         fields.forEach(field => {
             if (record.hasOwnProperty(field)) {
                 //console.log('field', field, 'exists in record', record);
-                setHasStationInfo(true)
+                setHasStationInfo(true);
             } else {
                 //console.log('field', field, 'does not exist');
             }
-        })
-    }
+        });
+    };
 
     useEffect(() => {
         //sets the state for the form dynamically. I have not implemented validation yet.
-        defaultState()
-        setFormState(prevState => ({ ...prevState, id: record.id })) //sets object id
-    }, [])
+        defaultState();
+        setFormState(prevState => ({ ...prevState, id: record.id })); //sets object id
+    }, []);
 
     useEffect(() => {
         //console.log('FORM STATE UPDATED', formState);
-    }, [formState])
+    }, [formState]);
 
     useEffect(() => {
         //console.log('Fields after default state was called', fields);
-        checkForStationInfo()
-    }, [fields])
+        checkForStationInfo();
+    }, [fields]);
 
     const handleFormUpdate = (field, selectedItem) => {
         //console.log('handling update', field, selectedItem);
         setFormState(prevState => ({
             ...prevState,
             [field.key]: selectedItem, //year/month/day
-        }))
-    }
+        }));
+    };
 
     const handleDateUpdate = (field, showname, newDate) => {
         // console.log('handling date update', field, showname, newDate);
         setFormState(prevState => ({
             ...prevState,
             [field.key]: newDate, //year/month/day
-        }))
+        }));
         setDateStates(prevState => ({
             ...prevState,
             [showname]: false, //should set dob or whatever date to the date text.
-        }))
-    }
+        }));
+    };
 
     const toggleDateShow = (field, showname) => {
-        let curState = dateStates[showname]
+        let curState = dateStates[showname];
         setDateStates(prevState => ({
             ...prevState,
             [showname]: !curState,
-        }))
-    }
+        }));
+    };
 
     const updateBool = field => {
-        const oldState = formState[field.key]
+        const oldState = formState[field.key];
         setFormState(prevState => ({
             ...prevState,
             [field.key]: !oldState,
-        }))
-    }
+        }));
+    };
 
     const handleSubmit = async () => {
         //Some validation function
@@ -128,24 +128,24 @@ const UpdateRecordScreen = ({ route }) => {
         const result = await sendRecord({
             record: formState,
             customData: customDataTypes.reduce((customData, { type, unit }) => {
-                const usedField = station.fields.find(field => field.type === type)
+                const usedField = station.fields.find(field => field.type === type);
                 const shouldAddKey =
-                    unit !== 'Custom' && usedField && formState[usedField.key] !== undefined
+                    unit !== 'Custom' && usedField && formState[usedField.key] !== undefined;
 
                 return shouldAddKey
                     ? {
                           ...customData,
                           [usedField.key]: unit,
                       }
-                    : customData
+                    : customData;
             }, {}),
-        })
-        setVisible(true)
-    }
+        });
+        setVisible(true);
+    };
 
     const renderInput = field => {
         if (field.type === 'date') {
-            let showname = `show${field.key}`
+            let showname = `show${field.key}`;
             return (
                 <React.Fragment key={field.key}>
                     <DatePicker
@@ -156,7 +156,7 @@ const UpdateRecordScreen = ({ route }) => {
                         field={field}
                     />
                 </React.Fragment>
-            )
+            );
         } else if (field.type === 'string') {
             return (
                 <React.Fragment key={field.key}>
@@ -169,7 +169,7 @@ const UpdateRecordScreen = ({ route }) => {
                                     setFormState(prevState => ({
                                         ...prevState,
                                         [field.key]: newText,
-                                    }))
+                                    }));
                                 }}
                                 style={styles.fieldInput}
                                 required={field.required}
@@ -177,7 +177,7 @@ const UpdateRecordScreen = ({ route }) => {
                         </View>
                     </View>
                 </React.Fragment>
-            )
+            );
         } else if (field.type === 'number') {
             return (
                 <React.Fragment key={field.key}>
@@ -194,7 +194,7 @@ const UpdateRecordScreen = ({ route }) => {
                                     setFormState(prevState => ({
                                         ...prevState,
                                         [field.key]: newText,
-                                    }))
+                                    }));
                                 }}
                                 style={styles.fieldInput}
                                 required={field.required}
@@ -202,7 +202,7 @@ const UpdateRecordScreen = ({ route }) => {
                         </View>
                     </View>
                 </React.Fragment>
-            )
+            );
         } else if (field.type === 'bool') {
             return (
                 <React.Fragment key={field.key}>
@@ -213,7 +213,7 @@ const UpdateRecordScreen = ({ route }) => {
                         field={field}
                     />
                 </React.Fragment>
-            )
+            );
         } else {
             //custom picker
             return (
@@ -225,9 +225,9 @@ const UpdateRecordScreen = ({ route }) => {
                         field={field}
                     ></CustomDataPicker>
                 </React.Fragment>
-            )
+            );
         }
-    }
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -250,7 +250,7 @@ const UpdateRecordScreen = ({ route }) => {
                     </View>
                     <View>
                         {station.fields.map(field => {
-                            return renderInput(field)
+                            return renderInput(field);
                         })}
                     </View>
                 </View>
@@ -260,8 +260,8 @@ const UpdateRecordScreen = ({ route }) => {
                     style={styles.btnCancel}
                     pressEffectColor="#FCB8B8"
                     onPress={() => {
-                        setFormState({})
-                        navigation.goBack()
+                        setFormState({});
+                        navigation.goBack();
                     }}
                 >
                     <Text style={styles.btnText}>Cancel</Text>
@@ -278,8 +278,8 @@ const UpdateRecordScreen = ({ route }) => {
             <Dialog
                 visible={visible}
                 onDismiss={() => {
-                    setVisible(false)
-                    navigation.navigate('Current Session Queue')
+                    setVisible(false);
+                    navigation.navigate('Current Session Queue');
                 }}
                 fullWidth
                 maxWidth="md"
@@ -308,7 +308,7 @@ const UpdateRecordScreen = ({ route }) => {
                                         {formState[field].toString()}
                                     </Text>
                                 </React.Fragment>
-                            )
+                            );
                         } else if (formState[field] instanceof Date) {
                             return (
                                 <React.Fragment key={index}>
@@ -324,7 +324,7 @@ const UpdateRecordScreen = ({ route }) => {
                                         {formState[field].toLocaleDateString()}
                                     </Text>
                                 </React.Fragment>
-                            )
+                            );
                         } else {
                             return (
                                 <React.Fragment key={index}>
@@ -340,7 +340,7 @@ const UpdateRecordScreen = ({ route }) => {
                                         {formState[field]}
                                     </Text>
                                 </React.Fragment>
-                            )
+                            );
                         }
                     })}
                 </DialogContent>
@@ -350,15 +350,15 @@ const UpdateRecordScreen = ({ route }) => {
                         style={{ padding: 5 }}
                         variant="contained"
                         onPress={() => {
-                            setVisible(false)
-                            navigation.navigate('Current Session Queue')
+                            setVisible(false);
+                            navigation.navigate('Current Session Queue');
                         }}
                     />
                 </DialogActions>
             </Dialog>
         </SafeAreaView>
-    )
-}
+    );
+};
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -436,6 +436,6 @@ const styles = StyleSheet.create({
     btnText: {
         fontSize: 22,
     },
-})
+});
 
-export default UpdateRecordScreen
+export default UpdateRecordScreen;

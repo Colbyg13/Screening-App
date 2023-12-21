@@ -1,6 +1,6 @@
-import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
-import { Pressable } from '@react-native-material/core'
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Pressable } from '@react-native-material/core';
 
 /**
  *
@@ -14,8 +14,8 @@ const AddOfflineRecordBtn = props => {
                 <Text style={styles.btnText}>Add Record</Text>
             </Pressable>
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     wrapper: {
@@ -36,6 +36,6 @@ const styles = StyleSheet.create({
     btnText: {
         fontSize: 22,
     },
-})
+});
 
-export default AddOfflineRecordBtn
+export default AddOfflineRecordBtn;

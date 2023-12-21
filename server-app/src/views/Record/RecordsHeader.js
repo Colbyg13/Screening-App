@@ -1,8 +1,8 @@
-import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown'
-import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp'
-import { Menu, MenuItem } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import convert from '../../utils/convert'
+import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
+import ArrowDropUpIcon from '@mui/icons-material/ArrowDropUp';
+import { Menu, MenuItem } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import convert from '../../utils/convert';
 
 export default function RecordsHeader({
     mainSortKey,
@@ -13,27 +13,27 @@ export default function RecordsHeader({
     updateFieldUnit = () => {},
     updateSortArray = () => {},
 }) {
-    const [anchorEl, setAnchorEl] = useState(null)
+    const [anchorEl, setAnchorEl] = useState(null);
     const handleClose = () => {
-        setAnchorEl(null)
-    }
+        setAnchorEl(null);
+    };
 
     useEffect(() => {
         const openMenu = e => {
-            let node = e.target
+            let node = e.target;
             while (node && node.tagName !== 'TH') {
-                node = node.parentNode
+                node = node.parentNode;
             }
-            if (node && unitConversions[node.id]) setAnchorEl(node)
-            else setAnchorEl()
-        }
+            if (node && unitConversions[node.id]) setAnchorEl(node);
+            else setAnchorEl();
+        };
 
-        window.addEventListener('contextmenu', openMenu)
+        window.addEventListener('contextmenu', openMenu);
 
         return () => {
-            window.removeEventListener('contextmenu', openMenu)
-        }
-    }, [unitConversions])
+            window.removeEventListener('contextmenu', openMenu);
+        };
+    }, [unitConversions]);
 
     return (
         <>
@@ -81,8 +81,8 @@ export default function RecordsHeader({
                             <MenuItem
                                 key={unit}
                                 onClick={() => {
-                                    updateFieldUnit(anchorEl.id, unit)
-                                    handleClose()
+                                    updateFieldUnit(anchorEl.id, unit);
+                                    handleClose();
                                 }}
                             >
                                 {unit}
@@ -90,5 +90,5 @@ export default function RecordsHeader({
                         ))}
             </Menu>
         </>
-    )
+    );
 }

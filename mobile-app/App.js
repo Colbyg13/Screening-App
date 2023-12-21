@@ -1,20 +1,20 @@
-import { Provider } from '@react-native-material/core'
-import { NavigationContainer } from '@react-navigation/native'
-import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import ServerStatus from './src/components/ServerStatus'
-import CustomDataTypesProvider from './src/contexts/CustomDataContext'
-import SessionProvider from './src/contexts/SessionContext'
-import AddToOnlineQueue from './src/screens/AddToOnlineQueue'
-import HomeScreen from './src/screens/HomeScreen'
-import IpadOfflineModeStep1 from './src/screens/Offline/IpadOfflineModeStep1'
-import OfflineAddRecordStep3 from './src/screens/Offline/OfflineAddRecordStep3'
-import OfflineRecordsScreenStep2 from './src/screens/Offline/OfflineRecordsScreenStep2'
-import OfflineUpdateRecordStep3 from './src/screens/Offline/OfflineUpdateRecordStep3'
-import QueueScreen from './src/screens/QueueScreen'
-import StationSelectionScreen from './src/screens/StationSelectionScreen'
-import UpdateRecordScreen from './src/screens/UpdateRecordScreen'
-import ServerProvider from './src/contexts/ServerContext'
-const Stack = createNativeStackNavigator()
+import { Provider } from '@react-native-material/core';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import ServerStatus from './src/components/ServerStatus';
+import CustomDataTypesProvider from './src/contexts/CustomDataContext';
+import SessionProvider from './src/contexts/SessionContext';
+import AddToOnlineQueue from './src/screens/AddToOnlineQueue';
+import HomeScreen from './src/screens/HomeScreen';
+import IpadOfflineModeStep1 from './src/screens/Offline/IpadOfflineModeStep1';
+import OfflineAddRecordStep3 from './src/screens/Offline/OfflineAddRecordStep3';
+import OfflineRecordsScreenStep2 from './src/screens/Offline/OfflineRecordsScreenStep2';
+import OfflineUpdateRecordStep3 from './src/screens/Offline/OfflineUpdateRecordStep3';
+import QueueScreen from './src/screens/QueueScreen';
+import StationSelectionScreen from './src/screens/StationSelectionScreen';
+import UpdateRecordScreen from './src/screens/UpdateRecordScreen';
+import ServerProvider from './src/contexts/ServerContext';
+const Stack = createNativeStackNavigator();
 
 export default function App() {
     return (
@@ -80,5 +80,5 @@ export default function App() {
                 </ServerProvider>
             </NavigationContainer>
         </Provider>
-    )
+    );
 }

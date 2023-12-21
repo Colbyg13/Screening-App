@@ -1,18 +1,18 @@
-import { Button, IconButton, Paper } from '@mui/material'
-import React, { useState } from 'react'
-import { useSessionContext } from '../../../contexts/SessionContext'
-import StationFields from './StationFields'
-import FileDownloadDoneIcon from '@mui/icons-material/FileDownloadDone'
-import FolderIcon from '@mui/icons-material/Folder'
-import SessionTemplateModal from './SessionTemplateModal'
-import SessionSaveTemplateModal from './SessionSaveTemplateModal'
+import { Button, IconButton, Paper } from '@mui/material';
+import React, { useState } from 'react';
+import { useSessionContext } from '../../../contexts/SessionContext';
+import StationFields from './StationFields';
+import FileDownloadDoneIcon from '@mui/icons-material/FileDownloadDone';
+import FolderIcon from '@mui/icons-material/Folder';
+import SessionTemplateModal from './SessionTemplateModal';
+import SessionSaveTemplateModal from './SessionSaveTemplateModal';
 
 export default function StationManager() {
-    const [openTemplateModal, setOpenTemplateModal] = useState(false)
-    const [openSaveTemplateModal, setOpenSaveTemplateModal] = useState(false)
+    const [openTemplateModal, setOpenTemplateModal] = useState(false);
+    const [openSaveTemplateModal, setOpenSaveTemplateModal] = useState(false);
 
     const { sessionInfo, addStation, deleteStation, addField, updateField, deleteField } =
-        useSessionContext()
+        useSessionContext();
 
     return (
         <div className="h-screen flex flex-col p-8 pb-16 items-center overflow-y-scroll">
@@ -66,5 +66,5 @@ export default function StationManager() {
                 </div>
             </Paper>
         </div>
-    )
+    );
 }

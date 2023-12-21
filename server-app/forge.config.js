@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config();
 module.exports = {
     packagerConfig: {
         shortcuts: {
@@ -85,4 +85,4 @@ module.exports = {
             },
         },
     ],
-}
+};

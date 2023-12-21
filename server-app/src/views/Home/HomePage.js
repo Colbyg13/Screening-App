@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { ROUTES } from '../../components/Navbar/Navbar'
-import HomeLinkButton from './HomeLinkButton'
-import img from '../../assets/healthylogo.png'
-import { useSessionContext } from '../../contexts/SessionContext'
+import React, { useEffect, useState } from 'react';
+import { ROUTES } from '../../components/Navbar/Navbar';
+import HomeLinkButton from './HomeLinkButton';
+import img from '../../assets/healthylogo.png';
+import { useSessionContext } from '../../contexts/SessionContext';
 
 export default function HomePage() {
-    const { isConnectedToDB } = useSessionContext()
+    const { isConnectedToDB } = useSessionContext();
 
     return (
         <div className="w-full h-full overflow-y-auto pb-16 p-8 flex flex-col space-y-8">
@@ -115,5 +115,5 @@ export default function HomePage() {
                 </div>
             </div>
         </div>
-    )
+    );
 }

@@ -1,10 +1,10 @@
-import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
-import { Pressable } from '@react-native-material/core'
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Pressable } from '@react-native-material/core';
 
 //Returns an offline record item showing the ID and the name if present
 const OfflineRecordItem = props => {
-    const person = props.item
+    const person = props.item;
     return (
         <Pressable key={person.id} style={styles.item} onPress={props.onPress}>
             <View style={styles.innerContent}>
@@ -18,8 +18,8 @@ const OfflineRecordItem = props => {
                 </View>
             </View>
         </Pressable>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     item: {
@@ -57,6 +57,6 @@ const styles = StyleSheet.create({
         display: 'flex',
         justifyContent: 'center',
     },
-})
+});
 
-export default OfflineRecordItem
+export default OfflineRecordItem;

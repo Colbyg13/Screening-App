@@ -1,5 +1,5 @@
-import { Box, Button, CircularProgress, Modal, TextField, Typography } from '@mui/material'
-import React, { useState } from 'react'
+import { Box, Button, CircularProgress, Modal, TextField, Typography } from '@mui/material';
+import React, { useState } from 'react';
 
 export default function ConfirmModal({
     open,
@@ -10,9 +10,9 @@ export default function ConfirmModal({
     onClose,
     onSubmit,
 }) {
-    const [input, setInput] = useState('')
-    const canPerformAction = !deadmanText || input === deadmanText
-    const [loading, setLoading] = useState(false)
+    const [input, setInput] = useState('');
+    const canPerformAction = !deadmanText || input === deadmanText;
+    const [loading, setLoading] = useState(false);
 
     return (
         <Modal
@@ -65,10 +65,10 @@ export default function ConfirmModal({
                         variant="contained"
                         disabled={!canPerformAction}
                         onClick={async () => {
-                            setLoading(true)
-                            await onSubmit()
-                            setLoading(false)
-                            onClose()
+                            setLoading(true);
+                            await onSubmit();
+                            setLoading(false);
+                            onClose();
                         }}
                     >
                         {loading ? <CircularProgress size={24} /> : null}
@@ -77,5 +77,5 @@ export default function ConfirmModal({
                 </div>
             </Box>
         </Modal>
-    )
+    );
 }

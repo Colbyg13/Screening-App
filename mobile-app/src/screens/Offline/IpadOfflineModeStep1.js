@@ -1,11 +1,11 @@
-import React from 'react'
-import { useState, useEffect } from 'react'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { SafeAreaView, Text, View, ScrollView, FlatList, StyleSheet } from 'react-native'
-import { styles } from '../../style/styles'
-import OfflineStationDataTypeItem from '../../components/OfflineStationDataTypeItem'
-import NextButton from '../../components/NextButton'
-import AddDataTypeButton from '../../components/AddDataTypeButton'
+import React from 'react';
+import { useState, useEffect } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { SafeAreaView, Text, View, ScrollView, FlatList, StyleSheet } from 'react-native';
+import { styles } from '../../style/styles';
+import OfflineStationDataTypeItem from '../../components/OfflineStationDataTypeItem';
+import NextButton from '../../components/NextButton';
+import AddDataTypeButton from '../../components/AddDataTypeButton';
 import {
     Provider,
     Button,
@@ -14,25 +14,25 @@ import {
     DialogContent,
     DialogActions,
     TextInput,
-} from '@react-native-material/core'
-import SelectDropdown from 'react-native-select-dropdown'
-import { useCustomDataTypesContext } from '../../contexts/CustomDataContext'
+} from '@react-native-material/core';
+import SelectDropdown from 'react-native-select-dropdown';
+import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 
-const originalTypes = ['string', 'number', 'date', 'bool']
+const originalTypes = ['string', 'number', 'date', 'bool'];
 const IpadOfflineModeStep1 = ({ route, navigation }) => {
-    const { customDataTypes } = useCustomDataTypesContext()
-    const [standardDataTypes, setStandardDataTypes] = useState([]) //list of standard types from async storage
-    const [selectedDataTypes, setSelectedDataTypes] = useState([]) //list of selected types based on switch
-    const [isVisible, setIsVisible] = useState(false) //disable next button until at least one type is selected
-    const STATION_FIELDS_STORAGE_KEY = 'sessionFields'
+    const { customDataTypes } = useCustomDataTypesContext();
+    const [standardDataTypes, setStandardDataTypes] = useState([]); //list of standard types from async storage
+    const [selectedDataTypes, setSelectedDataTypes] = useState([]); //list of selected types based on switch
+    const [isVisible, setIsVisible] = useState(false); //disable next button until at least one type is selected
+    const STATION_FIELDS_STORAGE_KEY = 'sessionFields';
 
     //new data type dialog variables
-    const [addNewTypeIsVisible, setAddNewTypeIsVisible] = useState(false)
-    const [newFieldName, setNewFieldName] = useState('')
-    const [newFieldKey, setNewFieldKey] = useState('')
-    const [newFieldType, setNewFieldType] = useState('')
-    const [needToStoreNewType, setNeedToStoreNewType] = useState(false)
-    const [showDuplicateError, setShowDuplicateError] = useState(false)
+    const [addNewTypeIsVisible, setAddNewTypeIsVisible] = useState(false);
+    const [newFieldName, setNewFieldName] = useState('');
+    const [newFieldKey, setNewFieldKey] = useState('');
+    const [newFieldType, setNewFieldType] = useState('');
+    const [needToStoreNewType, setNeedToStoreNewType] = useState(false);
+    const [showDuplicateError, setShowDuplicateError] = useState(false);
 
     useEffect(() => {
         // initially get custom data from async storage
@@ -40,17 +40,17 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
             // if there are custom Data types, then we don't want to override it because it came from the DB already
             .then(storedFieldsString =>
                 setStandardDataTypes(dataTypes => JSON.parse(storedFieldsString) || []),
-            )
-    }, [])
+            );
+    }, []);
 
     //   AsyncStorage.removeItem(SELECTED_DATA_TYPES_STORAGE_KEY);
     // }, []);
 
     const renderDataTypes = item => {
-        const data = item.item
-        let isCustom = checkIsCustom(data)
+        const data = item.item;
+        let isCustom = checkIsCustom(data);
         if (isCustom) {
-            let customData = customDataTypes.find(dataType => dataType.type === data.name)
+            let customData = customDataTypes.find(dataType => dataType.type === data.name);
 
             return (
                 <OfflineStationDataTypeItem
@@ -60,7 +60,7 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
                     type="custom"
                     customData={customData}
                 />
-            )
+            );
         } else {
             return (
                 <OfflineStationDataTypeItem
@@ -69,19 +69,19 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
                     handleSelection={handleSelection}
                     type="standard"
                 />
-            )
+            );
         }
-    }
+    };
 
     const handleSelection = (data, value) => {
         if (value) {
             //if the switch is on, add the data type to the list
-            setSelectedDataTypes(prevState => [...prevState, data])
+            setSelectedDataTypes(prevState => [...prevState, data]);
         } else {
             //if the switch is off, remove the data type from the list
-            setSelectedDataTypes(prevState => prevState.filter(item => item.name !== data.name))
+            setSelectedDataTypes(prevState => prevState.filter(item => item.name !== data.name));
         }
-    }
+    };
 
     const checkIsCustom = field => {
         if (
@@ -90,78 +90,78 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
             field.type === 'bool' ||
             field.type === 'date'
         ) {
-            return false
+            return false;
         } else {
-            return true
+            return true;
         }
-    }
+    };
 
     const handleNextPress = () => {
         if (selectedDataTypes.length >= 1) {
             navigation.navigate('Offline Records', {
                 selectedDataTypes,
                 customDataTypes,
-            })
+            });
         } else {
-            setIsVisible(prevState => !prevState)
+            setIsVisible(prevState => !prevState);
         }
-    }
+    };
 
     handleAddTypePress = () => {
-        setAddNewTypeIsVisible(prevState => !prevState)
-    }
+        setAddNewTypeIsVisible(prevState => !prevState);
+    };
 
     const handleDismiss = () => {
-        setIsVisible(prevState => !prevState)
-    }
+        setIsVisible(prevState => !prevState);
+    };
 
     const handleNewTypeSubmit = () => {
         //check if newField name, key, and type are not empty
 
         if (newFieldName !== '' && newFieldKey !== '' && newFieldType !== '') {
             //check if newType name is not already in the list
-            let isDuplicate = standardDataTypes.find(type => type.key === newFieldKey.trim())
+            let isDuplicate = standardDataTypes.find(type => type.key === newFieldKey.trim());
             if (isDuplicate) {
-                setShowDuplicateError(true)
+                setShowDuplicateError(true);
             } else {
-                setShowDuplicateError(false)
+                setShowDuplicateError(false);
                 let newType = {
                     name: newFieldName,
                     key: newFieldKey,
                     type: newFieldType,
-                }
-                setStandardDataTypes(prevState => [...prevState, newType])
-                setNeedToStoreNewType(true)
-                setAddNewTypeIsVisible(prevState => !prevState)
-                setNewFieldName('')
-                setNewFieldKey('')
-                setNewFieldType('')
+                };
+                setStandardDataTypes(prevState => [...prevState, newType]);
+                setNeedToStoreNewType(true);
+                setAddNewTypeIsVisible(prevState => !prevState);
+                setNewFieldName('');
+                setNewFieldKey('');
+                setNewFieldType('');
             }
         }
-    }
+    };
 
     useEffect(() => {
         if (needToStoreNewType) {
-            storeStandardTypes()
+            storeStandardTypes();
         } else {
-            return
+            return;
         }
-    }, [needToStoreNewType])
+    }, [needToStoreNewType]);
 
     const storeStandardTypes = async () => {
         if (standardDataTypes.length > 0) {
             try {
                 const sorted = standardDataTypes.sort((a, b) => {
-                    return a.key.localeCompare(b.key)
-                })
-                const jsonValue = JSON.stringify(sorted)
-                await AsyncStorage.setItem(STATION_FIELDS_STORAGE_KEY, jsonValue)
-                setNeedToStoreNewType(false)
+                    return a.key.localeCompare(b.key);
+                });
+                const jsonValue = JSON.stringify(sorted);
+                await AsyncStorage.setItem(STATION_FIELDS_STORAGE_KEY, jsonValue);
+                setNeedToStoreNewType(false);
             } catch (error) {
-                console.log('error storing standard types', error)
+                console.log('error storing standard types', error);
             }
-        } else return
-    }
+        } else return;
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -215,8 +215,8 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
                             <View>
                                 <TextInput
                                     onChangeText={newText => {
-                                        setNewFieldName(newText)
-                                        setNewFieldKey(newText.toLowerCase())
+                                        setNewFieldName(newText);
+                                        setNewFieldKey(newText.toLowerCase());
                                     }}
                                     style={styles.fieldInput}
                                 ></TextInput>
@@ -227,15 +227,15 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
                                         buttonStyle={{ width: '75%' }}
                                         data={originalTypes}
                                         onSelect={(selectedItem, index) => {
-                                            setNewFieldType(selectedItem)
+                                            setNewFieldType(selectedItem);
                                         }}
                                         rowTextForSelection={(item, index) => {
                                             // text represented for each item in dropdown
                                             // if data array is an array of objects then return item.property to represent item in dropdown
-                                            return item
+                                            return item;
                                         }}
                                         keyExtractor={(item, index) => {
-                                            return item.key
+                                            return item.key;
                                         }}
                                     />
                                 </View>
@@ -247,11 +247,11 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
                                 compact
                                 color="#FF6464"
                                 onPress={() => {
-                                    setAddNewTypeIsVisible(false)
-                                    setShowDuplicateError(false)
-                                    setNewFieldName('')
-                                    setNewFieldKey('')
-                                    setNewFieldType('')
+                                    setAddNewTypeIsVisible(false);
+                                    setShowDuplicateError(false);
+                                    setNewFieldName('');
+                                    setNewFieldKey('');
+                                    setNewFieldType('');
                                 }}
                             />
                             <Button
@@ -266,8 +266,8 @@ const IpadOfflineModeStep1 = ({ route, navigation }) => {
                 </View>
             </View>
         </SafeAreaView>
-    )
-}
+    );
+};
 
 const ButtonStyles = StyleSheet.create({
     buttonWrapper: {
@@ -276,6 +276,6 @@ const ButtonStyles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-around',
     },
-})
+});
 
-export default IpadOfflineModeStep1
+export default IpadOfflineModeStep1;

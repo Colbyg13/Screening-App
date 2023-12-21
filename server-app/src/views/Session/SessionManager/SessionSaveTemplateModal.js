@@ -1,17 +1,17 @@
-import { Box, Button, Modal, TextField, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import { useSessionContext } from '../../../contexts/SessionContext'
+import { Box, Button, Modal, TextField, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { useSessionContext } from '../../../contexts/SessionContext';
 
 export default function SessionSaveTemplateModal({ open, onClose }) {
-    const { saveSessionTemplate } = useSessionContext()
+    const { saveSessionTemplate } = useSessionContext();
 
-    const [name, setName] = useState('')
+    const [name, setName] = useState('');
 
     useEffect(() => {
         if (open) {
-            setName('')
+            setName('');
         }
-    }, [open])
+    }, [open]);
 
     return (
         <Modal
@@ -62,8 +62,8 @@ export default function SessionSaveTemplateModal({ open, onClose }) {
                             variant="contained"
                             disabled={!name}
                             onClick={async () => {
-                                await saveSessionTemplate({ name })
-                                onClose()
+                                await saveSessionTemplate({ name });
+                                onClose();
                             }}
                         >
                             Save
@@ -72,5 +72,5 @@ export default function SessionSaveTemplateModal({ open, onClose }) {
                 </div>
             </Box>
         </Modal>
-    )
+    );
 }

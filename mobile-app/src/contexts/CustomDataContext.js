@@ -1,24 +1,24 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import axios from 'axios'
-import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-import { useServerContext } from './ServerContext'
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { createContext, useContext, useEffect, useMemo, useState } from 'react';
+import { useServerContext } from './ServerContext';
 
-const CUSTOM_DATA_STORAGE_KEY = 'customData'
+const CUSTOM_DATA_STORAGE_KEY = 'customData';
 
 const CustomDataTypesContext = createContext({
     loading: false,
     customDataTypes: [],
     customDataTypeMap: {},
     fetchData: () => {},
-})
+});
 
-export const useCustomDataTypesContext = () => useContext(CustomDataTypesContext)
+export const useCustomDataTypesContext = () => useContext(CustomDataTypesContext);
 
 export default function CustomDataTypesProvider({ children }) {
-    const { serverIp } = useServerContext()
+    const { serverIp } = useServerContext();
 
-    const [customDataTypes, setCustomDataTypes] = useState([])
-    const [loading, setLoading] = useState(false)
+    const [customDataTypes, setCustomDataTypes] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const customDataTypeMap = useMemo(
         () =>
@@ -30,7 +30,7 @@ export default function CustomDataTypesProvider({ children }) {
                 {},
             ),
         [customDataTypes],
-    )
+    );
 
     //Grabs custom data information from Local Storage.
     useEffect(() => {
@@ -43,39 +43,39 @@ export default function CustomDataTypesProvider({ children }) {
                         ? customDataTypes
                         : JSON.parse(storedCustomDataString) || [],
                 ),
-            )
-    }, [])
+            );
+    }, []);
 
     useEffect(() => {
         // saves the new custom data types into Async Storage
         if (customDataTypes.length)
-            AsyncStorage.setItem(CUSTOM_DATA_STORAGE_KEY, JSON.stringify(customDataTypes))
-    }, [customDataTypes])
+            AsyncStorage.setItem(CUSTOM_DATA_STORAGE_KEY, JSON.stringify(customDataTypes));
+    }, [customDataTypes]);
 
     useEffect(() => {
         // gets data from db and uses that
-        if (serverIp) fetchData()
-    }, [serverIp])
+        if (serverIp) fetchData();
+    }, [serverIp]);
     //Grabs custom data information directly from the database.
     async function fetchData() {
-        setLoading(true)
+        setLoading(true);
         try {
-            const url = `${serverIp}/api/v1/dataTypes`
+            const url = `${serverIp}/api/v1/dataTypes`;
             const { data: customDataTypes = [] } = await axios.get(url, {
                 headers: {
                     'Cache-Control': 'no-cache',
                     Pragma: 'no-cache',
                     Expires: '0',
                 },
-            })
+            });
             if (customDataTypes) {
-                setCustomDataTypes(customDataTypes)
+                setCustomDataTypes(customDataTypes);
             } else {
-                console.warn('Could not retrieve custom data types.')
+                console.warn('Could not retrieve custom data types.');
             }
-            setLoading(false)
+            setLoading(false);
         } catch (err) {
-            console.warn({ err })
+            console.warn({ err });
         }
     }
     return (
@@ -89,5 +89,5 @@ export default function CustomDataTypesProvider({ children }) {
         >
             {children}
         </CustomDataTypesContext.Provider>
-    )
+    );
 }

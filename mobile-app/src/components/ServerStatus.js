@@ -7,28 +7,28 @@ import {
     DialogContent,
     DialogHeader,
     TextInput,
-} from '@react-native-material/core'
-import React, { useState } from 'react'
-import { Text } from 'react-native'
-import { useSessionContext } from '../contexts/SessionContext'
-import { useServerContext } from '../contexts/ServerContext'
+} from '@react-native-material/core';
+import React, { useState } from 'react';
+import { Text } from 'react-native';
+import { useSessionContext } from '../contexts/SessionContext';
+import { useServerContext } from '../contexts/ServerContext';
 
 //Shows if you are connected or not. Long press allows you to type in IP address.
 export default function ServerStatus() {
-    const { serverLoading, tryFindingServer } = useServerContext()
+    const { serverLoading, tryFindingServer } = useServerContext();
 
-    const { isConnected, sessionIsRunning } = useSessionContext()
+    const { isConnected, sessionIsRunning } = useSessionContext();
 
-    const [showModal, setShowModal] = useState(false)
-    const [ipAddress, setIpAddress] = useState('')
+    const [showModal, setShowModal] = useState(false);
+    const [ipAddress, setIpAddress] = useState('');
 
     const handleLongPress = () => {
-        if (!serverLoading) tryFindingServer()
-    }
+        if (!serverLoading) tryFindingServer();
+    };
 
     const handleOnPress = () => {
-        setShowModal(true)
-    }
+        setShowModal(true);
+    };
 
     return (
         <>
@@ -50,8 +50,8 @@ export default function ServerStatus() {
                         variant="outlined"
                         title="Connect"
                         onPress={() => {
-                            tryFindingServer(ipAddress)
-                            setShowModal(false)
+                            tryFindingServer(ipAddress);
+                            setShowModal(false);
                         }}
                     />
                 </DialogActions>
@@ -73,5 +73,5 @@ export default function ServerStatus() {
                 <Text>{sessionIsRunning ? 'started' : isConnected ? 'connected' : 'offline'}</Text>
             </Chip>
         </>
-    )
+    );
 }

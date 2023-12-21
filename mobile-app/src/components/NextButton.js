@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
-import { Pressable } from '@react-native-material/core'
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Pressable } from '@react-native-material/core';
 
 /**
  *
@@ -14,8 +14,8 @@ const NextButton = props => {
                 <Text style={styles.btnText}>Next</Text>
             </Pressable>
         </View>
-    )
-}
+    );
+};
 const styles = StyleSheet.create({
     wrapper: {
         flex: 1,
@@ -34,6 +34,6 @@ const styles = StyleSheet.create({
     btnText: {
         fontSize: 22,
     },
-})
+});
 
-export default NextButton
+export default NextButton;

@@ -1,7 +1,7 @@
-import { MenuItem, Switch, TextField } from '@mui/material'
-import React from 'react'
-import { SESSION_DATA_TYPES } from '../../constants/session-data-types'
-import { useCustomDataTypesContext } from '../../contexts/CustomDataContext'
+import { MenuItem, Switch, TextField } from '@mui/material';
+import React from 'react';
+import { SESSION_DATA_TYPES } from '../../constants/session-data-types';
+import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 
 export default function RecordModalInputRow({
     fieldKeyMap,
@@ -11,17 +11,17 @@ export default function RecordModalInputRow({
     update,
     onChange,
 }) {
-    const { customDataTypeMap, fullCustomDataTypeMap } = useCustomDataTypesContext()
+    const { customDataTypeMap, fullCustomDataTypeMap } = useCustomDataTypesContext();
 
-    const { type: fieldType, name: fieldName } = fieldKeyMap[fieldKey] || {}
+    const { type: fieldType, name: fieldName } = fieldKeyMap[fieldKey] || {};
 
-    const label = fieldName || fieldKey
-    const customDataType = customDataTypeMap[fieldType]
-    const unit = unitConversions[fieldKey]
-    const hasUnitConversion = !!unit
-    const fieldPostfix = hasUnitConversion ? `(${unit})` : ''
+    const label = fieldName || fieldKey;
+    const customDataType = customDataTypeMap[fieldType];
+    const unit = unitConversions[fieldKey];
+    const hasUnitConversion = !!unit;
+    const fieldPostfix = hasUnitConversion ? `(${unit})` : '';
 
-    const title = `${label} ${fieldPostfix}`
+    const title = `${label} ${fieldPostfix}`;
     // checks update first
     const value =
         update[fieldKey] === undefined
@@ -29,7 +29,7 @@ export default function RecordModalInputRow({
               record?.[fieldKey] === undefined
                 ? ''
                 : record[fieldKey]
-            : update[fieldKey]
+            : update[fieldKey];
 
     return (
         <div className="flex">
@@ -74,8 +74,8 @@ export default function RecordModalInputRow({
                     value={formatDate(value)}
                     onChange={({ target: { value } }) => {
                         if (value) {
-                            const [year, month, day] = value.split('-')
-                            onChange(new Date(year, parseInt(month) - 1, day))
+                            const [year, month, day] = value.split('-');
+                            onChange(new Date(year, parseInt(month) - 1, day));
                         }
                     }}
                 />
@@ -91,18 +91,18 @@ export default function RecordModalInputRow({
                 />
             )}
         </div>
-    )
+    );
 }
 
 function formatDate(date) {
-    const d = date instanceof Date ? date : new Date(date)
+    const d = date instanceof Date ? date : new Date(date);
 
-    let month = '' + (d.getMonth() + 1)
-    let day = '' + d.getDate()
-    let year = d.getFullYear()
+    let month = '' + (d.getMonth() + 1);
+    let day = '' + d.getDate();
+    let year = d.getFullYear();
 
-    if (month.length < 2) month = '0' + month
-    if (day.length < 2) day = '0' + day
+    if (month.length < 2) month = '0' + month;
+    if (day.length < 2) day = '0' + day;
 
-    return [year, month, day].join('-')
+    return [year, month, day].join('-');
 }

@@ -1,9 +1,9 @@
-import { TextField } from '@mui/material'
-import React from 'react'
+import { TextField } from '@mui/material';
+import React from 'react';
 import {
     ALL_SESSION_DATA_TYPES,
     SESSION_DATA_TYPE_LABELS,
-} from '../../constants/session-data-types'
+} from '../../constants/session-data-types';
 
 export default function BaseFields() {
     return (
@@ -21,5 +21,5 @@ export default function BaseFields() {
                 ))}
             </div>
         </div>
-    )
+    );
 }

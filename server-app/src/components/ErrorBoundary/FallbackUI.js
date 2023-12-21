@@ -1,14 +1,14 @@
-import React from 'react'
-import { useNavigate } from 'react-router-dom'
-import { ROUTES } from '../Navbar/Navbar'
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../Navbar/Navbar';
 
 export default function FallbackUI({ error = '' }) {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
 
     const onClick = () => {
-        window.location.reload(true)
-        navigate(ROUTES.Home, { state: { forceRefresh: true } })
-    }
+        window.location.reload(true);
+        navigate(ROUTES.Home, { state: { forceRefresh: true } });
+    };
 
     return (
         <div className="h-screen w-screen bg-gray-200 flex flex-col justify-center items-center text-lg text-red-600 space-y-8">
@@ -18,5 +18,5 @@ export default function FallbackUI({ error = '' }) {
                 Refresh App
             </button>
         </div>
-    )
+    );
 }
