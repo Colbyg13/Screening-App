@@ -49,7 +49,7 @@ export default function RecordTitleBar({ unitConversions = {}, updateSearch, all
                 variant="contained"
                 type="button"
                 disabled={downloading || !totalRecordCount}
-                onClick={async () => {
+                onClick={() => {
                     try {
                         const outputPath = window.api.showSaveDialog();
                         if (outputPath) {
@@ -63,6 +63,7 @@ export default function RecordTitleBar({ unitConversions = {}, updateSearch, all
                                         message: 'Your download is complete.',
                                         type: 'info',
                                     });
+                                    window.api.openFile(outputPath);
                                 })
                                 .catch(err => {
                                     setDownloading(false);
