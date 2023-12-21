@@ -1,5 +1,6 @@
-import { Button, TextField } from '@mui/material';
-import React, { useState } from 'react';
+import { Button, FormControlLabel, TextField } from '@mui/material';
+import Switch from '@mui/material/Switch';
+import React, { useEffect, useState } from 'react';
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
 import { useSessionContext } from '../../contexts/SessionContext';
 
@@ -7,6 +8,22 @@ export default function Settings() {
     const [showDeleteRecordModal, setShowDeleteRecordModal] = useState(false);
     const [showFactoryResetModal, setShowFactoryResetModal] = useState(false);
     const { sessionIsRunning } = useSessionContext();
+
+    const [preventSleep, setPreventSleep] = useState(true);
+
+    useEffect(() => {
+        async function getPreventSleep() {
+            try {
+                const preventSleep = await window.api.getPreventSleep();
+                console.log({ preventSleep });
+                setPreventSleep(preventSleep);
+            } catch (err) {
+                console.error(`Could not get prevent sleep value ${err}`);
+            }
+        }
+
+        getPreventSleep();
+    }, []);
 
     return (
         <div className="flex w-full max-h-screen px-8 pt-8 pb-16 space-x-8 overflow-auto">
@@ -50,6 +67,24 @@ export default function Settings() {
                     <h2 className="text-xl mt-4 mb-2">Developers</h2>
                     <div>Andrew Giles - andrewgiles@gilezapps.com</div>
                     <div>Colby Gardiner - colbygardiner13@gmail.com</div>
+                </div>
+                <div>
+                    <h2 className="text-xl mt-4 mb-2">Device Settings</h2>
+                    <FormControlLabel
+                        control={
+                            <Switch
+                                name="disable-sleep"
+                                inputProps={{ 'aria-label': 'controlled' }}
+                                checked={preventSleep}
+                                onChange={e => {
+                                    const preventSleep = e.target.checked;
+                                    setPreventSleep(preventSleep);
+                                    window.api.setPreventSleep(preventSleep);
+                                }}
+                            />
+                        }
+                        label="Disable Computer Sleeping"
+                    />
                 </div>
                 <div>
                     <h2 className="text-xl mt-4 mb-2 text-red-600">Danger Zone</h2>

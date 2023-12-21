@@ -157,4 +157,17 @@ contextBridge.exposeInMainWorld('api', {
                 reject('An error occurred when trying to download the records.');
             });
         }),
+    getPreventSleep: async () => {
+        try {
+            return await ipcRenderer.invoke('get-prevent-sleep');
+        } catch (err) {
+            writeLog(
+                LOG_LEVEL.ERROR,
+                `An error occurred when trying to get prevent sleep value: ${err}`,
+            );
+        }
+    },
+    setPreventSleep: preventSleep => {
+        ipcRenderer.send('set-prevent-sleep', preventSleep);
+    },
 });
