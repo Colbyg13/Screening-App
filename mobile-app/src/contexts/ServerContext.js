@@ -1,41 +1,41 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createContext, useContext, useEffect, useState } from "react";
-import { io } from "socket.io-client";
-import findServer, { PREVIOUS_CONNECTION_STORAGE_KEY } from "../utils/find-server";
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { createContext, useContext, useEffect, useState } from 'react'
+import { io } from 'socket.io-client'
+import findServer, { PREVIOUS_CONNECTION_STORAGE_KEY } from '../utils/find-server'
 
-export const SERVER_PORT = 3333;
+export const SERVER_PORT = 3333
 
 const ServerContext = createContext({
     serverIp: '',
     serverLoading: false,
-    tryFindingServer: () => { },
-});
+    tryFindingServer: () => {},
+})
 
-export const useServerContext = () => useContext(ServerContext);
+export const useServerContext = () => useContext(ServerContext)
 
 export default function ServerProvider({ children }) {
-
-    const [serverLoading, setServerLoading] = useState(false);
-    const [serverIp, setServerIp] = useState();
+    const [serverLoading, setServerLoading] = useState(false)
+    const [serverIp, setServerIp] = useState()
 
     useEffect(() => {
-        tryFindingServer();
-    }, []);
-
+        tryFindingServer()
+    }, [])
 
     async function tryFindingServer(ipAddress) {
-        setServerLoading(true);
+        setServerLoading(true)
         try {
-            const serverIp = ipAddress ? `http://${ipAddress}:3333` : await findServer(SERVER_PORT, 'api/v1/server')
+            const serverIp = ipAddress
+                ? `http://${ipAddress}:3333`
+                : await findServer(SERVER_PORT, 'api/v1/server')
             if (serverIp) {
-                AsyncStorage.setItem(PREVIOUS_CONNECTION_STORAGE_KEY, serverIp);
-                console.log(`Server found on: ${serverIp}`);
-                setServerIp(serverIp);
+                AsyncStorage.setItem(PREVIOUS_CONNECTION_STORAGE_KEY, serverIp)
+                console.log(`Server found on: ${serverIp}`)
+                setServerIp(serverIp)
             }
         } catch (error) {
-            console.warn(error);
+            console.warn(error)
         } finally {
-            setServerLoading(false);
+            setServerLoading(false)
         }
     }
 
@@ -49,5 +49,5 @@ export default function ServerProvider({ children }) {
         >
             {children}
         </ServerContext.Provider>
-    );
+    )
 }

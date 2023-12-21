@@ -1,8 +1,8 @@
-import useFields from './useFields';
-import useRecords from './useRecords';
-import useSearch from './useSearch';
-import useSort from './useSort';
-import useUnitConversion from './useUnitConversion';
+import useFields from './useFields'
+import useRecords from './useRecords'
+import useSearch from './useSearch'
+import useSort from './useSort'
+import useUnitConversion from './useUnitConversion'
 
 export default function useRecordsManager() {
     const {
@@ -11,23 +11,19 @@ export default function useRecordsManager() {
         allFields,
         allFieldKeys,
         fieldKeyMap,
-    } = useFields();
+    } = useFields()
 
-    const {
-        sort,
-        mainSortKey,
-        updateSortArray,
-    } = useSort({ allFieldKeys });
+    const { sort, mainSortKey, updateSortArray } = useSort({ allFieldKeys })
 
-    const { search, updateSearch } = useSearch();
+    const { search, updateSearch } = useSearch()
 
     const {
         loading: loadingUnitConversion,
         unitConversions,
         updateFieldUnit,
-    } = useUnitConversion({ allFields });
+    } = useUnitConversion({ allFields })
 
-    const dependenciesLoaded = (!loadingUnitConversion && !fieldsLoading);
+    const dependenciesLoaded = !loadingUnitConversion && !fieldsLoading
 
     const {
         loading: loadingRecords,
@@ -38,25 +34,17 @@ export default function useRecordsManager() {
         selectRecord,
         updateRecord,
         deleteRecord,
-    } = useRecords({ search, sort, unitConversions, dependenciesLoaded });
-
+    } = useRecords({ search, sort, unitConversions, dependenciesLoaded })
 
     function handleScroll(e) {
+        const { target: { scrollHeight, clientHeight, scrollTop } = {} } = e
 
-        const {
-            target: {
-                scrollHeight,
-                clientHeight,
-                scrollTop,
-            } = {},
-        } = e;
-
-        const margin = 100;
+        const margin = 100
         // loads more when reaching the end of the page
-        const bottom = scrollHeight - scrollTop - margin <= clientHeight;
+        const bottom = scrollHeight - scrollTop - margin <= clientHeight
 
         if (!loadingRecords && !atEndOfRecords && bottom) {
-            getNextPage();
+            getNextPage()
         }
     }
 
@@ -88,5 +76,5 @@ export default function useRecordsManager() {
         updateRecord,
         deleteRecord,
         handleScroll,
-    };
+    }
 }

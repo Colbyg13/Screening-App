@@ -9,7 +9,7 @@ export default function RecordList({
     handleRecordClick,
 }) {
     return (
-        <tbody className=''>
+        <tbody className="">
             {records.map((record, i) => (
                 <RecordItem
                     key={record.id}
@@ -22,5 +22,5 @@ export default function RecordList({
                 />
             ))}
         </tbody>
-    );
+    )
 }
