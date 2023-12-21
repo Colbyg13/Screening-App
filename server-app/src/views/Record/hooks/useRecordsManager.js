@@ -34,6 +34,7 @@ export default function useRecordsManager() {
         selectRecord,
         updateRecord,
         deleteRecord,
+        refreshRecords,
     } = useRecords({ search, sort, unitConversions, dependenciesLoaded });
 
     function handleScroll(e) {
@@ -76,5 +77,6 @@ export default function useRecordsManager() {
         updateRecord,
         deleteRecord,
         handleScroll,
+        refreshRecords,
     };
 }

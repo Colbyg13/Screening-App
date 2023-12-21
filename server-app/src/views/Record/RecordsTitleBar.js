@@ -1,16 +1,34 @@
-import { Button, CircularProgress } from '@mui/material';
+import { Button, CircularProgress, IconButton } from '@mui/material';
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { LOG_LEVEL } from '../../constants/log-levels';
 import { serverURL } from '../../constants/server';
 import { useSnackBarContext } from '../../contexts/SnackbarContext';
 import RecordSearch from './RecordSearch';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
-export default function RecordTitleBar({ unitConversions = {}, updateSearch, allFieldKeys }) {
+export default function RecordTitleBar({
+    unitConversions = {},
+    updateSearch,
+    allFieldKeys,
+    loadingRecords,
+    refreshRecords = () => {},
+}) {
     const { addSnackBar } = useSnackBarContext();
 
+    const [displayRefresh, setDisplayRefresh] = useState(false);
+    const [refreshing, setRefreshing] = useState(false);
     const [downloading, setDownloading] = useState(false);
     const [totalRecordCount, setTotalRecordCount] = useState();
+
+    useEffect(() => {
+        if (!refreshing && displayRefresh && loadingRecords) {
+            setRefreshing(true);
+            setTimeout(() => {
+                setRefreshing(false);
+            }, 1000);
+        }
+    }, [loadingRecords, displayRefresh, refreshing]);
 
     useEffect(() => {
         getRecordCount();
@@ -41,6 +59,19 @@ export default function RecordTitleBar({ unitConversions = {}, updateSearch, all
                 <span>
                     {totalRecordCount ? `(${totalRecordCount.toLocaleString()} total)` : ''}
                 </span>
+                <button
+                    className="px-1 pb-0.5 bg-gray-200 hover:bg-gray-50 shadow-lg hover:shadow-xl transition-colors duration-200 rounded-md cursor-pointer"
+                    type="button"
+                    onClick={() => {
+                        setDisplayRefresh(true);
+                        refreshRecords();
+                    }}
+                >
+                    <RefreshIcon
+                        className={refreshing ? 'animate-spin' : ''}
+                        style={{ color: 'black', width: 20, height: 20 }}
+                    />
+                </button>
             </span>
             <RecordSearch updateSearch={updateSearch} />
             <Button
