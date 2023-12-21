@@ -1,9 +1,9 @@
-import React from 'react'
-import { USER_LOG_COLORS } from '../../../constants/log-types'
-import { useSessionContext } from '../../../contexts/SessionContext'
+import React from 'react';
+import { USER_LOG_COLORS } from '../../../constants/log-types';
+import { useSessionContext } from '../../../contexts/SessionContext';
 
 export default function SessionInfoConsole() {
-    const { sessionLogs = [] } = useSessionContext()
+    const { sessionLogs = [] } = useSessionContext();
 
     return (
         <div className="max-h-full w-96 overflow-y-hidden bg-gray-900 text-gray-50">
@@ -18,5 +18,5 @@ export default function SessionInfoConsole() {
                 ))}
             </div>
         </div>
-    )
+    );
 }

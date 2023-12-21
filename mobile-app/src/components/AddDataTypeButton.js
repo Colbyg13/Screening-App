@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet } from 'react-native'
-import { Pressable } from '@react-native-material/core'
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Pressable } from '@react-native-material/core';
 
 /**returns a button that opens a modal in the offlineStep1 to add a new data type. */
 const AddDataTypeButton = props => {
@@ -10,8 +10,8 @@ const AddDataTypeButton = props => {
                 <Text style={styles.btnText}>+ Data Type</Text>
             </Pressable>
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     btn: {
@@ -28,6 +28,6 @@ const styles = StyleSheet.create({
     btnText: {
         fontSize: 22,
     },
-})
+});
 
-export default AddDataTypeButton
+export default AddDataTypeButton;

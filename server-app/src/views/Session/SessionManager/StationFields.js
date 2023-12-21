@@ -1,8 +1,8 @@
-import { Button, IconButton } from '@mui/material'
-import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
-import React from 'react'
-import StationField from './StationField'
-import { ALL_REQUIRED_STATION_FIELDS } from '../../../constants/required-station-fields'
+import { Button, IconButton } from '@mui/material';
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
+import React from 'react';
+import StationField from './StationField';
+import { ALL_REQUIRED_STATION_FIELDS } from '../../../constants/required-station-fields';
 
 export default function StationFields({
     isGeneral,
@@ -13,7 +13,7 @@ export default function StationFields({
     deleteField,
     deleteStation,
 }) {
-    const shouldHaveRequiredFields = !isGeneral && !stationIndex
+    const shouldHaveRequiredFields = !isGeneral && !stationIndex;
 
     return (
         <div className="space-y-2">
@@ -53,5 +53,5 @@ export default function StationFields({
                 Add Field
             </Button>
         </div>
-    )
+    );
 }

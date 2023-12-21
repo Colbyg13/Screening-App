@@ -1,11 +1,11 @@
-import { useNavigation } from '@react-navigation/native'
-import React, { useEffect, useState } from 'react'
-import { FlatList, SafeAreaView, StatusBar, StyleSheet, Text } from 'react-native'
-import { useSessionContext } from '../contexts/SessionContext'
-import { TextInput } from '@react-native-material/core'
-import AddToQueueBtn from './AddToQueueBtn'
-import SessionQueueItem from './SessionQueueItem'
-import { PATIENT_RECORD_STATUS } from '../classes/patient-record'
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
+import { FlatList, SafeAreaView, StatusBar, StyleSheet, Text } from 'react-native';
+import { useSessionContext } from '../contexts/SessionContext';
+import { TextInput } from '@react-native-material/core';
+import AddToQueueBtn from './AddToQueueBtn';
+import SessionQueueItem from './SessionQueueItem';
+import { PATIENT_RECORD_STATUS } from '../classes/patient-record';
 
 //Shows the list of records for that session. Allows for searching by ID, also shows the progress of each record through the stations.
 const SessionQueue = props => {
@@ -13,82 +13,82 @@ const SessionQueue = props => {
         sessionInfo: { stations },
         sessionRecords,
         selectedStation: station,
-    } = useSessionContext()
-    const stationIndex = stations.indexOf(station)
-    const isStationOne = stations[0] === station
-    const [isSearching, setIsSearching] = React.useState(false)
-    const [searchText, setSearchText] = React.useState('')
-    const [filteredRecords, setFilteredRecords] = useState([])
+    } = useSessionContext();
+    const stationIndex = stations.indexOf(station);
+    const isStationOne = stations[0] === station;
+    const [isSearching, setIsSearching] = React.useState(false);
+    const [searchText, setSearchText] = React.useState('');
+    const [filteredRecords, setFilteredRecords] = useState([]);
     const sortedRecords = [...sessionRecords].sort((recordA, recordB) => {
         if (recordA.nextStationIndex === recordB.nextStationIndex) {
             if (recordA.nextStationIndex === recordB.nextStationStatus)
-                return recordA.lastModified <= recordB.lastModified ? -1 : 1
+                return recordA.lastModified <= recordB.lastModified ? -1 : 1;
 
-            return recordA.nextStationStatus === PATIENT_RECORD_STATUS.PARTIAL ? -1 : 1
+            return recordA.nextStationStatus === PATIENT_RECORD_STATUS.PARTIAL ? -1 : 1;
         }
         // Puts our station next as first ones in the list
-        if (recordA.nextStationIndex === stationIndex) return -1
-        if (recordB.nextStationIndex === stationIndex) return 1
+        if (recordA.nextStationIndex === stationIndex) return -1;
+        if (recordB.nextStationIndex === stationIndex) return 1;
         // complete ones last in the list
-        if (recordA.isComplete) return 1
-        if (recordB.isComplete) return -1
+        if (recordA.isComplete) return 1;
+        if (recordB.isComplete) return -1;
 
         if (recordA.nextStationIndex > stationIndex && recordB.nextStationIndex > stationIndex)
-            return recordA.nextStationIndex - recordB.nextStationIndex
+            return recordA.nextStationIndex - recordB.nextStationIndex;
 
         if (recordA.nextStationIndex > stationIndex && recordB.nextStationIndex < stationIndex)
-            return 1
+            return 1;
 
         if (recordA.nextStationIndex < stationIndex && recordB.nextStationIndex > stationIndex)
-            return -1
+            return -1;
 
-        return recordB.nextStationIndex - recordA.nextStationIndex
-    })
+        return recordB.nextStationIndex - recordA.nextStationIndex;
+    });
 
     useEffect(() => {
-        setFilteredRecords([])
-        setSearchText('')
-        setIsSearching(false)
-    }, [sessionRecords])
+        setFilteredRecords([]);
+        setSearchText('');
+        setIsSearching(false);
+    }, [sessionRecords]);
 
-    const navigation = useNavigation()
+    const navigation = useNavigation();
     const handlePress = item => {
-        navigation.navigate('Update Record', { item, isStationOne })
-    }
+        navigation.navigate('Update Record', { item, isStationOne });
+    };
     const handleAddToQueuePress = () => {
-        navigation.navigate('Add To Queue', { station })
-    }
+        navigation.navigate('Add To Queue', { station });
+    };
 
     const handleSearchInput = text => {
-        setSearchText(text)
-        setIsSearching(text.length > 0)
-    }
+        setSearchText(text);
+        setIsSearching(text.length > 0);
+    };
 
     useEffect(() => {
-        searchForRecord()
-    }, [isSearching, searchText])
+        searchForRecord();
+    }, [isSearching, searchText]);
     // console.log(sortedRecords[0]);
     const searchForRecord = () => {
         if (isSearching) {
             const foundRecord = sortedRecords.filter(record =>
                 record.id.toString().includes(searchText),
-            )
+            );
             if (foundRecord.length > 0) {
-                console.log('foundRecord', foundRecord)
-                setFilteredRecords(foundRecord)
+                console.log('foundRecord', foundRecord);
+                setFilteredRecords(foundRecord);
             } else {
-                console.log('no record found')
-                setFilteredRecords([])
+                console.log('no record found');
+                setFilteredRecords([]);
             }
         } else {
-            console.log('not searching')
-            setFilteredRecords([])
+            console.log('not searching');
+            setFilteredRecords([]);
         }
-    }
+    };
     //NEED SOCKET EVENT TO LISTEN FOR NEW DATA ADDED
     const renderQueueItem = ({ item }) => {
-        return <SessionQueueItem key={item.id} onPress={() => handlePress(item)} item={item} />
-    }
+        return <SessionQueueItem key={item.id} onPress={() => handlePress(item)} item={item} />;
+    };
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.stationTitle}>{station?.title}</Text>
@@ -119,8 +119,8 @@ const SessionQueue = props => {
             )}
             {isStationOne && <AddToQueueBtn onPress={handleAddToQueuePress}></AddToQueueBtn>}
         </SafeAreaView>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -154,6 +154,6 @@ const styles = StyleSheet.create({
         padding: 1,
         alignSelf: 'center',
     },
-})
+});
 
-export default SessionQueue
+export default SessionQueue;

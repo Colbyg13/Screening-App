@@ -1,33 +1,33 @@
-import { Box, Chip, Modal, Typography } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import { useSessionContext } from '../../../contexts/SessionContext'
+import { Box, Chip, Modal, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { useSessionContext } from '../../../contexts/SessionContext';
 
 export default function SessionSelectionModal({ open, onClose }) {
-    const { getSessionList, startSession } = useSessionContext()
+    const { getSessionList, startSession } = useSessionContext();
 
-    const [loading, setLoading] = useState([])
-    const [sessionList, setSessionList] = useState([])
+    const [loading, setLoading] = useState([]);
+    const [sessionList, setSessionList] = useState([]);
 
     useEffect(() => {
         if (open) {
-            setLoading(true)
+            setLoading(true);
             getSessionList()
                 .then((sessionList = []) => {
                     if (sessionList) {
                         const sortedSessionList = sessionList.sort(
                             ({ createdAt: a }, { createdAt: b }) => (a < b ? 1 : -1),
-                        )
-                        setSessionList(sortedSessionList)
+                        );
+                        setSessionList(sortedSessionList);
                     }
                 })
                 .catch(err => {
-                    console.error(err)
+                    console.error(err);
                 })
                 .finally(() => {
-                    setLoading(false)
-                })
+                    setLoading(false);
+                });
         }
-    }, [open])
+    }, [open]);
 
     return (
         <Modal
@@ -79,5 +79,5 @@ export default function SessionSelectionModal({ open, onClose }) {
                 </div>
             </Box>
         </Modal>
-    )
+    );
 }

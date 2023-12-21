@@ -1,10 +1,10 @@
-import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
-import { Pressable } from '@react-native-material/core'
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Pressable } from '@react-native-material/core';
 
 //returns an item for station list, clicking on this moves a user into the session queue to gather data.
 const StationsListItem = props => {
-    const station = props.item
+    const station = props.item;
     // console.log(typeof(station));
     // console.log(station);
     return (
@@ -19,14 +19,14 @@ const StationsListItem = props => {
                                 <View key={item.name} style={styles.fieldsView}>
                                     <Text style={styles.fieldsitem}>{item.name}</Text>
                                 </View>
-                            )
+                            );
                         })}
                     </View>
                 </View>
             </Pressable>
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     item: {
@@ -63,6 +63,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'space-evenly',
     },
-})
+});
 
-export default StationsListItem
+export default StationsListItem;

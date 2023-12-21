@@ -1,36 +1,36 @@
-import { Button, CircularProgress } from '@mui/material'
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import { LOG_LEVEL } from '../../constants/log-levels'
-import { serverURL } from '../../constants/server'
-import { useSnackBarContext } from '../../contexts/SnackbarContext'
-import RecordSearch from './RecordSearch'
+import { Button, CircularProgress } from '@mui/material';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import { LOG_LEVEL } from '../../constants/log-levels';
+import { serverURL } from '../../constants/server';
+import { useSnackBarContext } from '../../contexts/SnackbarContext';
+import RecordSearch from './RecordSearch';
 
 export default function RecordTitleBar({ unitConversions = {}, updateSearch, allFieldKeys }) {
-    const { addSnackBar } = useSnackBarContext()
+    const { addSnackBar } = useSnackBarContext();
 
-    const [downloading, setDownloading] = useState(false)
-    const [totalRecordCount, setTotalRecordCount] = useState()
+    const [downloading, setDownloading] = useState(false);
+    const [totalRecordCount, setTotalRecordCount] = useState();
 
     useEffect(() => {
-        getRecordCount()
-    }, [])
+        getRecordCount();
+    }, []);
 
     async function getRecordCount() {
         try {
             const result = await axios.get(`${serverURL}/api/v1/records`, {
                 params: { getCount: true },
-            })
-            setTotalRecordCount(result.data)
+            });
+            setTotalRecordCount(result.data);
         } catch (error) {
-            console.error('Could not get records from server', error)
+            console.error('Could not get records from server', error);
             addSnackBar({
                 title: 'Error',
                 message: `Could not get records from server: ${error}`,
                 variant: 'danger',
                 timeout: 2500,
-            })
-            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get records from server: ${error}`)
+            });
+            window.api.writeLog(LOG_LEVEL.ERROR, `Could not get records from server: ${error}`);
         }
     }
 
@@ -51,30 +51,30 @@ export default function RecordTitleBar({ unitConversions = {}, updateSearch, all
                 disabled={downloading || !totalRecordCount}
                 onClick={async () => {
                     try {
-                        const outputPath = window.api.showSaveDialog()
+                        const outputPath = window.api.showSaveDialog();
                         if (outputPath) {
-                            setDownloading(true)
+                            setDownloading(true);
                             window.api
                                 .downloadRecords(outputPath, allFieldKeys, unitConversions)
                                 .then(() => {
-                                    setDownloading(false)
+                                    setDownloading(false);
                                     window.api.showMessage({
                                         title: 'Download Complete',
                                         message: 'Your download is complete.',
                                         type: 'info',
-                                    })
+                                    });
                                 })
                                 .catch(err => {
-                                    setDownloading(false)
+                                    setDownloading(false);
                                     window.api.showMessage({
                                         title: 'Download Failed',
                                         message: `Your download has failed to complete. ${err}`,
                                         type: 'error',
-                                    })
-                                })
+                                    });
+                                });
                         }
                     } catch (error) {
-                        console.error('Could not download records', error)
+                        console.error('Could not download records', error);
                     }
                 }}
             >
@@ -82,5 +82,5 @@ export default function RecordTitleBar({ unitConversions = {}, updateSearch, all
                 <span>Export</span>
             </Button>
         </div>
-    )
+    );
 }

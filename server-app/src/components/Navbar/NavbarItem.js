@@ -1,5 +1,5 @@
-import { Badge, ListItem } from '@mui/material'
-import React from 'react'
+import { Badge, ListItem } from '@mui/material';
+import React from 'react';
 
 export default function NavbarItem({ open, Icon, title, selected, displayBadge, onClick }) {
     return (
@@ -10,5 +10,5 @@ export default function NavbarItem({ open, Icon, title, selected, displayBadge, 
                 {displayBadge ? <Badge variant="dot" overlap="circular" color="success" /> : null}
             </div>
         </ListItem>
-    )
+    );
 }

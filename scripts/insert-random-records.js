@@ -1,14 +1,14 @@
-const { faker } = require('@faker-js/faker')
-const axios = require('axios')
+const { faker } = require('@faker-js/faker');
+const axios = require('axios');
 
-const SERVER_PORT = 3333
-const NUM_RECORDS_TO_INSERT = 5000
+const SERVER_PORT = 3333;
+const NUM_RECORDS_TO_INSERT = 5000;
 
-const SCHOOLS = ['Vaisala', 'Salelologa', 'Auala']
-const EYES = ['20/20', '20/25', '20/30', '20/40', '20/50', '20/70', '20/100']
+const SCHOOLS = ['Vaisala', 'Salelologa', 'Auala'];
+const EYES = ['20/20', '20/25', '20/30', '20/40', '20/50', '20/70', '20/100'];
 
 function main() {
-    const url = `http://127.0.0.1:${SERVER_PORT}/api/v1/records`
+    const url = `http://127.0.0.1:${SERVER_PORT}/api/v1/records`;
 
     Promise.all(
         Array(NUM_RECORDS_TO_INSERT)
@@ -37,8 +37,8 @@ function main() {
     )
         .then(() => console.log('created'))
         .catch(err => {
-            console.error(err)
-        })
+            console.error(err);
+        });
 }
 
-main()
+main();

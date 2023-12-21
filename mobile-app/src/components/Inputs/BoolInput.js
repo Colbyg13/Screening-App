@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react'
-import { Text, View, Switch } from 'react-native'
-import { styles } from '../../style/styles'
+import React, { useState, useEffect } from 'react';
+import { Text, View, Switch } from 'react-native';
+import { styles } from '../../style/styles';
 
 /**
  *
@@ -8,11 +8,11 @@ import { styles } from '../../style/styles'
  * @returns a true or false switch with a label for the field name.
  */
 const BoolInput = props => {
-    const field = props.field
-    const [value, setValue] = useState(false)
+    const field = props.field;
+    const [value, setValue] = useState(false);
     useEffect(() => {
-        setValue(props.value)
-    }, [props.value])
+        setValue(props.value);
+    }, [props.value]);
     return (
         <View key={field.name} style={styles.row}>
             <Text style={styles.fieldName}>{field.name}:</Text>
@@ -20,14 +20,14 @@ const BoolInput = props => {
                 <Switch
                     ios_backgroundColor={'grey'}
                     onValueChange={() => {
-                        props.updateBool(field)
+                        props.updateBool(field);
                     }}
                     value={value}
                     style={styles.switch}
                 ></Switch>
             </View>
         </View>
-    )
-}
+    );
+};
 
-export default BoolInput
+export default BoolInput;

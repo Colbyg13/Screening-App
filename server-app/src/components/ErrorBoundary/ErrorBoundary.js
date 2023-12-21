@@ -1,18 +1,18 @@
-import React from 'react'
-import { LOG_LEVEL } from '../../constants/log-levels'
-import FallbackUI from './FallbackUI'
+import React from 'react';
+import { LOG_LEVEL } from '../../constants/log-levels';
+import FallbackUI from './FallbackUI';
 
 export class ErrorBoundary extends React.Component {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             hasError: false,
             error: '',
-        }
+        };
     }
 
     static getDerivedStateFromError(error) {
-        return { hasError: true, error }
+        return { hasError: true, error };
     }
 
     componentDidCatch(error, info) {
@@ -20,17 +20,17 @@ export class ErrorBoundary extends React.Component {
             window.api.writeLog(
                 LOG_LEVEL.ERROR,
                 `Error in react: ${error} @ ${info.componentStack}`,
-            )
+            );
         } catch (error) {
-            console.error('Could not write error', error)
+            console.error('Could not write error', error);
         }
     }
 
     render() {
         if (this.state.hasError) {
-            return <FallbackUI error={error} />
+            return <FallbackUI error={error} />;
         }
 
-        return this.props.children
+        return this.props.children;
     }
 }

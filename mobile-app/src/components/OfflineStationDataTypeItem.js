@@ -1,7 +1,7 @@
-import React, { useState } from 'react'
-import { View, Text, StyleSheet, Switch } from 'react-native'
-import { Button } from '@react-native-material/core'
-import { AntDesign } from '@expo/vector-icons'
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, Switch } from 'react-native';
+import { Button } from '@react-native-material/core';
+import { AntDesign } from '@expo/vector-icons';
 
 /**
  *
@@ -9,24 +9,24 @@ import { AntDesign } from '@expo/vector-icons'
  * @returns a list item that shows the field name and type, if custom it shows the options available. Has a switch to enable selection.
  */
 const OfflineStationDataTypeItem = props => {
-    const field = props.item
-    const [showValues, setShowValues] = useState(false)
-    const [value, setValue] = useState(false)
-    const [type, setType] = useState(props.type)
-    const [customData, setCustomData] = useState(props.customData)
-    let options = []
+    const field = props.item;
+    const [showValues, setShowValues] = useState(false);
+    const [value, setValue] = useState(false);
+    const [type, setType] = useState(props.type);
+    const [customData, setCustomData] = useState(props.customData);
+    let options = [];
     if (type === 'custom') {
         // console.log('custom data', customData)
         if (customData?.values !== null) {
-            options = customData?.values
+            options = customData?.values;
         } else {
-            options = null
+            options = null;
         }
     }
 
     const handleIconPress = () => {
-        setShowValues(prevState => !prevState)
-    }
+        setShowValues(prevState => !prevState);
+    };
 
     return (
         <View key={field._id} style={styles.item}>
@@ -69,8 +69,8 @@ const OfflineStationDataTypeItem = props => {
                     <Switch
                         ios_backgroundColor={'grey'}
                         onValueChange={value => {
-                            setValue(prevState => !prevState)
-                            props.handleSelection(field, value)
+                            setValue(prevState => !prevState);
+                            props.handleSelection(field, value);
                         }}
                         value={value}
                     ></Switch>
@@ -83,14 +83,14 @@ const OfflineStationDataTypeItem = props => {
                                     <Text style={styles.optionLabel}>Option {index + 1}:</Text>
                                     <Text style={styles.optiontext}>{option}</Text>
                                 </View>
-                            )
+                            );
                         })}
                     </View>
                 )}
             </View>
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     item: {
@@ -150,6 +150,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'flex-start',
     },
-})
+});
 
-export default OfflineStationDataTypeItem
+export default OfflineStationDataTypeItem;

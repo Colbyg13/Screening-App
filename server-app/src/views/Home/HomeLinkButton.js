@@ -1,6 +1,6 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import { ROUTES } from '../../components/Navbar/Navbar'
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { ROUTES } from '../../components/Navbar/Navbar';
 
 export default function HomeLinkButton({ title, to }) {
     const colorClassName =
@@ -10,7 +10,7 @@ export default function HomeLinkButton({ title, to }) {
               ? 'bg-gradient-to-br from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700'
               : to === ROUTES.CustomFields.path
                 ? 'bg-gradient-to-br from-fuchsia-500 to-fuchsia-600 hover:from-fuchsia-600 hover:to-fuchsia-700'
-                : 'bg-gradient-to-br from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700'
+                : 'bg-gradient-to-br from-gray-500 to-gray-600 hover:from-gray-600 hover:to-gray-700';
 
     return (
         <Link
@@ -21,5 +21,5 @@ export default function HomeLinkButton({ title, to }) {
                 {title}
             </h3>
         </Link>
-    )
+    );
 }

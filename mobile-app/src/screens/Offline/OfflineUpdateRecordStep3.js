@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from 'react'
-import { SafeAreaView, Text, ScrollView, View, Keyboard } from 'react-native'
-import { Pressable, TextInput } from '@react-native-material/core'
-import { styles } from '../../style/styles'
-import BoolInput from '../../components/Inputs/BoolInput'
-import DatePicker from '../../components/Inputs/DatePicker'
-import CustomDataPickerOffline from '../../components/Inputs/CustomDataPickerOffline'
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view'
+import React, { useEffect, useState } from 'react';
+import { SafeAreaView, Text, ScrollView, View, Keyboard } from 'react-native';
+import { Pressable, TextInput } from '@react-native-material/core';
+import { styles } from '../../style/styles';
+import BoolInput from '../../components/Inputs/BoolInput';
+import DatePicker from '../../components/Inputs/DatePicker';
+import CustomDataPickerOffline from '../../components/Inputs/CustomDataPickerOffline';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import {
     Provider,
     Button,
@@ -13,119 +13,119 @@ import {
     DialogHeader,
     DialogContent,
     DialogActions,
-} from '@react-native-material/core'
+} from '@react-native-material/core';
 const OfflineAddRecordStep3 = ({ route, navigation }) => {
-    const item = route.params.item
+    const item = route.params.item;
     // console.log('HERE IS THE ITEM TO UPDATE', item);
-    const customDataTypes = route.params.customDataTypes
+    const customDataTypes = route.params.customDataTypes;
     const selectedDataTypes = [
         { name: 'ID', key: 'id', type: 'number' },
         ...route.params.selectedDataTypes,
-    ]
+    ];
 
-    const [otherFields, setOtherFields] = useState([])
+    const [otherFields, setOtherFields] = useState([]);
 
-    const [formState, setFormState] = useState({}) //used to keep track of inputs.
-    const [dateStates, setDateStates] = useState({}) //keep track of date picker visibility
-    const [fields, setFields] = useState([]) //loop through to create the form.
-    const [isVisible, setIsVisible] = useState(false) //disable next button until at least one type is selected
+    const [formState, setFormState] = useState({}); //used to keep track of inputs.
+    const [dateStates, setDateStates] = useState({}); //keep track of date picker visibility
+    const [fields, setFields] = useState([]); //loop through to create the form.
+    const [isVisible, setIsVisible] = useState(false); //disable next button until at least one type is selected
 
-    const numFields = selectedDataTypes.length
+    const numFields = selectedDataTypes.length;
 
     const defaultState = () => {
-        let newFields = []
+        let newFields = [];
         for (let i = 0; i < numFields; i++) {
-            const varName = selectedDataTypes[i].key
+            const varName = selectedDataTypes[i].key;
             // console.log('varName', varName);
             if (item.hasOwnProperty(varName)) {
                 // console.log('item has property', varName);
                 setFormState(prevState => ({
                     ...prevState,
                     [varName]: item[varName],
-                }))
+                }));
             } else {
                 if (selectedDataTypes[i].type === 'date') {
-                    let showname = `show${varName}`
-                    setDateStates(prevState => ({ ...prevState, [showname]: false }))
+                    let showname = `show${varName}`;
+                    setDateStates(prevState => ({ ...prevState, [showname]: false }));
                 }
                 if (selectedDataTypes[i].type === 'bool') {
-                    setFormState(prevState => ({ ...prevState, [varName]: false }))
+                    setFormState(prevState => ({ ...prevState, [varName]: false }));
                 } else {
-                    setFormState(prevState => ({ ...prevState, [varName]: undefined }))
+                    setFormState(prevState => ({ ...prevState, [varName]: undefined }));
                 }
             }
-            newFields.push(varName)
+            newFields.push(varName);
         }
         for (let i = 0; i < Object.keys(item).length; i++) {
             if (!formState.hasOwnProperty(Object.keys(item)[i])) {
                 setFormState(prevState => ({
                     ...prevState,
                     [Object.keys(item)[i]]: item[Object.keys(item)[i]],
-                }))
+                }));
                 //setOtherFields((prevState) => [...prevState, Object.keys(item)[i]]);
                 //How do we want to handle other fields? We'd send all the possible types in order to render an input.
             }
         }
-        setFields(newFields)
-    }
+        setFields(newFields);
+    };
 
     useEffect(() => {
         //sets the state for the form dynamically. I have not implemented validation yet.
-        defaultState()
-    }, [])
+        defaultState();
+    }, []);
 
     useEffect(() => {
         //sets the state for the form dynamically. I have not implemented validation yet.
         // console.log('formState updated', formState);
-    }, [formState])
+    }, [formState]);
 
     const handleFormUpdate = (field, selectedItem) => {
         setFormState(prevState => ({
             ...prevState,
             [field.key]: selectedItem,
-        }))
-    }
+        }));
+    };
 
     const handleDateUpdate = (field, showname, newDate) => {
         setFormState(prevState => ({
             ...prevState,
             [field.key]: newDate, //year/month/day
-        }))
+        }));
         setDateStates(prevState => ({
             ...prevState,
             [showname]: false, //should set dob or whatever date to the date text.
-        }))
-    }
+        }));
+    };
 
     const toggleDateShow = (field, showname) => {
-        let curState = dateStates[showname]
+        let curState = dateStates[showname];
         setDateStates(prevState => ({
             ...prevState,
             [showname]: !curState,
-        }))
-    }
+        }));
+    };
 
     const updateBool = field => {
-        const oldState = formState[field.key]
+        const oldState = formState[field.key];
         setFormState(prevState => ({
             ...prevState,
             [field.key]: !oldState,
-        }))
-    }
+        }));
+    };
 
     const handleSubmit = () => {
         if (checkIDChange()) {
             //show dialog
-            setIsVisible(true)
+            setIsVisible(true);
         } else {
             //no ID change
             navigation.navigate({
                 name: 'Offline Records',
                 params: { updatedRecord: formState, oldRecordID: item.id },
                 merge: true,
-            })
+            });
         }
-    }
+    };
 
     /**
      *
@@ -133,11 +133,11 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
      */
     const checkIDChange = () => {
         if (item.id != formState.id) {
-            return true
+            return true;
         } else {
-            return false
+            return false;
         }
-    }
+    };
 
     /**
      *
@@ -147,7 +147,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
     const renderInput = field => {
         switch (field.type) {
             case 'date':
-                let showname = `show${field.key}`
+                let showname = `show${field.key}`;
                 return (
                     <DatePicker
                         value={formState[field.key]}
@@ -157,7 +157,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                         visible={dateStates[showname]}
                         field={field}
                     />
-                )
+                );
             case 'string':
                 return (
                     <View key={field.key} style={styles.row}>
@@ -169,14 +169,14 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                                     setFormState(prevState => ({
                                         ...prevState,
                                         [field.key]: newText,
-                                    }))
+                                    }));
                                 }}
                                 style={styles.fieldInput}
                                 required={field.required}
                             ></TextInput>
                         </View>
                     </View>
-                )
+                );
             case 'number':
                 return (
                     <View key={field.key} style={styles.row}>
@@ -192,14 +192,14 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                                     setFormState(prevState => ({
                                         ...prevState,
                                         [field.key]: +newText,
-                                    }))
+                                    }));
                                 }}
                                 style={styles.fieldInput}
                                 required={field.required}
                             ></TextInput>
                         </View>
                     </View>
-                )
+                );
             case 'bool':
                 return (
                     <BoolInput
@@ -208,7 +208,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                         updateBool={updateBool}
                         field={field}
                     />
-                )
+                );
             default:
                 return (
                     <CustomDataPickerOffline
@@ -218,9 +218,9 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                         updateForm={handleFormUpdate}
                         field={field}
                     ></CustomDataPickerOffline>
-                )
+                );
         }
-    }
+    };
 
     return (
         <SafeAreaView style={styles.container}>
@@ -236,7 +236,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
 
                 <View>
                     {selectedDataTypes.map(field => {
-                        return renderInput(field)
+                        return renderInput(field);
                     })}
                 </View>
             </KeyboardAwareScrollView>
@@ -245,12 +245,12 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                     style={styles.btnCancel}
                     pressEffectColor="#FCB8B8"
                     onPress={() => {
-                        setFormState({})
+                        setFormState({});
                         navigation.navigate({
                             name: 'Offline Records',
                             params: { deleteRecord: item.id },
                             merge: true,
-                        })
+                        });
                     }}
                 >
                     <Text style={styles.btnText}>Delete Record</Text>
@@ -259,8 +259,8 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                     style={styles.btnCancel}
                     pressEffectColor="#FCB8B8"
                     onPress={() => {
-                        setFormState({})
-                        navigation.goBack()
+                        setFormState({});
+                        navigation.goBack();
                     }}
                 >
                     <Text style={styles.btnText}>Cancel</Text>
@@ -297,8 +297,8 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                             setFormState(prevState => ({
                                 ...prevState,
                                 ID: item.id,
-                            }))
-                            setIsVisible(false)
+                            }));
+                            setIsVisible(false);
                         }}
                     />
                     <Button
@@ -307,19 +307,19 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                         color="#A3CDFF"
                         style={{ marginLeft: 10, marginRight: 10 }}
                         onPress={() => {
-                            setIsVisible(false)
+                            setIsVisible(false);
                             // console.log('formState before submit in dialog', formState);
                             navigation.navigate({
                                 name: 'Offline Records',
                                 params: { updatedRecord: formState, oldRecordID: item.id },
                                 merge: true,
-                            })
+                            });
                         }}
                     />
                 </DialogActions>
             </Dialog>
         </SafeAreaView>
-    )
-}
+    );
+};
 
-export default OfflineAddRecordStep3
+export default OfflineAddRecordStep3;

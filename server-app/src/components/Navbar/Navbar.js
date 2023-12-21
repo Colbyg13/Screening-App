@@ -1,15 +1,15 @@
-import CloudSyncOutlinedIcon from '@mui/icons-material/CloudSyncOutlined'
-import FeedOutlinedIcon from '@mui/icons-material/FeedOutlined'
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined'
-import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined'
-import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined'
-import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined'
-import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined'
-import { List } from '@mui/material'
-import React, { useEffect, useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { useSessionContext } from '../../contexts/SessionContext'
-import NavbarItem from './NavbarItem'
+import CloudSyncOutlinedIcon from '@mui/icons-material/CloudSyncOutlined';
+import FeedOutlinedIcon from '@mui/icons-material/FeedOutlined';
+import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
+import MenuOutlinedIcon from '@mui/icons-material/MenuOutlined';
+import SensorsOutlinedIcon from '@mui/icons-material/SensorsOutlined';
+import SettingsOutlinedIcon from '@mui/icons-material/SettingsOutlined';
+import StorageOutlinedIcon from '@mui/icons-material/StorageOutlined';
+import { List } from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useSessionContext } from '../../contexts/SessionContext';
+import NavbarItem from './NavbarItem';
 
 export const ROUTES = {
     Home: {
@@ -42,26 +42,26 @@ export const ROUTES = {
         path: '/settings',
         Icon: SettingsOutlinedIcon,
     },
-}
+};
 
 export default function Navbar() {
-    const navigate = useNavigate()
-    const { pathname } = useLocation()
-    const { sessionIsRunning } = useSessionContext()
+    const navigate = useNavigate();
+    const { pathname } = useLocation();
+    const { sessionIsRunning } = useSessionContext();
 
-    const [open, setOpen] = useState(true)
-    const [ip, setIP] = useState('')
+    const [open, setOpen] = useState(true);
+    const [ip, setIP] = useState('');
 
     useEffect(() => {
         if (!ip) {
             try {
-                const ip = window.api.getIP()
-                setIP(ip)
+                const ip = window.api.getIP();
+                setIP(ip);
             } catch (error) {
-                console.error('Could not get ip from server', error)
+                console.error('Could not get ip from server', error);
             }
         }
-    })
+    });
 
     return (
         <div className="relative h-full min-w-fit shadow-lg border-r border-gray-600 flex flex-col justify-between text-lg">
@@ -126,5 +126,5 @@ export default function Navbar() {
                 </div>
             ) : null}
         </div>
-    )
+    );
 }

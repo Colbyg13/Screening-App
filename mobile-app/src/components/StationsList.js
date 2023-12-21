@@ -1,31 +1,31 @@
-import React from 'react'
-import { Text, SafeAreaView, FlatList, StyleSheet, StatusBar } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
-import StationsListItem from '../components/StationsListItem'
-import { useSessionContext } from '../contexts/SessionContext'
+import React from 'react';
+import { Text, SafeAreaView, FlatList, StyleSheet, StatusBar } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import StationsListItem from '../components/StationsListItem';
+import { useSessionContext } from '../contexts/SessionContext';
 //returns the list of stations received from the session context. Clicking on a station lets an iPad start collecting data for those fields.
 const StationsList = props => {
-    const { sessionInfo, sessionInfo: { stations = [] } = {}, joinStation } = useSessionContext()
+    const { sessionInfo, sessionInfo: { stations = [] } = {}, joinStation } = useSessionContext();
     // console.log('Session info in Ipad', { sessionInfo })
-    const navigation = useNavigation()
+    const navigation = useNavigation();
     const createLabels = () => {
         for (let i = 0; i < sessionInfo.stations.length; i++) {
             if (i < 10) {
-                sessionInfo.stations[i].label = `0${i + 1}`
+                sessionInfo.stations[i].label = `0${i + 1}`;
             } else {
-                sessionInfo.stations[i].label = `${i + 1}`
+                sessionInfo.stations[i].label = `${i + 1}`;
             }
         }
-    }
-    createLabels()
+    };
+    createLabels();
     const handlePress = item => {
-        joinStation(item.id)
+        joinStation(item.id);
         // console.log('you pressed me', item);
-        navigation.navigate('Current Session Queue')
-    }
+        navigation.navigate('Current Session Queue');
+    };
     const renderStationItem = ({ item }) => {
-        return <StationsListItem key={item.id} onPress={() => handlePress(item)} item={item} />
-    }
+        return <StationsListItem key={item.id} onPress={() => handlePress(item)} item={item} />;
+    };
     return (
         <SafeAreaView style={styles.container}>
             <Text style={styles.pageDirection}>Select a station</Text>
@@ -35,8 +35,8 @@ const StationsList = props => {
                 renderItem={renderStationItem}
             />
         </SafeAreaView>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -58,6 +58,6 @@ const styles = StyleSheet.create({
         fontSize: 34,
         alignSelf: 'center',
     },
-})
+});
 
-export default StationsList
+export default StationsList;

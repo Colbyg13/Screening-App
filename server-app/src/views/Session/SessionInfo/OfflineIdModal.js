@@ -1,5 +1,5 @@
-import { Box, Button, Modal, Typography } from '@mui/material'
-import React from 'react'
+import { Box, Button, Modal, Typography } from '@mui/material';
+import React from 'react';
 
 export default function OfflineIdModal({ offlineId, onClose }) {
     return (
@@ -41,5 +41,5 @@ export default function OfflineIdModal({ offlineId, onClose }) {
                 </Button>
             </Box>
         </Modal>
-    )
+    );
 }

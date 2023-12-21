@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 export default function RecordSection({ recordKey, search, value }) {
     if (search && ['id', 'name'].includes(recordKey))
@@ -9,6 +9,6 @@ export default function RecordSection({ recordKey, search, value }) {
             >
                 {text}
             </span>
-        ))
-    return value
+        ));
+    return value;
 }

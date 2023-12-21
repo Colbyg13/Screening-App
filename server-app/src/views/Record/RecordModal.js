@@ -1,13 +1,13 @@
-import { Box, Button, Modal, Typography } from '@mui/material'
-import axios from 'axios'
-import React, { useEffect, useState } from 'react'
-import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
-import { LOG_LEVEL } from '../../constants/log-levels'
-import { serverURL } from '../../constants/server'
-import { useCustomDataTypesContext } from '../../contexts/CustomDataContext'
-import { useSessionContext } from '../../contexts/SessionContext'
-import { useSnackBarContext } from '../../contexts/SnackbarContext'
-import RecordModalInputRow from './RecordModalInputRow'
+import { Box, Button, Modal, Typography } from '@mui/material';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
+import { LOG_LEVEL } from '../../constants/log-levels';
+import { serverURL } from '../../constants/server';
+import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
+import { useSessionContext } from '../../contexts/SessionContext';
+import { useSnackBarContext } from '../../contexts/SnackbarContext';
+import RecordModalInputRow from './RecordModalInputRow';
 
 export default function RecordModal({
     record,
@@ -20,16 +20,16 @@ export default function RecordModal({
     onSave = () => {},
     onDelete = () => {},
 }) {
-    const { addSnackBar } = useSnackBarContext()
+    const { addSnackBar } = useSnackBarContext();
 
-    const [confirmDelete, setConfirmDelete] = useState(false)
-    const [update, setUpdate] = useState({})
-    const { customDataTypes } = useCustomDataTypesContext()
-    const { sessionIsRunning } = useSessionContext()
+    const [confirmDelete, setConfirmDelete] = useState(false);
+    const [update, setUpdate] = useState({});
+    const { customDataTypes } = useCustomDataTypesContext();
+    const { sessionIsRunning } = useSessionContext();
 
     useEffect(() => {
-        setUpdate({})
-    }, [record])
+        setUpdate({});
+    }, [record]);
 
     return (
         <Modal
@@ -64,26 +64,26 @@ export default function RecordModal({
                     onClose={() => setConfirmDelete(false)}
                     onSubmit={async () => {
                         try {
-                            await axios.delete(`${serverURL}/api/v1/records/${id}`)
+                            await axios.delete(`${serverURL}/api/v1/records/${id}`);
                             addSnackBar({
                                 title: 'Success',
                                 message: `Record deleted`,
                                 variant: 'success',
                                 timeout: 2500,
-                            })
-                            onDelete(id)
+                            });
+                            onDelete(id);
                         } catch (error) {
-                            console.error('Could not delete record.', error)
+                            console.error('Could not delete record.', error);
                             addSnackBar({
                                 title: 'Error',
                                 message: `Could not delete record: ${error}`,
                                 variant: 'danger',
                                 timeout: 2500,
-                            })
+                            });
                             window.api.writeLog(
                                 LOG_LEVEL.ERROR,
                                 `Could not delete record: ${error}`,
-                            )
+                            );
                         }
                     }}
                 />
@@ -141,48 +141,48 @@ export default function RecordModal({
                                     (customData, { type, unit }) => {
                                         const usedField = allFields.find(
                                             field => field.type === type,
-                                        )
+                                        );
                                         const shouldAddKey =
                                             unit !== 'Custom' &&
                                             usedField &&
-                                            update[usedField.key] !== undefined
+                                            update[usedField.key] !== undefined;
 
                                         return shouldAddKey
                                             ? {
                                                   ...customData,
                                                   [usedField.key]: unitConversions[usedField.key],
                                               }
-                                            : customData
+                                            : customData;
                                     },
                                     {},
-                                )
+                                );
 
                                 const payload = {
                                     record: { id, sessionId: record.sessionId, ...update },
                                     customData: customDataToUpdate,
-                                }
+                                };
 
                                 try {
-                                    await axios.post(`${serverURL}/api/v1/records`, payload)
+                                    await axios.post(`${serverURL}/api/v1/records`, payload);
                                     addSnackBar({
                                         title: 'Success',
                                         message: `Record updated`,
                                         variant: 'success',
                                         timeout: 2500,
-                                    })
-                                    onSave(payload.record)
+                                    });
+                                    onSave(payload.record);
                                 } catch (error) {
-                                    console.error('Could not update record.', error)
+                                    console.error('Could not update record.', error);
                                     addSnackBar({
                                         title: 'Error',
                                         message: `Could not update record: ${error}`,
                                         variant: 'danger',
                                         timeout: 2500,
-                                    })
+                                    });
                                     window.api.writeLog(
                                         LOG_LEVEL.ERROR,
                                         `Could not update record: ${error}`,
-                                    )
+                                    );
                                 }
                             }}
                         >
@@ -192,5 +192,5 @@ export default function RecordModal({
                 </div>
             </Box>
         </Modal>
-    )
+    );
 }

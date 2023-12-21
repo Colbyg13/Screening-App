@@ -1,12 +1,12 @@
-import { Button, TextField } from '@mui/material'
-import React, { useState } from 'react'
-import ConfirmModal from '../../components/ConfirmModal/ConfirmModal'
-import { useSessionContext } from '../../contexts/SessionContext'
+import { Button, TextField } from '@mui/material';
+import React, { useState } from 'react';
+import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
+import { useSessionContext } from '../../contexts/SessionContext';
 
 export default function Settings() {
-    const [showDeleteRecordModal, setShowDeleteRecordModal] = useState(false)
-    const [showFactoryResetModal, setShowFactoryResetModal] = useState(false)
-    const { sessionIsRunning } = useSessionContext()
+    const [showDeleteRecordModal, setShowDeleteRecordModal] = useState(false);
+    const [showFactoryResetModal, setShowFactoryResetModal] = useState(false);
+    const { sessionIsRunning } = useSessionContext();
 
     return (
         <div className="flex w-full max-h-screen px-8 pt-8 pb-16 space-x-8 overflow-auto">
@@ -16,9 +16,9 @@ export default function Settings() {
                 onClose={() => setShowDeleteRecordModal(false)}
                 onSubmit={() => {
                     try {
-                        window.api.deleteAllRecordsAndSessions()
+                        window.api.deleteAllRecordsAndSessions();
                     } catch (error) {
-                        console.error('Could not delete all records and sessions', error)
+                        console.error('Could not delete all records and sessions', error);
                     }
                 }}
                 title="Delete All Records"
@@ -31,9 +31,9 @@ export default function Settings() {
                 onClose={() => setShowFactoryResetModal(false)}
                 onSubmit={() => {
                     try {
-                        window.api.factoryReset()
+                        window.api.factoryReset();
                     } catch (error) {
-                        console.error('Could not complete the factory reset', error)
+                        console.error('Could not complete the factory reset', error);
                     }
                 }}
                 title="Factory Reset"
@@ -83,5 +83,5 @@ export default function Settings() {
                 </div>
             </div>
         </div>
-    )
+    );
 }

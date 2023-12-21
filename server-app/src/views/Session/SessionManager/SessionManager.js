@@ -1,18 +1,18 @@
-import { Button } from '@mui/material'
-import React, { useState } from 'react'
-import { useSessionContext } from '../../../contexts/SessionContext'
-import SessionSelectionModal from './SessionSelectionModal'
-import StationManager from './StationManager'
+import { Button } from '@mui/material';
+import React, { useState } from 'react';
+import { useSessionContext } from '../../../contexts/SessionContext';
+import SessionSelectionModal from './SessionSelectionModal';
+import StationManager from './StationManager';
 
 export default function SessionManager() {
-    const { startSession } = useSessionContext()
-    const [openSessionModal, setOpenSessionModal] = useState(false)
+    const { startSession } = useSessionContext();
+    const [openSessionModal, setOpenSessionModal] = useState(false);
 
     return (
         <form
             onSubmit={e => {
-                e.preventDefault()
-                startSession()
+                e.preventDefault();
+                startSession();
             }}
         >
             <SessionSelectionModal
@@ -35,5 +35,5 @@ export default function SessionManager() {
                 </Button>
             </div>
         </form>
-    )
+    );
 }

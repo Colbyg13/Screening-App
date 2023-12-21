@@ -1,4 +1,4 @@
-const path = require('path')
+const path = require('path');
 module.exports = [
     // Add support for native node modules
     {
@@ -56,4 +56,4 @@ module.exports = [
      *   }]
      * }
      */
-]
+];

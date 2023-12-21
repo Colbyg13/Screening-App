@@ -1,21 +1,21 @@
-import { Button, Stack, TextInput } from '@react-native-material/core'
-import React from 'react'
-import { Image, SafeAreaView } from 'react-native'
-import { useSessionContext } from '../contexts/SessionContext'
+import { Button, Stack, TextInput } from '@react-native-material/core';
+import React from 'react';
+import { Image, SafeAreaView } from 'react-native';
+import { useSessionContext } from '../contexts/SessionContext';
 
-export const DEVICE_NAME_STORAGE_KEY = 'device-name'
+export const DEVICE_NAME_STORAGE_KEY = 'device-name';
 //This is the homescreen. It has offline buttons and an the ability to connect to a session once you are connected to a server.
 const HomeScreen = ({ navigation }) => {
     const { uploadOfflineRecords, deviceName, setDeviceName, sessionIsRunning } =
-        useSessionContext()
+        useSessionContext();
 
     const handleOnPress = async () => {
-        navigation.navigate('Station Selection')
-    }
+        navigation.navigate('Station Selection');
+    };
 
     const offlineMode = () => {
-        navigation.navigate('Offline Mode')
-    }
+        navigation.navigate('Offline Mode');
+    };
     return (
         <SafeAreaView
             style={{
@@ -65,7 +65,7 @@ const HomeScreen = ({ navigation }) => {
                 ></Button>
             </Stack>
         </SafeAreaView>
-    )
-}
+    );
+};
 
-export default HomeScreen
+export default HomeScreen;

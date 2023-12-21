@@ -1,6 +1,6 @@
-import React from 'react'
-import RecordSection from './RecordSection'
-import { useCustomDataTypesContext } from '../../contexts/CustomDataContext'
+import React from 'react';
+import RecordSection from './RecordSection';
+import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 
 export default function RecordItem({
     record,
@@ -10,9 +10,9 @@ export default function RecordItem({
     index,
     handleRecordClick,
 }) {
-    const { customDataTypeMap } = useCustomDataTypesContext()
+    const { customDataTypeMap } = useCustomDataTypesContext();
 
-    const even = index % 2 === 0
+    const even = index % 2 === 0;
 
     return (
         <tr
@@ -47,5 +47,5 @@ export default function RecordItem({
             ))}
             <td className="w-full" />
         </tr>
-    )
+    );
 }

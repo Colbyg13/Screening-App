@@ -1,5 +1,5 @@
-import React from 'react'
-import RecordItem from './RecordItem'
+import React from 'react';
+import RecordItem from './RecordItem';
 
 export default function RecordList({
     search,
@@ -22,5 +22,5 @@ export default function RecordList({
                 />
             ))}
         </tbody>
-    )
+    );
 }

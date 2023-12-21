@@ -8,4 +8,4 @@ module.exports = {
     module: {
         rules: require('./webpack.rules'),
     },
-}
+};

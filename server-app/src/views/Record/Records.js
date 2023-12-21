@@ -1,14 +1,14 @@
-import { CircularProgress } from '@mui/material'
-import React from 'react'
-import { useSessionContext } from '../../contexts/SessionContext'
-import RecordList from './RecordList'
-import RecordModal from './RecordModal'
-import RecordsHeader from './RecordsHeader'
-import RecordTitleBar from './RecordsTitleBar'
-import useRecordsManager from './hooks/useRecordsManager'
+import { CircularProgress } from '@mui/material';
+import React from 'react';
+import { useSessionContext } from '../../contexts/SessionContext';
+import RecordList from './RecordList';
+import RecordModal from './RecordModal';
+import RecordsHeader from './RecordsHeader';
+import RecordTitleBar from './RecordsTitleBar';
+import useRecordsManager from './hooks/useRecordsManager';
 
 export default function Records() {
-    const { isConnectedToDB } = useSessionContext()
+    const { isConnectedToDB } = useSessionContext();
     const {
         sortedFieldKeys,
         allFields,
@@ -32,7 +32,7 @@ export default function Records() {
         updateRecord,
         deleteRecord,
         handleScroll,
-    } = useRecordsManager()
+    } = useRecordsManager();
 
     return isConnectedToDB ? (
         <>
@@ -96,5 +96,5 @@ export default function Records() {
                 https://www.mongodb.com/try/download/community
             </div>
         </div>
-    )
+    );
 }

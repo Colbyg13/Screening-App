@@ -1,15 +1,15 @@
-import React from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
-import Navbar, { ROUTES } from './components/Navbar/Navbar'
-import CustomDataTypesProvider from './contexts/CustomDataContext'
-import SessionProvider from './contexts/SessionContext'
-import CustomFields from './views/CustomFields/CustomFields'
-import HomePage from './views/Home/HomePage'
-import Records from './views/Record/Records'
-import Sessions from './views/Session/Sessions'
-import Settings from './views/Settings/Settings'
-import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary'
-import SnackBarProvider from './contexts/SnackbarContext'
+import React from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import Navbar, { ROUTES } from './components/Navbar/Navbar';
+import CustomDataTypesProvider from './contexts/CustomDataContext';
+import SessionProvider from './contexts/SessionContext';
+import CustomFields from './views/CustomFields/CustomFields';
+import HomePage from './views/Home/HomePage';
+import Records from './views/Record/Records';
+import Sessions from './views/Session/Sessions';
+import Settings from './views/Settings/Settings';
+import { ErrorBoundary } from './components/ErrorBoundary/ErrorBoundary';
+import SnackBarProvider from './contexts/SnackbarContext';
 
 function App() {
     return (
@@ -41,7 +41,7 @@ function App() {
                 </CustomDataTypesProvider>
             </SnackBarProvider>
         </ErrorBoundary>
-    )
+    );
 }
 
-export default App
+export default App;

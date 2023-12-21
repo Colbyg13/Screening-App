@@ -1,17 +1,17 @@
-import { TextField } from '@mui/material'
-import React, { useState } from 'react'
-import useDebounce from '../../hooks/useDebounce'
+import { TextField } from '@mui/material';
+import React, { useState } from 'react';
+import useDebounce from '../../hooks/useDebounce';
 
 export default function RecordSearch({ updateSearch }) {
-    const [searchInput, setSearchInput] = useState('')
+    const [searchInput, setSearchInput] = useState('');
 
     useDebounce(
         () => {
-            updateSearch(searchInput)
+            updateSearch(searchInput);
         },
         300,
         [searchInput],
-    )
+    );
 
     return (
         <input
@@ -20,5 +20,5 @@ export default function RecordSearch({ updateSearch }) {
             value={searchInput}
             onChange={({ target: { value } }) => setSearchInput(value)}
         />
-    )
+    );
 }

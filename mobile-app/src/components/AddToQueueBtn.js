@@ -1,6 +1,6 @@
-import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
-import { Pressable } from '@react-native-material/core'
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+import { Pressable } from '@react-native-material/core';
 
 /**
  *
@@ -14,8 +14,8 @@ const AddToQueueBtn = props => {
                 <Text style={styles.btnText}>Add To Queue</Text>
             </Pressable>
         </View>
-    )
-}
+    );
+};
 const styles = StyleSheet.create({
     wrapper: {
         flex: 1,
@@ -38,6 +38,6 @@ const styles = StyleSheet.create({
     btnText: {
         fontSize: 22,
     },
-})
+});
 
-export default AddToQueueBtn
+export default AddToQueueBtn;

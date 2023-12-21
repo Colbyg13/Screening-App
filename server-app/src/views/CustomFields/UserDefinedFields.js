@@ -1,10 +1,10 @@
-import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined'
-import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined'
-import { Button, IconButton, MenuItem, TextField } from '@mui/material'
-import React from 'react'
-import convert from '../../utils/convert'
+import DeleteForeverOutlinedIcon from '@mui/icons-material/DeleteForeverOutlined';
+import HighlightOffOutlinedIcon from '@mui/icons-material/HighlightOffOutlined';
+import { Button, IconButton, MenuItem, TextField } from '@mui/material';
+import React from 'react';
+import convert from '../../utils/convert';
 
-export const CUSTOM_DATA_TYPE = 'Custom'
+export const CUSTOM_DATA_TYPE = 'Custom';
 
 const customType = {
     abbr: CUSTOM_DATA_TYPE,
@@ -12,7 +12,7 @@ const customType = {
     system: CUSTOM_DATA_TYPE,
     singular: CUSTOM_DATA_TYPE,
     plural: CUSTOM_DATA_TYPE,
-}
+};
 
 const allUnits = [
     customType,
@@ -21,7 +21,7 @@ const allUnits = [
     ...convert().list('glucose'),
     ...convert().list('temperature'),
     ...convert().list('pressure'),
-]
+];
 
 export default function UserDefinedFields({
     customDataTypes,
@@ -142,5 +142,5 @@ export default function UserDefinedFields({
                 </Button>
             </div>
         </div>
-    )
+    );
 }

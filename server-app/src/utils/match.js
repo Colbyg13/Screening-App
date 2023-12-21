@@ -1,4 +1,4 @@
-const invokeIfCallback = (cb, ...args) => (typeof cb === 'function' ? cb(...args) : cb)
+const invokeIfCallback = (cb, ...args) => (typeof cb === 'function' ? cb(...args) : cb);
 
 const matched = result => ({
     on: () => matched(result),
@@ -9,9 +9,9 @@ const matched = result => ({
     against: () => matched(result),
     otherwise: () => result,
     finally: () => {
-        throw new Error(`Must use \`otherwise()\` before using finally()`)
+        throw new Error(`Must use \`otherwise()\` before using finally()`);
     },
-})
+});
 
 const match = (...inputs) => ({
     on: (predicate, cb) =>
@@ -46,8 +46,8 @@ const match = (...inputs) => ({
         ),
     otherwise: cb => invokeIfCallback(cb, ...inputs),
     finally: () => {
-        throw new Error(`Must use \`otherwise()\` before using finally()`)
+        throw new Error(`Must use \`otherwise()\` before using finally()`);
     },
-})
+});
 
-export default match
+export default match;
