@@ -1,8 +1,8 @@
-const { contextBridge, app, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, shell } = require('electron');
 const { dialog } = require('@electron/remote');
 const ip = require('ip');
 const { database } = require('./db');
-const { writeLog, LOG_LEVEL } = require('./utils/logger');
+const { writeLog, LOG_LEVEL, getLogsPath } = require('./utils/logger');
 const { default: convert, getBaseUnit } = require('../utils/convert');
 const fs = require('fs');
 
@@ -157,4 +157,21 @@ contextBridge.exposeInMainWorld('api', {
                 reject('An error occurred when trying to download the records.');
             });
         }),
+    getPreventSleep: async () => {
+        try {
+            return await ipcRenderer.invoke('get-prevent-sleep');
+        } catch (err) {
+            writeLog(
+                LOG_LEVEL.ERROR,
+                `An error occurred when trying to get prevent sleep value: ${err}`,
+            );
+        }
+    },
+    setPreventSleep: preventSleep => {
+        ipcRenderer.send('set-prevent-sleep', preventSleep);
+    },
+    getLogsPath,
+    openFile: async path => {
+        shell.openPath(path);
+    },
 });

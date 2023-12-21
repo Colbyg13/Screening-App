@@ -19,9 +19,13 @@ export default function useRecords({ sort, search, unitConversions, dependencies
     const [selectedRecord, setSelectedRecord] = useState();
 
     useEffect(() => {
+        refreshRecords();
+    }, [sort, search, unitConversions]);
+
+    function refreshRecords() {
         getRecords(0);
         pageRef.current = 0;
-    }, [sort, search, unitConversions]);
+    }
 
     async function getNextPage() {
         if (!recordBlockRef.current) {
@@ -111,5 +115,6 @@ export default function useRecords({ sort, search, unitConversions, dependencies
         selectRecord,
         updateRecord,
         deleteRecord,
+        refreshRecords,
     };
 }

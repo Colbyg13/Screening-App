@@ -32,6 +32,7 @@ export default function Records() {
         updateRecord,
         deleteRecord,
         handleScroll,
+        refreshRecords,
     } = useRecordsManager();
 
     return isConnectedToDB ? (
@@ -51,6 +52,8 @@ export default function Records() {
                     unitConversions={unitConversions}
                     allFieldKeys={sortedFieldKeys}
                     updateSearch={updateSearch}
+                    refreshRecords={refreshRecords}
+                    loadingRecords={loadingRecords}
                 />
                 <div className="flex-grow w-full h-full relative">
                     {records.length ? (
