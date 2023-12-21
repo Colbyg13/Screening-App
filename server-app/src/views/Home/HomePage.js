@@ -40,16 +40,17 @@ export default function HomePage() {
                     </span>
                     <div className="ml-4 flex flex-col">
                         <span>
-                            Type - This is the name of the field. (ex. Height, Weight, Eyes, etc...)
+                            Name - This is the name of the field. (ex. Height, Weight, Eyes, etc...)
                         </span>
                         <span>
-                            Unit - This is the unit the field will be measured with (ex. kg, m,
+                            Measurement - This is measurement for the unit you want to select. You
+                            can also assign a "Custom" measurement where you can specify the unit.
+                        </span>
+                        <span>
+                            Unit - This is the unit or values that will be used for the measurement.
+                            (ex. For a type custom type of "Vision" values will be: 20/20, 20/25,
+                            20/30, etc... For the Measurement of mass the units will be mg, g, kg,
                             etc...)
-                        </span>
-                        <span>
-                            Values - This is only used if using the "Custom" Unit. This will be a
-                            set of defined values that will be selectable for the field (ex. For a
-                            type of "Eyes", values will be: 20/20, 20/25, 20/30, etc...)
                         </span>
                     </div>
                 </div>
