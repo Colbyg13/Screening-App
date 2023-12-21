@@ -15,7 +15,6 @@ export default function Settings() {
         async function getPreventSleep() {
             try {
                 const preventSleep = await window.api.getPreventSleep();
-                console.log({ preventSleep });
                 setPreventSleep(preventSleep);
             } catch (err) {
                 console.error(`Could not get prevent sleep value ${err}`);
@@ -85,6 +84,25 @@ export default function Settings() {
                         }
                         label="Disable Computer Sleeping"
                     />
+                </div>
+                <div>
+                    <h2 className="text-xl mt-4 mb-2">Server Logs</h2>
+                    <Button
+                        type="button"
+                        size="large"
+                        color="primary"
+                        variant="contained"
+                        onClick={async () => {
+                            try {
+                                const logsPath = await window.api.getLogsPath();
+                                window.api.openFile(logsPath);
+                            } catch (error) {
+                                console.error(`Could not open logs file ${error}`);
+                            }
+                        }}
+                    >
+                        <span>Open Logs</span>
+                    </Button>
                 </div>
                 <div>
                     <h2 className="text-xl mt-4 mb-2 text-red-600">Danger Zone</h2>

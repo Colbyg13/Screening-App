@@ -1,8 +1,8 @@
-const { contextBridge, app, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, shell } = require('electron');
 const { dialog } = require('@electron/remote');
 const ip = require('ip');
 const { database } = require('./db');
-const { writeLog, LOG_LEVEL } = require('./utils/logger');
+const { writeLog, LOG_LEVEL, getLogsPath } = require('./utils/logger');
 const { default: convert, getBaseUnit } = require('../utils/convert');
 const fs = require('fs');
 
@@ -169,5 +169,9 @@ contextBridge.exposeInMainWorld('api', {
     },
     setPreventSleep: preventSleep => {
         ipcRenderer.send('set-prevent-sleep', preventSleep);
+    },
+    getLogsPath,
+    openFile: async path => {
+        shell.openPath(path);
     },
 });

@@ -77,6 +77,14 @@ async function setup() {
     }
 }
 
+async function getLogsPath() {
+    if (!applicationPath || !logsPath) {
+        await setPaths();
+    }
+
+    return logsPath;
+}
+
 async function setPaths() {
     try {
         const appDataPath = await ipcRenderer.invoke('get-path');
@@ -84,7 +92,7 @@ async function setPaths() {
         applicationPath = path.join(appDataPath, applicationName);
         logsPath = path.join(applicationPath, 'logs');
     } catch (error) {
-        console.error("Error while invoking 'get-path':", error);
+        console.error('Error setting logs path:', error);
     }
 }
 
@@ -92,4 +100,5 @@ module.exports = {
     LOG_LEVEL,
     writeLog,
     setup,
+    getLogsPath,
 };
