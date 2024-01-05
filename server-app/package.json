@@ -1,7 +1,7 @@
 {
     "name": "records-keep",
     "productName": "Healthy Samoa",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "Server for keeping records",
     "main": ".webpack/main",
     "build": {
