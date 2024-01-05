@@ -5,15 +5,9 @@ import useSort from './useSort';
 import useUnitConversion from './useUnitConversion';
 
 export default function useRecordsManager() {
-    const {
-        loading: fieldsLoading,
-        sortedFieldKeys,
-        allFields,
-        allFieldKeys,
-        fieldKeyMap,
-    } = useFields();
+    const { loading: fieldsLoading, sortedFieldKeys, allFields, fieldKeyMap } = useFields();
 
-    const { sort, mainSortKey, updateSortArray } = useSort({ allFieldKeys });
+    const { sort, sortKey, updateSortArray } = useSort();
 
     const { search, updateSearch } = useSearch();
 
@@ -56,8 +50,7 @@ export default function useRecordsManager() {
         fieldKeyMap,
 
         // sort
-        sort,
-        mainSortKey,
+        sortKey,
         updateSortArray,
 
         // search

@@ -5,10 +5,9 @@ import React, { useEffect, useState } from 'react';
 import convert from '../../utils/convert';
 
 export default function RecordsHeader({
-    mainSortKey,
+    sortKey = {},
     allFieldKeys = [],
     fieldKeyMap = {},
-    sort = {},
     unitConversions = {},
     updateFieldUnit = () => {},
     updateSortArray = () => {},
@@ -43,8 +42,8 @@ export default function RecordsHeader({
                         <th
                             id={key}
                             key={key}
-                            className={`px-4 py-3 text-start hover:bg-gray-100 cursor-pointer shadow-inner ${
-                                mainSortKey === key ? 'text-blue-500' : ''
+                            className={`px-1 py-1 text-start hover:bg-gray-100 cursor-pointer shadow-inner ${
+                                sortKey.key === key ? 'text-blue-500' : ''
                             }`}
                             onClick={() => updateSortArray(key)}
                         >
@@ -53,11 +52,13 @@ export default function RecordsHeader({
                                 <span>
                                     {unitConversions[key] ? `(${unitConversions[key]})` : ''}
                                 </span>
-                                {sort[key] < 0 ? (
-                                    <ArrowDropDownIcon size={12} />
-                                ) : (
-                                    <ArrowDropUpIcon />
-                                )}
+                                {sortKey.key === key ? (
+                                    sortKey.value > 0 ? (
+                                        <ArrowDropDownIcon size={12} />
+                                    ) : (
+                                        <ArrowDropUpIcon />
+                                    )
+                                ) : null}
                             </div>
                         </th>
                     ))}

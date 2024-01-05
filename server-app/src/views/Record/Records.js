@@ -14,8 +14,7 @@ export default function Records() {
         allFields,
         fieldKeyMap,
 
-        sort,
-        mainSortKey,
+        sortKey,
         updateSortArray,
 
         search,
@@ -63,13 +62,12 @@ export default function Records() {
                         >
                             <table className="w-full table-auto">
                                 <RecordsHeader
-                                    mainSortKey={mainSortKey}
+                                    sortKey={sortKey}
                                     allFieldKeys={sortedFieldKeys}
                                     fieldKeyMap={fieldKeyMap}
                                     unitConversions={unitConversions}
                                     updateSortArray={updateSortArray}
                                     updateFieldUnit={updateFieldUnit}
-                                    sort={sort}
                                 />
                                 <RecordList
                                     search={search}

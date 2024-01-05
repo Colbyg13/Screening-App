@@ -1,48 +1,25 @@
-import { useEffect, useMemo, useState } from 'react';
-import {
-    ALL_REQUIRED_DB_FIELD_KEYS,
-    REQUIRED_DB_FIELDS,
-} from '../../../constants/required-station-fields';
+import { useMemo, useState } from 'react';
 
 const initialSortArr = [['id', -1]];
 
-export default function useSort({ allFieldKeys }) {
-    const [sortArr, setSortArr] = useState(initialSortArr);
-    const mainSortKey = sortArr[0]?.[0];
+export default function useSort() {
+    const [sortKey, setSortKey] = useState({
+        key: 'id',
+        value: -1,
+    });
 
-    const sort = useMemo(
-        () =>
-            sortArr.reduce(
-                (all, [key, sortValue]) => ({
-                    ...all,
-                    [key]: sortValue,
-                }),
-                {},
-            ),
-        [sortArr],
-    );
-
-    useEffect(() => {
-        setSortArr([
-            ['id', -1],
-            ...ALL_REQUIRED_DB_FIELD_KEYS.map(key => [key, 1]),
-            ...allFieldKeys
-                .filter(key => !REQUIRED_DB_FIELDS[key] && key !== 'id')
-                .map(key => [key, 1]),
-        ]);
-    }, [allFieldKeys]);
+    const sort = useMemo(() => ({ [sortKey.key]: sortKey.value }), [sortKey]);
 
     function updateSortArray(key) {
-        const [_, oldValue] = sortArr.find(([k]) => k === key);
-        setSortArr(sortArr => [
-            [key, oldValue < 0 ? 1 : -1],
-            ...sortArr.filter(([k]) => k !== key),
-        ]);
+        setSortKey(({ key: oldKey, value: oldValue }) => ({
+            key,
+            value: oldKey === key && oldValue > 0 ? -1 : 1,
+        }));
     }
 
     return {
+        sortKey,
         sort,
-        mainSortKey,
         updateSortArray,
     };
 }
