@@ -94,14 +94,7 @@ const AddToOnlineQueue = ({ route }) => {
         }
     };
 
-    useEffect(() => {
-        console.log({ formState })
-
-    }, [formState])
-
-
     const handleFormUpdate = (field, selectedItem) => {
-        console.log('handling update', field, selectedItem);
         setFormState(prevState => ({
             ...prevState,
             [field.key]: selectedItem,

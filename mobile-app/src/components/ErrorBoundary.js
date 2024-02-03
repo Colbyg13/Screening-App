@@ -19,8 +19,6 @@ export default function AppErrorBoundary({ children }) {
 
             existingLogs.unshift(errorLog);
 
-            console.log({ existingLogsJSON, existingLogs })
-
             await AsyncStorage.setItem(ERROR_LOGS_STORAGE_KEY, JSON.stringify(existingLogs));
         } catch (storageError) {
             console.error('Error storing error log:', storageError);
