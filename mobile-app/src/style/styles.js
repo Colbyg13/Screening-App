@@ -18,7 +18,8 @@ export const styles = StyleSheet.create({
         alignSelf: 'flex-start',
     },
     fieldInput: {
-        width: 200,
+        maxWidth: 300,
+        width: '100%',
         fontSize: 30,
     },
     switch: {

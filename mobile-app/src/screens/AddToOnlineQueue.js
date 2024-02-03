@@ -94,8 +94,14 @@ const AddToOnlineQueue = ({ route }) => {
         }
     };
 
+    useEffect(() => {
+        console.log({ formState })
+
+    }, [formState])
+
+
     const handleFormUpdate = (field, selectedItem) => {
-        //console.log('handling update', field, selectedItem);
+        console.log('handling update', field, selectedItem);
         setFormState(prevState => ({
             ...prevState,
             [field.key]: selectedItem,
@@ -146,40 +152,36 @@ const AddToOnlineQueue = ({ route }) => {
             return (
                 <View key={field.key} style={styles.row}>
                     <Text style={styles.fieldName}>{field.name}:</Text>
-                    <View>
-                        <TextInput
-                            onChangeText={newText => {
-                                setFormState(prevState => ({
-                                    ...prevState,
-                                    [field.key]: newText,
-                                }));
-                            }}
-                            style={styles.fieldInput}
-                            required={field.required}
-                        ></TextInput>
-                    </View>
+                    <TextInput
+                        onChangeText={newText => {
+                            setFormState(prevState => ({
+                                ...prevState,
+                                [field.key]: newText,
+                            }));
+                        }}
+                        style={styles.fieldInput}
+                        required={field.required}
+                    ></TextInput>
                 </View>
             );
         } else if (field.type === 'number') {
             return (
                 <View key={field.key} style={styles.row}>
                     <Text style={styles.fieldName}>{field.name}:</Text>
-                    <View>
-                        <TextInput
-                            keyboardType="number-pad"
-                            returnKeyType="done"
-                            onSubmitEditing={Keyboard.dismiss}
-                            onChangeText={newText => {
-                                // console.log(newText);
-                                setFormState(prevState => ({
-                                    ...prevState,
-                                    [field.key]: newText,
-                                }));
-                            }}
-                            style={styles.fieldInput}
-                            required={field.required}
-                        ></TextInput>
-                    </View>
+                    <TextInput
+                        keyboardType="number-pad"
+                        returnKeyType="done"
+                        onSubmitEditing={Keyboard.dismiss}
+                        onChangeText={newText => {
+                            // console.log(newText);
+                            setFormState(prevState => ({
+                                ...prevState,
+                                [field.key]: newText,
+                            }));
+                        }}
+                        style={styles.fieldInput}
+                        required={field.required}
+                    ></TextInput>
                 </View>
             );
         } else if (field.type === 'bool') {

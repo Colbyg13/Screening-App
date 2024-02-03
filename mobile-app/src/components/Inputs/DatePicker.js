@@ -37,6 +37,7 @@ const DatePicker = props => {
                 onPress={() => {
                     props.toggleShow(field, showname);
                 }}
+                style={styles.fieldInput}
             ></Button>
             <DateTimePickerModal
                 isVisible={visible}

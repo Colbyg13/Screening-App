@@ -30,20 +30,18 @@ const CustomDataPicker = props => {
                 <Text style={styles.fieldName}>
                     {field.name}: ({customData?.unit})
                 </Text>
-                <View>
-                    <TextInput
-                        value={`${value ?? ''}`}
-                        keyboardType="decimal-pad"
-                        returnKeyType="done"
-                        onSubmitEditing={Keyboard.dismiss}
-                        onChangeText={newText => {
-                            // console.log(newText);
-                            props.updateForm(field, newText);
-                        }}
-                        style={styles.fieldInput}
-                        required={field.required}
-                    ></TextInput>
-                </View>
+                <TextInput
+                    value={`${value ?? ''}`}
+                    keyboardType="decimal-pad"
+                    returnKeyType="done"
+                    onSubmitEditing={Keyboard.dismiss}
+                    onChangeText={newText => {
+                        setValue(newText)
+                        props.updateForm(field, +newText);
+                    }}
+                    style={styles.fieldInput}
+                    required={field.required}
+                ></TextInput>
             </View>
         );
     } else {
@@ -62,7 +60,7 @@ const CustomDataPicker = props => {
                 <Text style={styles.fieldName}>{field.name}:</Text>
                 <View>
                     <SelectDropdown
-                        buttonStyle={{ width: '75%' }}
+                        buttonStyle={styles.fieldInput}
                         defaultValue={value}
                         data={customData?.values}
                         onSelect={(selectedItem, index) => {
