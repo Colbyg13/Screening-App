@@ -90,15 +90,15 @@ router.get('/', async (req, res) => {
 
         const find = search
             ? {
-                  $or: ['id', 'name'].map(key => ({
-                      $expr: {
-                          $regexMatch: {
-                              input: { $toString: `$${key}` },
-                              regex: new RegExp(search, 'i'),
-                          },
-                      },
-                  })),
-              }
+                $or: ['id', 'name'].map(key => ({
+                    $expr: {
+                        $regexMatch: {
+                            input: { $toString: `$${key}` },
+                            regex: new RegExp(search, 'i'),
+                        },
+                    },
+                })),
+            }
             : {};
 
         const records = await recordsCol.find(find).sort(sort).skip(skip).limit(pageSize).toArray();
@@ -178,9 +178,9 @@ router.post('/', async (req, res) => {
     if (creatingRecord && !sessionId) {
         writeLog(
             LOG_LEVEL.ERROR,
-            `Error updating record: Cannot create or update record without a sessionId`,
+            `Error Creating record: Cannot create record without a sessionId`,
         );
-        res.status(400).json({ error: 'Cannot create or update record without a sessionId' });
+        res.status(400).json({ error: 'Cannot create a record without a sessionId' });
         return;
     }
 
