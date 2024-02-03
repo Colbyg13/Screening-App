@@ -2,8 +2,9 @@ import { StyleSheet, StatusBar } from 'react-native';
 //has most of the styles used throughout the app. However styling is still used in components where it was more convenient than overloading this page.
 export const styles = StyleSheet.create({
     container: {
+        flex: 1,
         height: '100%',
-        marginTop: StatusBar.currentHeight || 0,
+        marginTop: 0,
         backgroundColor: '#ffffff',
     },
     fieldName: {
@@ -12,8 +13,8 @@ export const styles = StyleSheet.create({
         fontSize: 22,
     },
     pageDirection: {
-        marginTop: 30,
-        margin: 10,
+        marginTop: 20,
+        marginHorizontal: 20,
         fontSize: 34,
         alignSelf: 'flex-start',
     },
@@ -83,7 +84,7 @@ export const styles = StyleSheet.create({
     },
     flatList: {
         marginTop: 10,
-        height: '75%',
+        height: '100%',
         flexGrow: 0,
         padding: 5,
     },

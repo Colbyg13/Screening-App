@@ -368,7 +368,6 @@ const UpdateRecordScreen = ({ route }) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: StatusBar.currentHeight,
         paddingBottom: 20,
         backgroundColor: '#ffffff',
     },
