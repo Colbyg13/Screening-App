@@ -1,27 +1,26 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, SafeAreaView, FlatList, Keyboard } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { styles } from '../../style/styles';
+import React, { useEffect, useState } from 'react';
+import { FlatList, Keyboard, SafeAreaView, Text, View } from 'react-native';
 import AddOfflineRecordBtn from '../../components/AddOfflineRecordBtn';
 import OfflineRecordItem from '../../components/OfflineRecordItem';
+import { styles } from '../../style/styles';
 
 import {
-    Provider,
     Button,
     Dialog,
-    DialogHeader,
-    DialogContent,
     DialogActions,
+    DialogContent,
+    DialogHeader,
     TextInput,
 } from '@react-native-material/core';
+import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 
 export const LOCAL_RECORDS_STORAGE_KEY = 'LOCAL_RECORDS';
 
 const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
+    const { customDataTypes } = useCustomDataTypesContext();
     const [records, setRecords] = useState([]); //array to hold records list
-    const customDataTypes = route.params.customDataTypes;
     const selectedDataTypes = route.params.selectedDataTypes;
-    const [newRecord, setNewRecord] = useState(null); //object to hold new record
     const [needsToStoreData, setNeedsToStoreData] = useState(false); //boolean to determine if new record needs to be stored
     const [needsUpdate, setNeedsUpdate] = useState(true); //boolean to trigger update of records list
     const [replacementID, setReplacementID] = useState(null); //string to hold ID of record to be replaced
@@ -41,7 +40,6 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
         try {
             const value = await AsyncStorage.getItem(LOCAL_RECORDS_STORAGE_KEY);
             if (value !== null) {
-                // We have data!!
                 setRecords(JSON.parse(value));
                 setNeedsUpdate(false);
             }

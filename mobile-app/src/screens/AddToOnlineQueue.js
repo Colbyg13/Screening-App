@@ -69,26 +69,29 @@ const AddToOnlineQueue = ({ route }) => {
         //call function to handle SOCKET EVENT TO ADD NEW RECORD TO SESSION/QUEUE
         //On success open dialog with new ID, name, and DOB
         //On dialog close go back to session and update list of patients
-        const result = await sendRecord({
-            record: formState,
-            // puts only updated values in form into
-            customData: customDataTypes.reduce((customData, { type, unit }) => {
-                const usedField = station.fields.find(field => field.type === type);
-                const shouldAddKey =
-                    unit !== 'Custom' && usedField && formState[usedField.key] !== undefined;
+        try {
+            const result = await sendRecord({
+                record: formState,
+                // puts only updated values in form into
+                customData: customDataTypes.reduce((customData, { type, unit }) => {
+                    const usedField = station.fields.find(field => field.type === type);
+                    const shouldAddKey =
+                        unit !== 'Custom' && usedField && formState[usedField.key] !== undefined;
 
-                return shouldAddKey
-                    ? {
-                          ...customData,
-                          [usedField.key]: unit,
-                      }
-                    : customData;
-            }, {}),
-        });
-        // let newId = Math.floor(Math.random() * 10); //this id will be given in the server
-        setPatient(prevState => ({ ...prevState, id: result.newId })); //on server success set the patient in state for display.
+                    return shouldAddKey
+                        ? {
+                            ...customData,
+                            [usedField.key]: unit,
+                        }
+                        : customData;
+                }, {}),
+            });
+            setPatient(prevState => ({ ...prevState, id: result.newId })); //on server success set the patient in state for display.
 
-        setVisible(true); //opens the modal/dialog
+            setVisible(true); //opens the modal/dialog
+        } catch (error) {
+            console.warn("Could not send record")
+        }
     };
 
     const handleFormUpdate = (field, selectedItem) => {

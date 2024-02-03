@@ -6,9 +6,10 @@ import BoolInput from '../../components/Inputs/BoolInput';
 import DatePicker from '../../components/Inputs/DatePicker';
 import CustomDataPickerOffline from '../../components/Inputs/CustomDataPickerOffline';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 const OfflineAddRecordStep3 = ({ route, navigation }) => {
     // console.log('add to queue offline screen', route.params);
-    const customDataTypes = route.params.customDataTypes;
+    const { customDataTypes } = useCustomDataTypesContext();
     const selectedDataTypes = [
         { name: 'ID', key: 'id', type: 'number' },
         ...route.params.selectedDataTypes,

@@ -9,7 +9,7 @@ const CustomDataTypesContext = createContext({
     loading: false,
     customDataTypes: [],
     customDataTypeMap: {},
-    fetchData: () => {},
+    fetchData: () => { },
 });
 
 export const useCustomDataTypesContext = () => useContext(CustomDataTypesContext);
@@ -23,10 +23,10 @@ export default function CustomDataTypesProvider({ children }) {
     const customDataTypeMap = useMemo(
         () =>
             customDataTypes.reduce(
-                (all, { type, unit }) => ({
-                    ...all,
-                    [type]: unit,
-                }),
+                (customDataTypeMap, { type, unit }) => {
+                    customDataTypeMap[type] = unit;
+                    return customDataTypeMap;
+                },
                 {},
             ),
         [customDataTypes],

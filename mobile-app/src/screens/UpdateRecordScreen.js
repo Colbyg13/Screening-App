@@ -125,23 +125,27 @@ const UpdateRecordScreen = ({ route }) => {
         //call function to handle SOCKET EVENT TO ADD NEW RECORD TO SESSION/QUEUE
         //On success open dialog with new ID, name, and DOB
         //On dialog close go back to session and update list of patients
-        const result = await sendRecord({
-            record: formState,
-            customData: customDataTypes.reduce((customData, { type, unit }) => {
-                const usedField = station.fields.find(field => field.type === type);
-                const shouldAddKey =
-                    unit !== 'Custom' &&
-                    usedField &&
-                    formState[usedField.key] !== undefined &&
-                    formState[usedField.key] !== '';
+        try {
+            const result = await sendRecord({
+                record: formState,
+                customData: customDataTypes.reduce((customData, { type, unit }) => {
+                    const usedField = station.fields.find(field => field.type === type);
+                    const shouldAddKey =
+                        unit !== 'Custom' &&
+                        usedField &&
+                        formState[usedField.key] !== undefined &&
+                        formState[usedField.key] !== '';
 
-                if (shouldAddKey) {
-                    customData[usedField.key] = unit;
-                }
+                    if (shouldAddKey) {
+                        customData[usedField.key] = unit;
+                    }
 
-                return customData;
-            }, {}),
-        });
+                    return customData;
+                }, {}),
+            });
+        } catch (error) {
+            console.warn('Error sending record to server')
+        }
         setVisible(true);
     };
 

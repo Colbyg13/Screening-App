@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { View, Text, StyleSheet, Switch } from 'react-native';
 import { Button } from '@react-native-material/core';
 import { AntDesign } from '@expo/vector-icons';
@@ -12,17 +12,7 @@ const OfflineStationDataTypeItem = props => {
     const field = props.item;
     const [showValues, setShowValues] = useState(false);
     const [value, setValue] = useState(false);
-    const [type, setType] = useState(props.type);
-    const [customData, setCustomData] = useState(props.customData);
-    let options = [];
-    if (type === 'custom') {
-        // console.log('custom data', customData)
-        if (customData?.values !== null) {
-            options = customData?.values;
-        } else {
-            options = null;
-        }
-    }
+    const options = useMemo(() => props.customData?.values || [], [props.customData])
 
     const handleIconPress = () => {
         setShowValues(prevState => !prevState);
@@ -31,14 +21,22 @@ const OfflineStationDataTypeItem = props => {
     return (
         <View key={field._id} style={styles.item}>
             <View style={styles.row}>
+                {/* add a trashcan icon that uses props.handleDelete(field) */}
+                <AntDesign
+                    style={styles.icon}
+                    name="delete"
+                    size={24}
+                    color="red"
+                    onPress={() => props.handleDelete(field)}
+                />
                 <View style={styles.rowDescription}>
                     <Text style={styles.text}>Field: {field.name}</Text>
                     <Text style={styles.text}>
-                        Type: {type === 'custom' ? 'custom' : `${field.type}`}
+                        Type: {field.type}
                     </Text>
-                    {type == 'custom' && (
+                    {options.length > 0 ? (
                         <React.Fragment>
-                            {options !== null && (
+                            {options.length > 0 ? (
                                 <View style={styles.optionIconWrapper}>
                                     <Text style={styles.text} onPress={handleIconPress}>
                                         Options:
@@ -61,9 +59,9 @@ const OfflineStationDataTypeItem = props => {
                                         />
                                     )}
                                 </View>
-                            )}
+                            ) : null}
                         </React.Fragment>
-                    )}
+                    ) : null}
                 </View>
                 <View>
                     <Switch
@@ -75,18 +73,17 @@ const OfflineStationDataTypeItem = props => {
                         value={value}
                     ></Switch>
                 </View>
-                {showValues && (
+                {showValues ? (
                     <View style={styles.valuesWrapper}>
                         {options.map((option, index) => {
                             return (
                                 <View key={index} style={styles.optionLabelAndTextWrapper}>
-                                    <Text style={styles.optionLabel}>Option {index + 1}:</Text>
                                     <Text style={styles.optiontext}>{option}</Text>
                                 </View>
                             );
                         })}
                     </View>
-                )}
+                ) : null}
             </View>
         </View>
     );

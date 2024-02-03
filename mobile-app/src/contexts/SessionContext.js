@@ -22,7 +22,7 @@ import { useCustomDataTypesContext } from './CustomDataContext';
 
 export const SERVER_PORT = 3333;
 
-const STATION_FIELDS_STORAGE_KEY = 'sessionFields';
+export const STATION_FIELDS_STORAGE_KEY = 'sessionFields';
 const DEVICE_NAME_STORAGE_KEY = 'device-name';
 
 const SessionContext = createContext({
@@ -33,11 +33,11 @@ const SessionContext = createContext({
     sessionRecords: [],
     deviceName: '',
     selectedStation: {},
-    setDeviceName: () => {},
-    uploadOfflineRecords: () => {},
-    joinStation: () => {},
-    leaveStation: () => {},
-    sendRecord: () => {},
+    setDeviceName: () => { },
+    uploadOfflineRecords: () => { },
+    joinStation: () => { },
+    leaveStation: () => { },
+    sendRecord: () => { },
 });
 
 export const useSessionContext = () => useContext(SessionContext);
@@ -141,7 +141,7 @@ export default function SessionProvider({ children }) {
             });
 
             socket.on('session-info', data => {
-                console.log('session info');
+                console.log('session info', data);
                 const {
                     initial,
                     sessionIsRunning: newSessionIsRunning,
@@ -170,6 +170,7 @@ export default function SessionProvider({ children }) {
 
             return () => {
                 socket.disconnect();
+                setSocket(null);
             };
         }
     }, [serverIp]);
@@ -211,7 +212,18 @@ export default function SessionProvider({ children }) {
         try {
             const result = await axios.get(`${serverIp}/api/v1/fields`);
             if (result.data) {
-                AsyncStorage.setItem(STATION_FIELDS_STORAGE_KEY, JSON.stringify(result.data));
+                const existingFieldsJSON = await AsyncStorage.getItem(STATION_FIELDS_STORAGE_KEY);
+                const existingFields = existingFieldsJSON ? JSON.parse(existingFieldsJSON) : [];
+
+                // remove duplicate keys
+                const allFieldsMap = [...existingFields, ...result.data].reduce((allFieldsMap, field) => {
+                    allFieldsMap[field.key] = field;
+                    return allFieldsMap;
+                }, {});
+
+                const allFields = Object.values(allFieldsMap).sort((a, b) => a.key < b.key ? -1 : 1);
+
+                AsyncStorage.setItem(STATION_FIELDS_STORAGE_KEY, JSON.stringify(allFields));
             }
         } catch (error) {
             console.warn(error);
@@ -219,18 +231,28 @@ export default function SessionProvider({ children }) {
     }
 
     async function joinStation(stationId) {
+        if (!socket) return;
         console.log('join station');
         setSelectedStationId(stationId);
         socket.emit('station-join', { stationId });
     }
 
     async function leaveStation() {
+        if (!socket) return;
         console.log('leave station');
         setSelectedStationId();
         socket.emit('station-leave');
     }
 
     async function uploadOfflineRecords(showModal) {
+        if (!isConnected) {
+            setSnackbarInfo({
+                status: 'error',
+                message: 'Cannot sync records when not connected to a server',
+            });
+            return;
+        }
+
         const offlineRecords = JSON.parse(await AsyncStorage.getItem(LOCAL_RECORDS_STORAGE_KEY));
         if (offlineRecords && offlineRecords.length) {
             Promise.allSettled(
@@ -283,6 +305,7 @@ export default function SessionProvider({ children }) {
             return result.data;
         } catch (error) {
             console.warn(error);
+            throw new Error("Error sending record to server.")
         }
     }
 
@@ -310,7 +333,7 @@ export default function SessionProvider({ children }) {
                 severity={snackbarInfo?.status}
                 duration={6000}
             />
-            <Dialog visible={!!modalMessage} onDismiss={() => {}}>
+            <Dialog visible={!!modalMessage} onDismiss={() => { }}>
                 <DialogHeader title={modalMessage} />
                 <DialogContent>
                     <View style={{ display: 'flex', flexDirection: 'row' }}>

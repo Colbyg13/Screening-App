@@ -5,16 +5,17 @@ import { Pressable } from '@react-native-material/core';
 //Returns an offline record item showing the ID and the name if present
 const OfflineRecordItem = props => {
     const person = props.item;
+    const { id: personId, customData, ...personRest } = person;
     return (
         <Pressable key={person.id} style={styles.item} onPress={props.onPress}>
             <View style={styles.innerContent}>
                 <View style={styles.itemWrapper}>
-                    <Text style={styles.title}>ID: {person.id}</Text>
-                    {person.name && (
-                        <View key={person.name} style={styles.fieldsView}>
-                            <Text style={styles.fieldsitem}>Name: {person.name}</Text>
+                    <Text style={styles.title}>ID: {personId}</Text>
+                    {Object.entries(personRest).map(([key, value]) => (
+                        <View key={key} style={styles.fieldsView}>
+                            <Text style={styles.fieldsitem}>{key}: {JSON.stringify(value)}</Text>
                         </View>
-                    )}
+                    ))}
                 </View>
             </View>
         </Pressable>
