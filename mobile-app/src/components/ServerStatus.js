@@ -61,8 +61,8 @@ export default function ServerStatus() {
                     backgroundColor: sessionIsRunning
                         ? 'lightgreen'
                         : isConnected
-                          ? 'lightblue'
-                          : 'lightgray',
+                            ? 'lightblue'
+                            : 'lightgray',
                     borderWidth: 1,
                     borderColor: sessionIsRunning ? 'green' : isConnected ? 'blue' : 'gray',
                 }}
@@ -70,7 +70,7 @@ export default function ServerStatus() {
                 onLongPress={handleLongPress}
             >
                 {serverLoading ? <ActivityIndicator /> : null}
-                <Text>{sessionIsRunning ? 'started' : isConnected ? 'connected' : 'offline'}</Text>
+                <Text>{sessionIsRunning ? 'Running' : isConnected ? 'Connected' : 'Offline'}</Text>
             </Chip>
         </>
     );

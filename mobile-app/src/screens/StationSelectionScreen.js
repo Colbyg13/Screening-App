@@ -6,10 +6,8 @@ import { useCustomDataTypesContext } from '../contexts/CustomDataContext';
 
 //the screen for selecting a station to collect data for.
 const StationSelectionScreen = ({ route, navigation }) => {
-    const { customDataTypes } = useCustomDataTypesContext();
-
     const isFocused = useIsFocused();
-    const { selectedStation, leaveStation, sessionInfo } = useSessionContext();
+    const { selectedStation, leaveStation } = useSessionContext();
 
     // leave the station automatically
     useEffect(() => {

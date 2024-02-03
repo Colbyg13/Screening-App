@@ -1,15 +1,12 @@
-import { Button, Stack, TextInput } from '@react-native-material/core';
 import React from 'react';
-import { Image, SafeAreaView, Dimensions, StyleSheet } from 'react-native';
+import { Image, SafeAreaView, Dimensions, StyleSheet, Text } from 'react-native';
+import { Button, Stack, TextInput } from '@react-native-material/core';
 import { useSessionContext } from '../contexts/SessionContext';
 
 const { width, height } = Dimensions.get('window');
 
-export const DEVICE_NAME_STORAGE_KEY = 'device-name';
-
 const HomeScreen = ({ navigation }) => {
-    const { uploadOfflineRecords, deviceName, setDeviceName, sessionIsRunning } =
-        useSessionContext();
+    const { uploadOfflineRecords, deviceName, setDeviceName, sessionIsRunning } = useSessionContext();
 
     const handleOnPress = async () => {
         navigation.navigate('Station Selection');
@@ -39,7 +36,7 @@ const HomeScreen = ({ navigation }) => {
                 <Button
                     style={styles.button}
                     title="Connect to Session"
-                    color="#EDEDED"
+                    color={colors.primary}
                     disabled={!sessionIsRunning}
                     titleStyle={styles.buttonText}
                     loadingIndicatorPosition="trailing"
@@ -48,27 +45,33 @@ const HomeScreen = ({ navigation }) => {
                 <Button
                     style={styles.button}
                     title="Offline Mode"
-                    color="#EDEDED"
+                    color={colors.secondary}
                     titleStyle={styles.buttonText}
                     onPress={offlineMode}
                 />
                 <Button
                     style={styles.button}
                     title="Sync Offline Records"
-                    color="#EDEDED"
+                    color={colors.secondary}
                     titleStyle={styles.buttonText}
                     onPress={uploadOfflineRecords}
                 />
                 <Button
                     style={styles.button}
                     title="Settings"
-                    color="#EDEDED"
+                    color={colors.secondary}
                     titleStyle={styles.buttonText}
                     onPress={openSettings}
                 />
+                <Text style={styles.versionText}>Version 1.0.5</Text>
             </Stack>
         </SafeAreaView>
     );
+};
+
+const colors = {
+    primary: '#EDEDED',
+    secondary: '#EDEDED',
 };
 
 const styles = StyleSheet.create({
@@ -86,14 +89,19 @@ const styles = StyleSheet.create({
     },
     input: {
         width: '80%',
+        marginBottom: 10,
     },
     button: {
         width: '80%',
         paddingVertical: 15,
+        marginBottom: 10,
     },
     buttonText: {
         fontSize: 16,
         fontWeight: 'bold',
+    },
+    versionText: {
+        marginBottom: 20,
     },
 });
 
