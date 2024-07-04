@@ -141,7 +141,6 @@ export default function SessionProvider({ children }) {
             });
 
             socket.on('session-info', data => {
-                console.log('session info', data);
                 const {
                     initial,
                     sessionIsRunning: newSessionIsRunning,

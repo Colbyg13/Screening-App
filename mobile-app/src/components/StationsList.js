@@ -41,7 +41,6 @@ const StationsList = props => {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        marginTop: StatusBar.currentHeight || 0,
         backgroundColor: '#ffffff',
     },
     item: {

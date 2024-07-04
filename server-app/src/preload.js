@@ -1,5 +1,5 @@
 const express = require('express');
-const unhandled = require('electron-unhandled');
+// const unhandled = require('electron-unhandled');
 const socketIo = require('socket.io');
 const cors = require('cors');
 const http = require('http');
@@ -13,17 +13,17 @@ console.log('-- starting up server --');
 
 setup();
 
-unhandled({
-    logger: error => {
-        try {
-            writeLog(LOG_LEVEL.ERROR, `Uncaught Exception: ${error}`);
-        } catch (error) {
-            console.error('Could not write log');
-        }
-    },
-    showDialog: true,
-    reportButton: false,
-});
+// unhandled({
+//     logger: error => {
+//         try {
+//             writeLog(LOG_LEVEL.ERROR, `Uncaught Exception: ${error}`);
+//         } catch (error) {
+//             console.error('Could not write log');
+//         }
+//     },
+//     showDialog: true,
+//     reportButton: false,
+// });
 
 const app = express();
 const server = http.createServer(app);

@@ -7,7 +7,6 @@ export const PREVIOUS_CONNECTION_STORAGE_KEY = 'previous-connection';
 export default async function findServer(port, path = '') {
     // Check previous connected ip
     const previousIp = await AsyncStorage.getItem(PREVIOUS_CONNECTION_STORAGE_KEY);
-    console.log({ previousIp });
     // Manually goes through all the ip addresses (with subnet /24 - will need to update if differs)
     return new Promise((res, rej) =>
         Network.getIpAddressAsync().then(ipAddress =>

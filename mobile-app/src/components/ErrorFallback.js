@@ -3,8 +3,6 @@ import React from 'react';
 import { View, Text, Button, StyleSheet } from 'react-native';
 
 export default function ErrorFallback({ error, resetError }) {
-    console.log(arguments)
-
     const navigation = useNavigation();
 
     function handleRefresh() {

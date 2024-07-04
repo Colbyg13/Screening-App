@@ -218,7 +218,7 @@ const IpadOfflineModeStep1 = ({ navigation }) => {
 
 const ButtonStyles = StyleSheet.create({
     buttonWrapper: {
-        marginTop: 20,
+        marginTop: 10,
         marginBottom: 20,
         flexDirection: 'row',
         justifyContent: 'space-around',
