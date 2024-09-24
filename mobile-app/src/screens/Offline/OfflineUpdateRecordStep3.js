@@ -1,19 +1,13 @@
-import React, { useEffect, useState } from 'react';
-import { SafeAreaView, Text, ScrollView, View, Keyboard } from 'react-native';
-import { Pressable, TextInput } from '@react-native-material/core';
-import { styles } from '../../style/styles';
-import BoolInput from '../../components/Inputs/BoolInput';
-import DatePicker from '../../components/Inputs/DatePicker';
-import CustomDataPickerOffline from '../../components/Inputs/CustomDataPickerOffline';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import {
-    Provider,
     Button,
-    Dialog,
-    DialogHeader,
-    DialogContent,
-    DialogActions,
+    Dialog, DialogActions, DialogContent, DialogHeader, Pressable, TextInput
 } from '@react-native-material/core';
+import React, { useEffect, useState } from 'react';
+import { Keyboard, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import BoolInput from '../../components/Inputs/BoolInput';
+import CustomDataPickerOffline from '../../components/Inputs/CustomDataPickerOffline';
+import DatePicker from '../../components/Inputs/DatePicker';
 const OfflineAddRecordStep3 = ({ route, navigation }) => {
     const item = route.params.item;
     // console.log('HERE IS THE ITEM TO UPDATE', item);
@@ -188,11 +182,11 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                                 returnKeyType="done"
                                 onSubmitEditing={Keyboard.dismiss}
                                 onChangeText={newText => {
-                                    // console.log(newText);
-                                    setFormState(prevState => ({
-                                        ...prevState,
-                                        [field.key]: +newText,
-                                    }));
+                                    const value = +newText;
+                                        setFormState(prevState => ({
+                                            ...prevState,
+                                            [field.key]: Number.isNaN(value) ? 0 : value,
+                                        }));
                                 }}
                                 style={styles.fieldInput}
                                 required={field.required}
@@ -321,5 +315,83 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
         </SafeAreaView>
     );
 };
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        paddingBottom: 20,
+        backgroundColor: '#ffffff',
+    },
+    scrollView: {
+        marginHorizontal: 10,
+    },
+    fieldName: {
+        alignSelf: 'flex-start',
+        marginBottom: 5,
+        fontSize: 22,
+    },
+    fieldInput: {
+        width: 200,
+        fontSize: 30,
+    },
+    row: {
+        marginLeft: 10,
+        marginTop: 20,
+        flexDirection: 'column',
+        flexWrap: 'wrap',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+    },
+    pageDirection: {
+        margin: 16,
+        marginTop: 20,
+        fontSize: 34,
+        alignSelf: 'flex-start',
+    },
+    patientInfoWrapper: {
+        backgroundColor: '#EDEDED',
+        padding: 20,
+        marginVertical: 8,
+        marginHorizontal: 16,
+        borderRadius: 10,
+        overflow: 'hidden',
+    },
+    patientInfoItem: {
+        fontSize: 24,
+        margin: 5,
+    },
+    wrapper: {
+        marginTop: 20,
+        flexDirection: 'row',
+        justifyContent: 'flex-end',
+    },
+    btnSubmit: {
+        alignSelf: 'flex-end',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10,
+        backgroundColor: '#A3CDFF',
+        height: 50,
+        width: 100,
+        borderRadius: 10,
+        overflow: 'hidden',
+        marginRight: 20,
+    },
+    btnCancel: {
+        alignSelf: 'flex-end',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: 10,
+        marginRight: 20,
+        backgroundColor: '#FF6464',
+        height: 50,
+        width: 100,
+        borderRadius: 10,
+        overflow: 'hidden',
+    },
+    btnText: {
+        fontSize: 22,
+    },
+});
 
 export default OfflineAddRecordStep3;

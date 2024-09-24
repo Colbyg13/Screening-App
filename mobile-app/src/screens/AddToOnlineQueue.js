@@ -1,23 +1,17 @@
-import { Pressable, TextInput } from '@react-native-material/core';
 import {
-    Provider,
     Button,
-    Dialog,
-    DialogHeader,
-    DialogContent,
-    DialogActions,
-    Text,
+    Dialog, DialogActions, DialogContent, DialogHeader, Pressable, Text, TextInput
 } from '@react-native-material/core';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, Keyboard, ScrollView, SafeAreaView } from 'react-native';
-import { useSessionContext } from '../contexts/SessionContext';
-import CustomDataPicker from '../components/Inputs/CustomDataPicker';
-import { styles } from '../style/styles';
-import DatePicker from '../components/Inputs/DatePicker';
-import BoolInput from '../components/Inputs/BoolInput';
-import { useCustomDataTypesContext } from '../contexts/CustomDataContext';
+import { Keyboard, SafeAreaView, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import BoolInput from '../components/Inputs/BoolInput';
+import CustomDataPicker from '../components/Inputs/CustomDataPicker';
+import DatePicker from '../components/Inputs/DatePicker';
+import { useCustomDataTypesContext } from '../contexts/CustomDataContext';
+import { useSessionContext } from '../contexts/SessionContext';
+import { styles } from '../style/styles';
 
 const AddToOnlineQueue = ({ route }) => {
     const navigation = useNavigation();

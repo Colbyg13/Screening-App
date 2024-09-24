@@ -19,7 +19,10 @@ const AddOfflineRecordBtn = props => {
 
 const styles = StyleSheet.create({
     wrapper: {
+        position: "absolute",
         flex: 1,
+        bottom: 20,
+        right: 0,
     },
     btn: {
         alignSelf: 'flex-end',
