@@ -6,6 +6,7 @@ import ServerStatus from './src/components/ServerStatus';
 import CustomDataTypesProvider from './src/contexts/CustomDataContext';
 import ServerProvider from './src/contexts/ServerContext';
 import SessionProvider from './src/contexts/SessionContext';
+import SnackbarProvider from './src/contexts/SnackbarContext';
 import AddToOnlineQueue from './src/screens/AddToOnlineQueue';
 import HomeScreen from './src/screens/HomeScreen';
 import IpadOfflineModeStep1 from './src/screens/Offline/IpadOfflineModeStep1';
@@ -23,69 +24,71 @@ export default function App() {
         <Provider>
             <NavigationContainer>
                 <AppErrorBoundary>
-                    <ServerProvider>
-                        <CustomDataTypesProvider>
-                            <SessionProvider>
-                                <Stack.Navigator
-                                    initialRouteName="Home"
-                                    screenOptions={{
-                                        headerRight: ServerStatus,
-                                    }}
-                                >
-                                    <Stack.Screen
-                                        name="Home"
-                                        component={HomeScreen}
-                                        options={{ title: 'Home Screen' }}
-                                    />
-                                    <Stack.Screen
-                                        name="Station Selection"
-                                        component={StationSelectionScreen}
-                                        options={{ title: 'Stations' }}
-                                    />
-                                    <Stack.Screen
-                                        name="Current Session Queue"
-                                        component={QueueScreen}
-                                        options={{ title: 'Session' }}
-                                    />
-                                    <Stack.Screen
-                                        name="Add To Queue"
-                                        component={AddToOnlineQueue}
-                                        options={{ title: 'Add to Queue' }}
-                                    />
-                                    <Stack.Screen
-                                        name="Update Record"
-                                        component={UpdateRecordScreen}
-                                        options={{ title: 'Update Record' }}
-                                    />
-                                    <Stack.Screen
-                                        name="Offline Mode"
-                                        component={IpadOfflineModeStep1}
-                                        options={{ title: 'Offline Mode' }}
-                                    />
-                                    <Stack.Screen
-                                        name="Offline Records"
-                                        component={OfflineRecordsScreenStep2}
-                                        options={{ title: 'Offline Records' }}
-                                    />
-                                    <Stack.Screen
-                                        name="Offline Add Records"
-                                        component={OfflineAddRecordStep3}
-                                        options={{ title: 'Add Offline Record' }}
-                                    />
-                                    <Stack.Screen
-                                        name="Offline Update Records"
-                                        component={OfflineUpdateRecordStep3}
-                                        options={{ title: 'Update Offline Record' }}
-                                    />
-                                    <Stack.Screen
-                                        name="Settings Page"
-                                        component={SettingsPage}
-                                        options={{ title: 'Settings' }}
-                                    />
-                                </Stack.Navigator>
-                            </SessionProvider>
-                        </CustomDataTypesProvider>
-                    </ServerProvider>
+                    <SnackbarProvider>
+                        <ServerProvider>
+                            <CustomDataTypesProvider>
+                                <SessionProvider>
+                                    <Stack.Navigator
+                                        initialRouteName="Home"
+                                        screenOptions={{
+                                            headerRight: ServerStatus,
+                                        }}
+                                    >
+                                        <Stack.Screen
+                                            name="Home"
+                                            component={HomeScreen}
+                                            options={{ title: 'Home Screen' }}
+                                        />
+                                        <Stack.Screen
+                                            name="Station Selection"
+                                            component={StationSelectionScreen}
+                                            options={{ title: 'Stations' }}
+                                        />
+                                        <Stack.Screen
+                                            name="Current Session Queue"
+                                            component={QueueScreen}
+                                            options={{ title: 'Session' }}
+                                        />
+                                        <Stack.Screen
+                                            name="Add To Queue"
+                                            component={AddToOnlineQueue}
+                                            options={{ title: 'Add to Queue' }}
+                                        />
+                                        <Stack.Screen
+                                            name="Update Record"
+                                            component={UpdateRecordScreen}
+                                            options={{ title: 'Update Record' }}
+                                        />
+                                        <Stack.Screen
+                                            name="Offline Mode"
+                                            component={IpadOfflineModeStep1}
+                                            options={{ title: 'Offline Mode' }}
+                                        />
+                                        <Stack.Screen
+                                            name="Offline Records"
+                                            component={OfflineRecordsScreenStep2}
+                                            options={{ title: 'Offline Records' }}
+                                        />
+                                        <Stack.Screen
+                                            name="Offline Add Records"
+                                            component={OfflineAddRecordStep3}
+                                            options={{ title: 'Add Offline Record' }}
+                                        />
+                                        <Stack.Screen
+                                            name="Offline Update Records"
+                                            component={OfflineUpdateRecordStep3}
+                                            options={{ title: 'Update Offline Record' }}
+                                        />
+                                        <Stack.Screen
+                                            name="Settings Page"
+                                            component={SettingsPage}
+                                            options={{ title: 'Settings' }}
+                                        />
+                                    </Stack.Navigator>
+                                </SessionProvider>
+                            </CustomDataTypesProvider>
+                        </ServerProvider>
+                    </SnackbarProvider>
                 </AppErrorBoundary>
             </NavigationContainer>
         </Provider>

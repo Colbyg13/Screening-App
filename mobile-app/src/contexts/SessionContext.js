@@ -14,16 +14,15 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { io } from 'socket.io-client';
 import PatientRecord from '../classes/patient-record';
-import Snackbar from '../components/Snackbar';
 import { LOCAL_RECORDS_STORAGE_KEY } from '../screens/Offline/OfflineRecordsScreenStep2';
 import replace from '../utils/replace';
-import { useServerContext } from './ServerContext';
 import { useCustomDataTypesContext } from './CustomDataContext';
+import { useServerContext } from './ServerContext';
+import { useSnackbarContext } from './SnackbarContext';
+import { SNACKBAR_SEVERITIES } from '../components/Snackbar';
 
 export const SERVER_PORT = 3333;
-
 export const STATION_FIELDS_STORAGE_KEY = 'sessionFields';
-const DEVICE_NAME_STORAGE_KEY = 'device-name';
 
 const SessionContext = createContext({
     isConnected: false,
@@ -31,9 +30,7 @@ const SessionContext = createContext({
     loading: false,
     sessionInfo: {},
     sessionRecords: [],
-    deviceName: '',
     selectedStation: {},
-    setDeviceName: () => { },
     uploadOfflineRecords: () => { },
     joinStation: () => { },
     leaveStation: () => { },
@@ -50,7 +47,6 @@ export default function SessionProvider({ children }) {
 
     const [isConnected, setIsConnected] = useState(false);
     const [socket, setSocket] = useState(null);
-    const [deviceName, setDeviceName] = useState('');
 
     // SESSION
     const [loading, setLoading] = useState(false);
@@ -61,7 +57,7 @@ export default function SessionProvider({ children }) {
     const [selectedStationId, setSelectedStationId] = useState();
 
     // snackbar
-    const [snackbarInfo, setSnackbarInfo] = useState();
+    const {addSnackbar} = useSnackbarContext();
 
     // MODAL
     const [modalMessage, setModalMessage] = useState('');
@@ -75,21 +71,6 @@ export default function SessionProvider({ children }) {
         () => sessionInfo?.stations?.find(({ id }) => id === selectedStationId),
         [sessionInfo, selectedStationId],
     );
-
-    useEffect(() => {
-        // get device name
-        AsyncStorage.getItem(DEVICE_NAME_STORAGE_KEY).then(name =>
-            setDeviceName(name || `device-${~~(Math.random() * 1000)}`),
-        );
-    }, []);
-
-    // updates device name in local storage and in socket
-    useEffect(() => {
-        if (deviceName) AsyncStorage.setItem(DEVICE_NAME_STORAGE_KEY, deviceName);
-        if (socket) {
-            socket.auth = { username: deviceName };
-        }
-    }, [deviceName, socket]);
 
     // UPLOAD OFFLINE RECORDS TO SERVER WHEN CONNECTED
     useEffect(() => {
@@ -121,7 +102,6 @@ export default function SessionProvider({ children }) {
         setSocket(socket);
 
         if (socket) {
-            socket.auth = { username: deviceName };
             socket.on('connect', () => {
                 console.log('Connected to server');
                 setIsConnected(true);
@@ -182,9 +162,9 @@ export default function SessionProvider({ children }) {
                 setSessionInfo(result.data);
             }
         } catch (error) {
-            setSnackbarInfo({
-                status: 'error',
+            addSnackbar({
                 message: `Could not get session from server: ${error}`,
+                severity: SNACKBAR_SEVERITIES.ERROR,
             });
         } finally {
             setLoading(false);
@@ -200,9 +180,9 @@ export default function SessionProvider({ children }) {
                 setSessionRecords(result.data);
             }
         } catch (error) {
-            setSnackbarInfo({
-                status: 'error',
+            addSnackbar({
                 message: `Could not get session records from server: ${error}`,
+                severity: SNACKBAR_SEVERITIES.ERROR,
             });
         }
     }
@@ -245,9 +225,9 @@ export default function SessionProvider({ children }) {
 
     async function uploadOfflineRecords(showModal) {
         if (!isConnected) {
-            setSnackbarInfo({
-                status: 'error',
+            addSnackbar({
                 message: 'Cannot sync records when not connected to a server',
+                severity: SNACKBAR_SEVERITIES.ERROR,
             });
             return;
         }
@@ -269,6 +249,7 @@ export default function SessionProvider({ children }) {
                             LOCAL_RECORDS_STORAGE_KEY,
                             JSON.stringify(notUpdatedRecords),
                         );
+                        
                         setSnackbarInfo({
                             status: 'error',
                             message: 'Could not sync all offline records',
@@ -317,21 +298,12 @@ export default function SessionProvider({ children }) {
                 sessionInfo,
                 sessionRecords: patientRecords,
                 selectedStation,
-                deviceName,
-                setDeviceName,
                 uploadOfflineRecords,
                 joinStation,
                 leaveStation,
                 sendRecord,
             }}
         >
-            <Snackbar
-                open={!!snackbarInfo}
-                onClose={() => setSnackbarInfo()}
-                message={snackbarInfo?.message}
-                severity={snackbarInfo?.status}
-                duration={6000}
-            />
             <Dialog visible={!!modalMessage} onDismiss={() => { }}>
                 <DialogHeader title={modalMessage} />
                 <DialogContent>

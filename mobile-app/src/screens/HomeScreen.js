@@ -1,12 +1,14 @@
+import { Button, Stack } from '@react-native-material/core';
 import React from 'react';
-import { Image, SafeAreaView, Dimensions, StyleSheet, Text } from 'react-native';
-import { Button, Stack, TextInput } from '@react-native-material/core';
+import { Dimensions, Image, SafeAreaView, StyleSheet, Text, View } from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
+import { useSnackbarContext } from '../contexts/SnackbarContext';
 
 const { width, height } = Dimensions.get('window');
 
-const HomeScreen = ({ navigation }) => {
-    const { uploadOfflineRecords, deviceName, setDeviceName, sessionIsRunning } = useSessionContext();
+export default function HomeScreen ({ navigation })  {
+    const { uploadOfflineRecords, sessionIsRunning } = useSessionContext();
+    const { addSnackbar } = useSnackbarContext();
 
     const handleOnPress = async () => {
         navigation.navigate('Station Selection');
@@ -26,13 +28,6 @@ const HomeScreen = ({ navigation }) => {
         <SafeAreaView style={styles.container}>
             <Stack center spacing={20} style={styles.stack}>
                 <Image source={require('../../assets/healthylogo.png')} style={{ ...styles.logo, height: logoHeight }} />
-                <TextInput
-                    style={styles.input}
-                    label="Device Name"
-                    value={deviceName}
-                    placeholder="John Doe's iPad"
-                    onChangeText={setDeviceName}
-                />
                 <Button
                     style={styles.button}
                     title="Connect to Session"
@@ -63,7 +58,7 @@ const HomeScreen = ({ navigation }) => {
                     titleStyle={styles.buttonText}
                     onPress={openSettings}
                 />
-                <Text style={styles.versionText}>Version 1.0.5</Text>
+                <Text style={styles.versionText}>Version 1.0.6</Text>
             </Stack>
         </SafeAreaView>
     );
@@ -100,9 +95,4 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
-    versionText: {
-        marginBottom: 20,
-    },
 });
-
-export default HomeScreen;
