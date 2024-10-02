@@ -1,14 +1,12 @@
 import { Button, Stack } from '@react-native-material/core';
 import React from 'react';
-import { Dimensions, Image, SafeAreaView, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Image, SafeAreaView, StyleSheet, Text } from 'react-native';
 import { useSessionContext } from '../contexts/SessionContext';
-import { useSnackbarContext } from '../contexts/SnackbarContext';
 
 const { width, height } = Dimensions.get('window');
 
-export default function HomeScreen ({ navigation })  {
+export default function HomeScreen({ navigation }) {
     const { uploadOfflineRecords, sessionIsRunning } = useSessionContext();
-    const { addSnackbar } = useSnackbarContext();
 
     const handleOnPress = async () => {
         navigation.navigate('Station Selection');
@@ -27,7 +25,10 @@ export default function HomeScreen ({ navigation })  {
     return (
         <SafeAreaView style={styles.container}>
             <Stack center spacing={20} style={styles.stack}>
-                <Image source={require('../../assets/healthylogo.png')} style={{ ...styles.logo, height: logoHeight }} />
+                <Image
+                    source={require('../../assets/healthylogo.png')}
+                    style={{ ...styles.logo, height: logoHeight }}
+                />
                 <Button
                     style={styles.button}
                     title="Connect to Session"
@@ -62,7 +63,7 @@ export default function HomeScreen ({ navigation })  {
             </Stack>
         </SafeAreaView>
     );
-};
+}
 
 const colors = {
     primary: '#EDEDED',

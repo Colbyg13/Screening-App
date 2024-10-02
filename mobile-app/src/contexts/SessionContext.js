@@ -21,7 +21,6 @@ import { useServerContext } from './ServerContext';
 import { useSnackbarContext } from './SnackbarContext';
 import { SNACKBAR_SEVERITIES } from '../components/Snackbar';
 
-export const SERVER_PORT = 3333;
 export const STATION_FIELDS_STORAGE_KEY = 'sessionFields';
 
 const SessionContext = createContext({
@@ -31,16 +30,16 @@ const SessionContext = createContext({
     sessionInfo: {},
     sessionRecords: [],
     selectedStation: {},
-    uploadOfflineRecords: () => { },
-    joinStation: () => { },
-    leaveStation: () => { },
-    sendRecord: () => { },
+    uploadOfflineRecords: () => {},
+    joinStation: () => {},
+    leaveStation: () => {},
+    sendRecord: () => {},
 });
 
 export const useSessionContext = () => useContext(SessionContext);
 
 export default function SessionProvider({ children }) {
-    const { serverIp } = useServerContext();
+    const { serverURL } = useServerContext();
     const { customDataTypeMap } = useCustomDataTypesContext();
 
     const navigation = useNavigation();
@@ -57,7 +56,7 @@ export default function SessionProvider({ children }) {
     const [selectedStationId, setSelectedStationId] = useState();
 
     // snackbar
-    const {addSnackbar} = useSnackbarContext();
+    const { addSnackbar } = useSnackbarContext();
 
     // MODAL
     const [modalMessage, setModalMessage] = useState('');
@@ -84,10 +83,10 @@ export default function SessionProvider({ children }) {
     }, [isConnected]);
 
     useEffect(() => {
-        if (serverIp) {
+        if (serverURL) {
             updateFieldsFromServer();
         }
-    }, [serverIp]);
+    }, [serverURL]);
 
     // get session data
     useEffect(() => {
@@ -98,7 +97,7 @@ export default function SessionProvider({ children }) {
     }, [sessionId]);
 
     useEffect(() => {
-        const socket = io(serverIp);
+        const socket = io(serverURL);
         setSocket(socket);
 
         if (socket) {
@@ -152,12 +151,12 @@ export default function SessionProvider({ children }) {
                 setSocket(null);
             };
         }
-    }, [serverIp]);
+    }, [serverURL]);
 
     async function getSessionInfo(sessionId) {
         setLoading(true);
         try {
-            const result = await axios.get(`${serverIp}/api/v1/sessions/${sessionId}`);
+            const result = await axios.get(`${serverURL}/api/v1/sessions/${sessionId}`);
             if (result.data) {
                 setSessionInfo(result.data);
             }
@@ -173,7 +172,7 @@ export default function SessionProvider({ children }) {
 
     async function getSessionRecords(sessionId) {
         try {
-            const result = await axios.get(`${serverIp}/api/v1/records`, {
+            const result = await axios.get(`${serverURL}/api/v1/records`, {
                 params: { sessionId, unitConversions: customDataTypeMap },
             });
             if (result.data) {
@@ -189,18 +188,23 @@ export default function SessionProvider({ children }) {
 
     async function updateFieldsFromServer() {
         try {
-            const result = await axios.get(`${serverIp}/api/v1/fields`);
+            const result = await axios.get(`${serverURL}/api/v1/fields`);
             if (result.data) {
                 const existingFieldsJSON = await AsyncStorage.getItem(STATION_FIELDS_STORAGE_KEY);
                 const existingFields = existingFieldsJSON ? JSON.parse(existingFieldsJSON) : [];
 
                 // remove duplicate keys
-                const allFieldsMap = [...existingFields, ...result.data].reduce((allFieldsMap, field) => {
-                    allFieldsMap[field.key] = field;
-                    return allFieldsMap;
-                }, {});
+                const allFieldsMap = [...existingFields, ...result.data].reduce(
+                    (allFieldsMap, field) => {
+                        allFieldsMap[field.key] = field;
+                        return allFieldsMap;
+                    },
+                    {},
+                );
 
-                const allFields = Object.values(allFieldsMap).sort((a, b) => a.key < b.key ? -1 : 1);
+                const allFields = Object.values(allFieldsMap).sort((a, b) =>
+                    a.key < b.key ? -1 : 1,
+                );
 
                 AsyncStorage.setItem(STATION_FIELDS_STORAGE_KEY, JSON.stringify(allFields));
             }
@@ -249,23 +253,23 @@ export default function SessionProvider({ children }) {
                             LOCAL_RECORDS_STORAGE_KEY,
                             JSON.stringify(notUpdatedRecords),
                         );
-                        
-                        setSnackbarInfo({
-                            status: 'error',
+
+                        addSnackbar({
+                            severity: SNACKBAR_SEVERITIES.ERROR,
                             message: 'Could not sync all offline records',
                         });
                     } else {
                         AsyncStorage.removeItem(LOCAL_RECORDS_STORAGE_KEY);
-                        setSnackbarInfo({
-                            status: 'success',
+                        addSnackbar({
+                            severity: SNACKBAR_SEVERITIES.SUCCESS,
                             message: 'Offline records successfully synced',
                         });
                     }
                 })
                 .catch(err => console.warn(err));
         } else if (showModal)
-            setSnackbarInfo({
-                status: 'success',
+            addSnackbar({
+                severity: SNACKBAR_SEVERITIES.SUCCESS,
                 message: 'offline records have already been synced',
             });
     }
@@ -281,11 +285,11 @@ export default function SessionProvider({ children }) {
         };
 
         try {
-            const result = await axios.post(`${serverIp}/api/v1/records`, payload);
+            const result = await axios.post(`${serverURL}/api/v1/records`, payload);
             return result.data;
         } catch (error) {
             console.warn(error);
-            throw new Error("Error sending record to server.")
+            throw new Error('Error sending record to server.');
         }
     }
 
@@ -304,7 +308,7 @@ export default function SessionProvider({ children }) {
                 sendRecord,
             }}
         >
-            <Dialog visible={!!modalMessage} onDismiss={() => { }}>
+            <Dialog visible={!!modalMessage} onDismiss={() => {}}>
                 <DialogHeader title={modalMessage} />
                 <DialogContent>
                     <View style={{ display: 'flex', flexDirection: 'row' }}>

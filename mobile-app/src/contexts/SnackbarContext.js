@@ -14,15 +14,22 @@ export default function SnackbarProvider({ children }) {
     const [snackbars, setSnackbars] = useState([]);
 
     const closeSnackbar = () => setSnackbars(messages => messages.splice(1));
-    const addSnackbar = useCallback(({ message, severity }) => {
-        if (snackbars.find((snackbar) => snackbar.message === message)) {
-            return;
-        }
-        const newSnackbar = { message, severity };
-        setSnackbars(snackbars => [...snackbars, newSnackbar]);
+    const addSnackbar = useCallback(
+        ({ message, severity }) => {
+            const foundMessage = snackbars.find(snackbar => snackbar.message === message);
+            if (foundMessage) {
+                clearTimeout(foundMessage.timeoutId);
+            }
 
-        setTimeout(closeSnackbar, SNACKBAR_TIMEOUT);
-    }, [snackbars]);
+            const timeoutId = setTimeout(closeSnackbar, SNACKBAR_TIMEOUT);
+            const newSnackbar = { message, severity, timeoutId };
+            setSnackbars(snackbars => [
+                ...snackbars.filter(s => s.message !== message),
+                newSnackbar,
+            ]);
+        },
+        [snackbars],
+    );
 
     return (
         <SnackbarContext.Provider
@@ -48,7 +55,7 @@ export default function SnackbarProvider({ children }) {
                     }}
                 >
                     {snackbars.map(snackbar => (
-                        <Snackbar open message={snackbar.message} severity={snackbar.severity} />
+                        <Snackbar key={snackbar.message} open message={snackbar.message} severity={snackbar.severity} />
                     ))}
                 </View>
                 {children}

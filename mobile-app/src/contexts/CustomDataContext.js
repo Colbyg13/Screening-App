@@ -15,7 +15,7 @@ const CustomDataTypesContext = createContext({
 export const useCustomDataTypesContext = () => useContext(CustomDataTypesContext);
 
 export default function CustomDataTypesProvider({ children }) {
-    const { serverIp } = useServerContext();
+    const { serverURL } = useServerContext();
 
     const [customDataTypes, setCustomDataTypes] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -54,13 +54,13 @@ export default function CustomDataTypesProvider({ children }) {
 
     useEffect(() => {
         // gets data from db and uses that
-        if (serverIp) fetchData();
-    }, [serverIp]);
+        if (serverURL) fetchData();
+    }, [serverURL]);
     //Grabs custom data information directly from the database.
     async function fetchData() {
         setLoading(true);
         try {
-            const url = `${serverIp}/api/v1/dataTypes`;
+            const url = `${serverURL}/api/v1/dataTypes`;
             const { data: customDataTypes = [] } = await axios.get(url, {
                 headers: {
                     'Cache-Control': 'no-cache',
