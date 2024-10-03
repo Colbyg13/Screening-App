@@ -4,3 +4,14 @@ export function validateIP(ipaddress) {
 
     return ipv4Pattern.test(ipaddress);
 }
+
+export function generateSubnetIps(baseIp) {
+    const subnet = baseIp.replace(/^(\d+\.\d+\.\d+)\.\d+$/, '$1');
+    return Array.from({ length: 256 }, (_, i) => `${subnet}.${i}`);
+}
+
+export function getIpFromUrl(url) {
+    const ipPattern = /\b(?:\d{1,3}\.){3}\d{1,3}\b/;
+    const ipAddress = url.match(ipPattern);
+    return ipAddress[0];
+}

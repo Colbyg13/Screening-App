@@ -1,7 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import * as Network from 'expo-network';
 import axios from 'axios';
+import * as Network from 'expo-network';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { generateSubnetIps, getIpFromUrl } from '../utils/network';
 
 const SERVER_PORT = 3333;
 const SEVER_PATH = 'api/v1/server';
@@ -29,6 +30,16 @@ export default function ServerProvider({ children }) {
 
     const connectToServer = useCallback(setServerIp, [setServerIp]);
     const disconnectFromServer = useCallback(() => setServerIp(), [setServerIp]);
+    const findServer = useCallback(async () => {
+        setFindingServers(true);
+
+        // Scan subnet if no previous server found
+        const ipAddress = await Network.getIpAddressAsync();
+        const ipRange = generateSubnetIps(ipAddress);
+        await scanSubnet(ipRange, SERVER_PORT, SEVER_PATH);
+
+        setFindingServers(false);
+    }, []);
 
     useEffect(() => {
         getPreviousIP();
@@ -48,40 +59,6 @@ export default function ServerProvider({ children }) {
         }
     }
 
-    async function findServer() {
-        setFindingServers(true);
-
-        // Scan subnet if no previous server found
-        const ipAddress = await Network.getIpAddressAsync();
-        const ipRange = generateSubnetIps(ipAddress);
-        await scanSubnet(ipRange, SERVER_PORT, SEVER_PATH);
-
-        setFindingServers(false);
-    }
-
-    async function tryConnect(ip, port, path) {
-        try {
-            const url = `http://${ip}:${port}/${path}`;
-            const response = await axios.get(url, { timeout: TIMEOUT });
-            const foundServerIp = formatServerUrl(response.config.url);
-            setAvailableServerIps(serverIps =>
-                serverIps.includes(foundServerIp) ? serverIps : [...serverIps, foundServerIp],
-            );
-        } catch {
-            return;
-        }
-    }
-
-    function generateSubnetIps(baseIp) {
-        const subnet = baseIp.replace(/^(\d+\.\d+\.\d+)\.\d+$/, '$1');
-        return Array.from({ length: 256 }, (_, i) => `${subnet}.${i}`);
-    }
-
-    async function scanIpsBatch(ipBatch, port, path) {
-        const connectionPromises = ipBatch.map(ip => tryConnect(ip, port, path));
-        await Promise.allSettled(connectionPromises);
-    }
-
     async function scanSubnet(ipRange, port, path) {
         const allServers = [];
 
@@ -93,10 +70,22 @@ export default function ServerProvider({ children }) {
         return allServers;
     }
 
-    function formatServerUrl(url) {
-        const ipPattern = /\b(?:\d{1,3}\.){3}\d{1,3}\b/;
-        const ipAddress = url.match(ipPattern);
-        return ipAddress[0];
+    async function scanIpsBatch(ipBatch, port, path) {
+        const connectionPromises = ipBatch.map(ip => tryConnect(ip, port, path));
+        await Promise.allSettled(connectionPromises);
+    }
+
+    async function tryConnect(ip, port, path) {
+        try {
+            const url = `http://${ip}:${port}/${path}`;
+            const response = await axios.get(url, { timeout: TIMEOUT });
+            const foundServerIp = getIpFromUrl(response.config.url);
+            setAvailableServerIps(serverIps =>
+                serverIps.includes(foundServerIp) ? serverIps : [...serverIps, foundServerIp],
+            );
+        } catch {
+            return;
+        }
     }
 
     return (
