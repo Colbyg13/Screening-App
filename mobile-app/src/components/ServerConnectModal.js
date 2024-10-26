@@ -68,7 +68,9 @@ export default function ServerConnectModal({ showModal = false, onDismiss = () =
                                 style={styles.currentConnectionDisconnectButton}
                                 onPress={disconnectFromServer}
                             >
-                                <MaterialIcons name="close" size={18} color="red" />
+                                <Text style={styles.currentConnectionDisconnectButtonText}>
+                                    Disconnect
+                                </Text>
                             </TouchableOpacity>
                         ) : null}
                     </View>
@@ -139,7 +141,7 @@ const styles = StyleSheet.create({
     },
     currentConnectionRow: {
         display: 'flex',
-        flexDirection: 'row',
+        flexDirection: 'column',
         justifyContent: 'space-between',
         alignItems: 'baseline',
         marginBottom: 8,
@@ -158,7 +160,15 @@ const styles = StyleSheet.create({
     },
     currentConnectionDisconnectButton: {
         borderWidth: 1,
-        borderColor: 'red',
+        backgroundColor: 'red',
+        borderRadius: 4,
+        width: '100%',
+        paddingVertical: 4,
+        alignItems: 'center',
+    },
+    currentConnectionDisconnectButtonText: {
+        fontSize: 16,
+        color: 'white',
     },
     serverFinderContainer: {
         minHeight: 200,
@@ -191,6 +201,8 @@ const styles = StyleSheet.create({
         marginTop: 6,
         paddingHorizontal: 8,
         paddingVertical: 6,
+        shadowRadius: 4,
+        backgroundColor: 'light-gray',
     },
     foundServerText: {
         fontSize: 16,

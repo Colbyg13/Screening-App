@@ -20,8 +20,16 @@ import { useCustomDataTypesContext } from './CustomDataContext';
 import { useServerContext } from './ServerContext';
 import { useSnackbarContext } from './SnackbarContext';
 import { SNACKBAR_SEVERITIES } from '../components/Snackbar';
+import { ROUTES } from '../../NavigationWrapper';
 
 export const STATION_FIELDS_STORAGE_KEY = 'sessionFields';
+
+const REDIRECT_ON_SESSION_END_ROUTES = [
+    ROUTES.STATION_SELECTION,
+    ROUTES.UPDATE_RECORD,
+    ROUTES.ADD_TO_QUEUE,
+    ROUTES.CURRENT_SESSION_QUEUE,
+];
 
 const SessionContext = createContext({
     isConnected: false,
@@ -143,7 +151,12 @@ export default function SessionProvider({ children }) {
                 setIsConnected(false);
                 setSessionIsRunning(false);
                 setSessionId();
-                setModalMessage('You have disconnected from the server.');
+
+                const state = navigation.getState();
+                const currentPageName = state.routes.at(-1)?.name;
+                if (REDIRECT_ON_SESSION_END_ROUTES.includes(currentPageName)) {
+                    setModalMessage('You have disconnected from the server.');
+                }
             });
 
             return () => {
