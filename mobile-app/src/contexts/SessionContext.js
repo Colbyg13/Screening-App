@@ -14,13 +14,12 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { io } from 'socket.io-client';
 import PatientRecord from '../classes/patient-record';
+import { SNACKBAR_SEVERITIES } from '../components/Snackbar';
+import { ROUTES } from '../constants/navigation';
 import { LOCAL_RECORDS_STORAGE_KEY } from '../screens/Offline/OfflineRecordsScreenStep2';
-import replace from '../utils/replace';
 import { useCustomDataTypesContext } from './CustomDataContext';
 import { useServerContext } from './ServerContext';
 import { useSnackbarContext } from './SnackbarContext';
-import { SNACKBAR_SEVERITIES } from '../components/Snackbar';
-import { ROUTES } from '../../NavigationWrapper';
 
 export const STATION_FIELDS_STORAGE_KEY = 'sessionFields';
 
@@ -120,9 +119,9 @@ export default function SessionProvider({ children }) {
 
             socket.on('record-updated', updatedRecord => {
                 setSessionRecords(records => {
-                    const oldRecord = records.find(({ id }) => id === updatedRecord?.id);
-                    return oldRecord
-                        ? replace(records, records.indexOf(oldRecord), updatedRecord)
+                    const oldRecordIndex = records.findIndex(({ id }) => id === updatedRecord?.id);
+                    return oldRecordIndex >= 0
+                        ? records.with(oldRecordIndex, updatedRecord)
                         : records;
                 });
             });

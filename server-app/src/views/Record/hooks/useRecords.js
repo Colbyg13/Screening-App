@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from 'react';
 import { LOG_LEVEL } from '../../../constants/log-levels';
 import { serverURL } from '../../../constants/server';
 import { useSnackBarContext } from '../../../contexts/SnackbarContext';
-import replace from '../../../utils/replace';
 
 export default function useRecords({ sort, search, unitConversions, dependenciesLoaded }) {
     const { addSnackBar } = useSnackBarContext();
@@ -91,9 +90,9 @@ export default function useRecords({ sort, search, unitConversions, dependencies
         if (update)
             setRecords(records => {
                 // update state instead of requerying
-                const oldRecord = records.find(({ id }) => id === update.id);
-                if (oldRecord)
-                    return replace(records, records.indexOf(oldRecord), {
+                const oldRecordIndex = records.findIndex(({ id }) => id === update.id);
+                if (oldRecordIndex >= 0)
+                    return records.with(oldRecordIndex, {
                         ...oldRecord,
                         ...update,
                     });

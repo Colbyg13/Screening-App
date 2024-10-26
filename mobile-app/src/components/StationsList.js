@@ -9,11 +9,11 @@ const StationsList = props => {
     // console.log('Session info in Ipad', { sessionInfo })
     const navigation = useNavigation();
     const createLabels = () => {
-        for (let i = 0; i < sessionInfo.stations.length; i++) {
+        for (let i = 0; i < stations.length; i++) {
             if (i < 10) {
-                sessionInfo.stations[i].label = `0${i + 1}`;
+                stations[i].label = `0${i + 1}`;
             } else {
-                sessionInfo.stations[i].label = `${i + 1}`;
+                stations[i].label = `${i + 1}`;
             }
         }
     };

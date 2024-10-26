@@ -8,7 +8,6 @@ import {
     REQUIRED_DB_FIELDS,
 } from '../constants/required-station-fields';
 import { serverURL } from '../constants/server';
-import replace from '../utils/replace';
 import { useSnackBarContext } from './SnackbarContext';
 
 const SessionContext = createContext({
@@ -244,7 +243,7 @@ export default function SessionProvider({ children }) {
         else
             setSessionInfo(sessionInfo => ({
                 ...sessionInfo,
-                stations: replace(sessionInfo.stations, stationIndex, {
+                stations: sessionInfo.stations.with(stationIndex, {
                     ...sessionInfo.stations[stationIndex],
                     fields: [...sessionInfo.stations[stationIndex].fields, { name: '', type: '' }],
                 }),
@@ -256,15 +255,15 @@ export default function SessionProvider({ children }) {
         if (stationIndex === undefined)
             setSessionInfo(sessionInfo => ({
                 ...sessionInfo,
-                generalFields: replace(sessionInfo.generalFields, fieldIndex, update),
+                generalFields: sessionInfo.generalFields.with(fieldIndex, update),
             }));
         // Station Field
         else
             setSessionInfo(sessionInfo => ({
                 ...sessionInfo,
-                stations: replace(sessionInfo.stations, stationIndex, {
+                stations: sessionInfo.stations.with(stationIndex, {
                     ...sessionInfo.stations[stationIndex],
-                    fields: replace(sessionInfo.stations[stationIndex].fields, fieldIndex, update),
+                    fields: sessionInfo.stations[stationIndex].fields.with(fieldIndex, update),
                 }),
             }));
     }
@@ -278,7 +277,7 @@ export default function SessionProvider({ children }) {
         else
             setSessionInfo(sessionInfo => ({
                 ...sessionInfo,
-                stations: replace(sessionInfo.stations, stationIndex, {
+                stations: sessionInfo.stations.with(stationIndex, {
                     ...sessionInfo.stations[stationIndex],
                     fields: sessionInfo.stations[stationIndex].fields.filter(
                         (_, i) => i !== fieldIndex,

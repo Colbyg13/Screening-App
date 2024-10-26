@@ -12,20 +12,8 @@ import QueueScreen from './src/screens/QueueScreen';
 import SettingsPage from './src/screens/SettingsPage';
 import StationSelectionScreen from './src/screens/StationSelectionScreen';
 import UpdateRecordScreen from './src/screens/UpdateRecordScreen';
+import { ROUTES } from './src/constants/navigation';
 const Stack = createNativeStackNavigator();
-
-export const ROUTES = {
-    HOME: 'Home',
-    STATION_SELECTION: 'Station Selection',
-    CURRENT_SESSION_QUEUE: 'Current Session Queue',
-    ADD_TO_QUEUE: 'Add To Queue',
-    UPDATE_RECORD: 'Update Record',
-    OFFLINE_MODE: 'Offline Mode',
-    OFFLINE_RECORDS: 'Offline Records',
-    OFFLINE_ADD_RECORDS: 'Offline Add Records',
-    OFFLINE_UPDATE_RECORDS: 'Offline Update Records',
-    SETTINGS_PAGE: 'Settings Page',
-};
 
 export default function NavigationWrapper() {
     const [showServerModal, setShowServerModal] = useState(false);
@@ -42,58 +30,58 @@ export default function NavigationWrapper() {
         <>
             <ServerConnectModal showModal={showServerModal} onDismiss={onServerModalDismiss} />
             <Stack.Navigator
-                initialRouteName="Home"
+                initialRouteName={ROUTES.HOME}
                 screenOptions={{
                     headerRight: () => <ServerStatus onPress={handleServerStatusPress} />,
                 }}
             >
                 <Stack.Screen
-                    name="Home"
+                    name={ROUTES.HOME}
                     component={HomeScreen}
                     options={{ title: 'Home Screen' }}
                 />
                 <Stack.Screen
-                    name="Station Selection"
+                    name={ROUTES.STATION_SELECTION}
                     component={StationSelectionScreen}
                     options={{ title: 'Stations' }}
                 />
                 <Stack.Screen
-                    name="Current Session Queue"
+                    name={ROUTES.CURRENT_SESSION_QUEUE}
                     component={QueueScreen}
                     options={{ title: 'Session' }}
                 />
                 <Stack.Screen
-                    name="Add To Queue"
+                    name={ROUTES.ADD_TO_QUEUE}
                     component={AddToOnlineQueue}
                     options={{ title: 'Add to Queue' }}
                 />
                 <Stack.Screen
-                    name="Update Record"
+                    name={ROUTES.UPDATE_RECORD}
                     component={UpdateRecordScreen}
                     options={{ title: 'Update Record' }}
                 />
                 <Stack.Screen
-                    name="Offline Mode"
+                    name={ROUTES.OFFLINE_MODE}
                     component={IpadOfflineModeStep1}
                     options={{ title: 'Offline Mode' }}
                 />
                 <Stack.Screen
-                    name="Offline Records"
+                    name={ROUTES.OFFLINE_RECORDS}
                     component={OfflineRecordsScreenStep2}
                     options={{ title: 'Offline Records' }}
                 />
                 <Stack.Screen
-                    name="Offline Add Records"
+                    name={ROUTES.OFFLINE_ADD_RECORDS}
                     component={OfflineAddRecordStep3}
                     options={{ title: 'Add Offline Record' }}
                 />
                 <Stack.Screen
-                    name="Offline Update Records"
+                    name={ROUTES.OFFLINE_UPDATE_RECORDS}
                     component={OfflineUpdateRecordStep3}
                     options={{ title: 'Update Offline Record' }}
                 />
                 <Stack.Screen
-                    name="Settings Page"
+                    name={ROUTES.SETTINGS_PAGE}
                     component={SettingsPage}
                     options={{ title: 'Settings' }}
                 />

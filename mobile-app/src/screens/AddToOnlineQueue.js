@@ -1,6 +1,12 @@
 import {
     Button,
-    Dialog, DialogActions, DialogContent, DialogHeader, Pressable, Text, TextInput
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogHeader,
+    Pressable,
+    Text,
+    TextInput,
 } from '@react-native-material/core';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
@@ -74,17 +80,17 @@ const AddToOnlineQueue = ({ route }) => {
 
                     return shouldAddKey
                         ? {
-                            ...customData,
-                            [usedField.key]: unit,
-                        }
+                              ...customData,
+                              [usedField.key]: unit,
+                          }
                         : customData;
                 }, {}),
             });
-            setPatient(prevState => ({ ...prevState, id: result.newId })); //on server success set the patient in state for display.
+            setPatient(prevState => ({ ...prevState, id: result.id })); //on server success set the patient in state for display.
 
             setVisible(true); //opens the modal/dialog
         } catch (error) {
-            console.warn("Could not send record")
+            console.warn('Could not send record');
         }
     };
 
