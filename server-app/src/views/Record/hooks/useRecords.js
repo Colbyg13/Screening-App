@@ -97,7 +97,7 @@ export default function useRecords({ sort, search, unitConversions, dependencies
                 const oldRecordIndex = records.findIndex(({ id }) => id === update.id);
                 if (oldRecordIndex >= 0)
                     return records.with(oldRecordIndex, {
-                        ...oldRecord,
+                        ...records[oldRecordIndex],
                         ...update,
                     });
             });

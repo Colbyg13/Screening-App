@@ -1,5 +1,4 @@
 import { LOG_LEVEL, writeLog } from '../../utils/logger.js';
-import { database } from '../db.js';
 
 // DEPRECATED but used for migration
 const LATEST_RECORD_ID_COLLECTION_NAME = 'latestRecordID';
@@ -92,9 +91,9 @@ export async function getNextSequenceValue(sequenceName) {
         const document = await idCounterCollection.findOneAndUpdate(
             { sequenceName },
             { $inc: { sequenceValue: 1 } },
-            { returnDocument: 'after' },
+            { returnDocument: 'before' },
         );
-        return document.sequenceValue;
+        return document.value.sequenceValue;
     } catch (error) {
         writeLog(LOG_LEVEL.ERROR, `Error getting next sequence value: ${error}`);
         throw error;

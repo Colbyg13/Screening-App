@@ -187,7 +187,7 @@ router.post('/', async (req, res) => {
 
     if (creatingRecord) {
         try {
-            const nextRecordID = getNextSequenceValue(SEQUENCE_NAMES.RECORDS);
+            const nextRecordID = await getNextSequenceValue(SEQUENCE_NAMES.RECORDS);
 
             const sessionCol = database.collection('sessions');
             const sessionData = await sessionCol.findOne({ _id: new ObjectId(sessionId) });
