@@ -36,7 +36,7 @@
         "autoprefixer": "^10.4.13",
         "babel-loader": "^9.1.0",
         "css-loader": "^6.0.0",
-        "electron": "22.0.0",
+        "electron": "^33.0.0",
         "electron-is-dev": "^2.0.0",
         "file-loader": "^6.2.0",
         "node-loader": "^2.0.0",
@@ -47,7 +47,7 @@
         "yarn": "^1.22.22"
     },
     "dependencies": {
-        "@electron/remote": "^2.0.8",
+        "@electron/remote": "^2.1.2",
         "@emotion/react": "^11.10.4",
         "@emotion/styled": "^11.10.4",
         "@mui/icons-material": "^5.10.16",

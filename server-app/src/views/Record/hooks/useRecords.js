@@ -57,14 +57,18 @@ export default function useRecords({ sort, search, unitConversions, dependencies
                     unitConversions,
                 },
             });
-            const records = result.data;
+            if (result.data) {
+                const records = result.data;
 
-            if (records.length) {
-                // only include the previous if page is not 0
-                setRecords(previousRecords =>
-                    page === 0 ? records : [...previousRecords, ...records],
-                );
-                setAtEndOfRecords(false);
+                if (records.length) {
+                    // only include the previous if page is not 0
+                    setRecords(previousRecords =>
+                        page === 0 ? records : [...previousRecords, ...records],
+                    );
+                    setAtEndOfRecords(false);
+                } else {
+                    setAtEndOfRecords(true);
+                }
             } else {
                 setAtEndOfRecords(true);
             }

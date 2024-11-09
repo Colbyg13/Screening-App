@@ -44,7 +44,9 @@ export default function useFields() {
         setLoading(true);
         try {
             const result = await axios.get(`${serverURL}/api/v1/fields`);
-            setAllFields(result.data);
+            if (result.data) {
+                setAllFields(result.data);
+            }
         } catch (error) {
             console.error('Could not get fields from server', error);
             addSnackBar({

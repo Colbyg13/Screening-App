@@ -309,11 +309,15 @@ export default function SessionProvider({ children }) {
     async function getSessionTemplates() {
         try {
             const result = await axios.get(`${serverURL}/api/v1/sessionTemplates`);
-            const sessionTemplates = result.data;
-            return sessionTemplates.map(template => ({
-                ...template,
-                createdAt: new Date(template.createdAt),
-            }));
+            if (result.data) {
+                const sessionTemplates = result.data;
+                return sessionTemplates.map(template => ({
+                    ...template,
+                    createdAt: new Date(template.createdAt),
+                }));
+            }
+
+            return [];
         } catch (error) {
             console.error('Could not get session template list from server.', error);
             addSnackBar({
@@ -363,11 +367,15 @@ export default function SessionProvider({ children }) {
     async function getSessionList() {
         try {
             const result = await axios.get(`${serverURL}/api/v1/sessions`);
-            const sessionList = result.data;
-            return sessionList.map(session => ({
-                ...session,
-                createdAt: new Date(session.createdAt),
-            }));
+            if (result.data) {
+                const sessionList = result.data;
+                return sessionList.map(session => ({
+                    ...session,
+                    createdAt: new Date(session.createdAt),
+                }));
+            }
+
+            return [];
         } catch (error) {
             console.error('Could not get session list from server.', error);
             addSnackBar({
