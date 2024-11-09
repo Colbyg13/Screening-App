@@ -1,7 +1,8 @@
 const { LOG_LEVEL, writeLog } = require('../utils/logger');
-const { database } = require('../db');
+const { database } = require('../database/db');
 const { normalizeFields } = require('../utils/index');
 const { uniqueId } = require('lodash');
+const { createNewUser, getUser } = require('../database/utils/users');
 
 let sessionState = {
     sessionIsRunning: false,
@@ -9,10 +10,26 @@ let sessionState = {
 };
 
 module.exports = io => {
-    io.on('connection', socket => {
-        const userId = uniqueId();
-        const username = socket.handshake.auth.username;
+    io.on('connection', async socket => {
+        const deviceID = socket.handshake.auth.deviceID;
         const isAdmin = socket.handshake.auth.isAdmin;
+        let username = '';
+        let userID = '';
+
+        try {
+            const user = await getUser(deviceID);
+            if (user) {
+                username === user?.username;
+                userID = user?.userID;
+            } else {
+                const newUser = await createNewUser(deviceID);
+                username === newUser?.username;
+                userID = newUser?.userID;
+            }
+        } catch (error) {
+            writeLog(LOG_LEVEL.ERROR, `Error getting username from device ID: ${deviceID}`);
+            return;
+        }
 
         writeLog(LOG_LEVEL.INFO, `Session Connect: ${username}  ${isAdmin ? '(Admin)' : ''}`);
 
@@ -99,7 +116,7 @@ module.exports = io => {
             socket.stationId = data.stationId;
             writeLog(LOG_LEVEL.INFO, `Station Join: ${username}-${socket.stationId}`);
             io.emit('station-join', {
-                userId,
+                userID,
                 username,
                 stationId: socket.stationId,
             });
@@ -109,7 +126,7 @@ module.exports = io => {
             writeLog(LOG_LEVEL.INFO, `Station Leave: ${username}-${socket.stationId}`);
             socket.stationId = undefined;
             io.emit('station-leave', {
-                userId,
+                userID,
                 username,
             });
         });
@@ -117,13 +134,13 @@ module.exports = io => {
         socket.on('disconnect', () => {
             writeLog(LOG_LEVEL.INFO, `Station Disconnect: ${username}-${socket.stationId}`);
             io.emit('user-disconnect', {
-                userId,
+                userID,
                 username,
             });
         });
 
         io.emit('user-connected', {
-            userId,
+            userID,
             username,
         });
 

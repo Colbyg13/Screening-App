@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { database } = require('../db');
+const { database } = require('../database/db');
 const { LOG_LEVEL, writeLog } = require('../utils/logger');
 const { ObjectId } = require('mongodb');
 

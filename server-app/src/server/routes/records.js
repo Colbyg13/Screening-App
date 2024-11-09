@@ -1,9 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { database } = require('../db');
+const { database } = require('../database/db');
 const { LOG_LEVEL, writeLog } = require('../utils/logger');
 const { ObjectId } = require('mongodb');
 const { default: convert, getBaseUnit } = require('../../utils/convert');
+const { getNextSequenceValue, SEQUENCE_NAMES } = require('../database/utils/idCounters');
 const io = global.io;
 
 const pageSize = 50;
@@ -90,15 +91,15 @@ router.get('/', async (req, res) => {
 
         const find = search
             ? {
-                $or: ['id', 'name'].map(key => ({
-                    $expr: {
-                        $regexMatch: {
-                            input: { $toString: `$${key}` },
-                            regex: new RegExp(search, 'i'),
-                        },
-                    },
-                })),
-            }
+                  $or: ['id', 'name'].map(key => ({
+                      $expr: {
+                          $regexMatch: {
+                              input: { $toString: `$${key}` },
+                              regex: new RegExp(search, 'i'),
+                          },
+                      },
+                  })),
+              }
             : {};
 
         const records = await recordsCol.find(find).sort(sort).skip(skip).limit(pageSize).toArray();
@@ -186,11 +187,7 @@ router.post('/', async (req, res) => {
 
     if (creatingRecord) {
         try {
-            const latestIDCol = database.collection('latestRecordID');
-            const updatedRecordID = await latestIDCol.findOneAndUpdate(
-                {},
-                { $inc: { latestID: 1 } },
-            );
+            const nextRecordID = getNextSequenceValue(SEQUENCE_NAMES.RECORDS);
 
             const sessionCol = database.collection('sessions');
             const sessionData = await sessionCol.findOne({ _id: new ObjectId(sessionId) });
@@ -201,7 +198,7 @@ router.post('/', async (req, res) => {
             }, {});
 
             const newRecord = {
-                id: updatedRecordID.value.latestID,
+                id: nextRecordID,
                 createdAt: new Date(),
                 lastModified: new Date(),
                 sessionId,

@@ -36,9 +36,10 @@ export default function CustomFields() {
     }
 
     function updateCustomDataType(update, index) {
-        setCustomDataTypes(dataTypes =>
-            dataTypes.with(index, { ...dataTypes[index], ...update }),
-        );
+        setCustomDataTypes(dataTypes => {
+            console.log({ dataTypes });
+            dataTypes.with(index, { ...dataTypes[index], ...update });
+        });
     }
 
     function deleteCustomDataType(index) {
@@ -58,12 +59,13 @@ export default function CustomFields() {
     }
 
     function updateCustomDataTypeValue(update, dataTypeIndex, valueIndex) {
-        setCustomDataTypes(dataTypes =>
-            dataTypes.with(dataTypeIndex, {
+        setCustomDataTypes(dataTypes => {
+            console.log({ dataTypes });
+            return dataTypes.with(dataTypeIndex, {
                 ...dataTypes[dataTypeIndex],
                 values: dataTypes[dataTypeIndex].values.with(valueIndex, update),
-            }),
-        );
+            });
+        });
     }
 
     function deleteCustomDataTypeValue(dataTypeIndex, valueIndex) {

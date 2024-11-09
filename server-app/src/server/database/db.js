@@ -1,7 +1,10 @@
 const { MongoClient } = require('mongodb');
+const { LOG_LEVEL, writeLog } = require('../utils/logger');
+const { initializeIDCounterCollection } = require('./utils/idCounters');
+const { initializeUserCollection } = require('./utils/users');
+
 const uri = 'mongodb://localhost:27017';
 const DB_NAME = 'screening_app';
-const { LOG_LEVEL, writeLog } = require('./utils/logger');
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 const database = client.db(DB_NAME);
@@ -13,8 +16,10 @@ async function connectToMongo() {
 
         // SETUP TASKS
         await createMandatoryCollections();
-        await ensureDocumentsExist();
+        await createMandatoryDocuments();
         await createIndexes();
+        await initializeIDCounterCollection(database);
+        await initializeUserCollection(database);
     } catch (error) {
         writeLog(LOG_LEVEL.ERROR, `Error connecting to DB: ${error}`);
     }
@@ -37,7 +42,7 @@ async function createMandatoryCollections() {
     writeLog(LOG_LEVEL.INFO, 'Finished creating needed collections.');
 }
 
-async function ensureDocumentsExist() {
+async function createMandatoryDocuments() {
     writeLog(LOG_LEVEL.INFO, 'Ensuring collection has needed documents...');
 
     // CHECK FIELDS
@@ -56,13 +61,6 @@ async function ensureDocumentsExist() {
         await fieldsCollection.updateOne(filter, update, { upsert: true });
     }
 
-    // CHECK ID
-    const lastRecord = database.collection('latestRecordID');
-    const result = await lastRecord.countDocuments();
-    if (result === 0) {
-        await lastRecord.insertOne({ latestID: 1 });
-    }
-
     writeLog(LOG_LEVEL.INFO, 'Finished ensuring collection has needed documents...');
 }
 
@@ -71,8 +69,8 @@ async function createIndexes() {
 
     const recordsCollection = database.collection('records');
 
-    const indexExists = await recordsCollection.indexExists('id');
-    if (!indexExists) {
+    const recordIDIndexExists = await recordsCollection.indexExists('id');
+    if (!recordIDIndexExists) {
         await recordsCollection.createIndex({
             id: 1,
         });
@@ -81,6 +79,4 @@ async function createIndexes() {
     writeLog(LOG_LEVEL.INFO, 'Finished creating indexes...');
 }
 
-connectToMongo();
-
-module.exports = { database };
+module.exports = { database, connectToMongo };
