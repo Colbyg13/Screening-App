@@ -20,6 +20,8 @@ import { LOCAL_RECORDS_STORAGE_KEY } from '../screens/Offline/OfflineRecordsScre
 import { useCustomDataTypesContext } from './CustomDataContext';
 import { useServerContext } from './ServerContext';
 import { useSnackbarContext } from './SnackbarContext';
+import * as Application from 'expo-application';
+import { Platform } from 'react-native';
 
 export const STATION_FIELDS_STORAGE_KEY = 'sessionFields';
 
@@ -62,6 +64,9 @@ export default function SessionProvider({ children }) {
     const [sessionRecords, setSessionRecords] = useState([]);
     const [selectedStationId, setSelectedStationId] = useState();
 
+    // Device
+    const [deviceID, setDeviceID] = useState(null);
+
     // snackbar
     const { addSnackbar } = useSnackbarContext();
 
@@ -77,6 +82,10 @@ export default function SessionProvider({ children }) {
         () => sessionInfo?.stations?.find(({ id }) => id === selectedStationId),
         [sessionInfo, selectedStationId],
     );
+
+    useEffect(() => {
+        getAndSetDeviceID();
+    }, []);
 
     // UPLOAD OFFLINE RECORDS TO SERVER WHEN CONNECTED
     useEffect(() => {
@@ -104,66 +113,104 @@ export default function SessionProvider({ children }) {
     }, [sessionId]);
 
     useEffect(() => {
-        const socket = io(serverURL);
+        if (deviceID === null) {
+            return;
+        }
+
+        if (deviceID === '') {
+            addSnackbar({
+                message:
+                    'Unable to connect to session server with deviceID, so we will not be able to track your devices updates',
+                severity: SNACKBAR_SEVERITIES.WARNING,
+            });
+        }
+
+        const socket = io(serverURL, {
+            auth: {
+                deviceID,
+            },
+        });
+
+        if (!socket) {
+            return;
+        }
+
         setSocket(socket);
 
-        if (socket) {
-            socket.on('connect', () => {
-                console.log('Connected to server');
-                setIsConnected(true);
+        socket.on('connect', () => {
+            console.log('Connected to server');
+            setIsConnected(true);
+        });
+
+        socket.on('record-created', createdRecord => {
+            setSessionRecords(records => [...records, createdRecord]);
+        });
+
+        socket.on('record-updated', updatedRecord => {
+            setSessionRecords(records => {
+                const oldRecordIndex = records.findIndex(({ id }) => id === updatedRecord?.id);
+                return oldRecordIndex >= 0 ? records.with(oldRecordIndex, updatedRecord) : records;
             });
+        });
 
-            socket.on('record-created', createdRecord => {
-                setSessionRecords(records => [...records, createdRecord]);
-            });
+        socket.on('session-info', data => {
+            const {
+                initial,
+                sessionIsRunning: newSessionIsRunning,
+                sessionId: newSessionId,
+            } = data;
 
-            socket.on('record-updated', updatedRecord => {
-                setSessionRecords(records => {
-                    const oldRecordIndex = records.findIndex(({ id }) => id === updatedRecord?.id);
-                    return oldRecordIndex >= 0
-                        ? records.with(oldRecordIndex, updatedRecord)
-                        : records;
-                });
-            });
+            setSessionIsRunning(newSessionIsRunning);
+            setSessionId(newSessionId);
 
-            socket.on('session-info', data => {
-                const {
-                    initial,
-                    sessionIsRunning: newSessionIsRunning,
-                    sessionId: newSessionId,
-                } = data;
+            if (newSessionIsRunning) {
+                setModalMessage('');
+                // already was running
+            } else if (!initial) {
+                setModalMessage('The current session has ended.');
+                setSessionRecords([]);
+            }
+        });
 
-                setSessionIsRunning(newSessionIsRunning);
-                setSessionId(newSessionId);
+        socket.on('disconnect', () => {
+            console.log('Disconnected from server');
+            setIsConnected(false);
+            setSessionIsRunning(false);
+            setSessionId();
 
-                if (newSessionIsRunning) {
-                    setModalMessage('');
-                    // already was running
-                } else if (!initial) {
-                    setModalMessage('The current session has ended.');
-                    setSessionRecords([]);
-                }
-            });
+            const state = navigation.getState();
+            const currentPageName = state.routes.at(-1)?.name;
+            if (REDIRECT_ON_SESSION_END_ROUTES.includes(currentPageName)) {
+                setModalMessage('You have disconnected from the server.');
+            }
+        });
 
-            socket.on('disconnect', () => {
-                console.log('Disconnected from server');
-                setIsConnected(false);
-                setSessionIsRunning(false);
-                setSessionId();
+        return () => {
+            socket.disconnect();
+            setSocket(null);
+        };
+    }, [serverURL, deviceID]);
 
-                const state = navigation.getState();
-                const currentPageName = state.routes.at(-1)?.name;
-                if (REDIRECT_ON_SESSION_END_ROUTES.includes(currentPageName)) {
-                    setModalMessage('You have disconnected from the server.');
-                }
-            });
-
-            return () => {
-                socket.disconnect();
-                setSocket(null);
-            };
+    async function getAndSetDeviceID() {
+        try {
+            const deviceID = await getDeviceID();
+            setDeviceID(deviceID);
+            return
+        } catch (err) {
+            console.warn('unable to get device id', err);
         }
-    }, [serverURL]);
+        setDeviceID('');
+    }
+
+    async function getDeviceID() {
+        if (Platform.OS === 'ios') {
+            // TODO test that this works with ipads
+            return await Application.getIosIdForVendorAsync();
+        } else if (Platform.OS === 'android') {
+            return Application.getAndroidId();
+        }
+        return null;
+    }
 
     async function getSessionInfo(sessionId) {
         setLoading(true);
