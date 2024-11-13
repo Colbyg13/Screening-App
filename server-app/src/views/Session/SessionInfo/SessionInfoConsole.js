@@ -30,7 +30,7 @@ export default function SessionInfoConsole() {
     return (
         <div className="max-h-full w-96 overflow-y-hidden bg-gray-900 text-gray-50">
             <h2 className="w-full pb-2 pt-8 text-xl text-center border-b border-gray-50">
-                Session Console
+                Session Logs
             </h2>
             <div
                 ref={logContainerRef}

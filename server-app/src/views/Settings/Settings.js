@@ -60,7 +60,7 @@ export default function Settings() {
                 <h2 className="text-2xl mb-4">Settings</h2>
                 <div className="flex space-x-2 items-center">
                     <span className="text-lg">Device Name</span>
-                    <TextField disabled className="w-52" size="small" value="Admin" />
+                    <TextField disabled className="w-52" size="small" value="Server Computer" />
                 </div>
                 <div>
                     <h2 className="text-xl mt-4 mb-2">Developers</h2>
