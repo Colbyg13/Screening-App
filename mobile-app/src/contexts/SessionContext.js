@@ -179,8 +179,8 @@ export default function SessionProvider({ children }) {
             setSessionId();
 
             const state = navigation.getState();
-            const currentPageName = state.routes.at(-1)?.name;
-            if (REDIRECT_ON_SESSION_END_ROUTES.includes(currentPageName)) {
+            const currentPageName = state?.routes?.at(-1)?.name;
+            if (currentPageName && REDIRECT_ON_SESSION_END_ROUTES.includes(currentPageName)) {
                 setModalMessage('You have disconnected from the server.');
             }
         });

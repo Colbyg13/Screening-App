@@ -67,21 +67,17 @@ const SessionQueue = props => {
     useEffect(() => {
         searchForRecord();
     }, [isSearching, searchText]);
-    // console.log(sortedRecords[0]);
     const searchForRecord = () => {
         if (isSearching) {
             const foundRecord = sortedRecords.filter(record =>
                 record.id.toString().includes(searchText),
             );
             if (foundRecord.length > 0) {
-                console.log('foundRecord', foundRecord);
                 setFilteredRecords(foundRecord);
             } else {
-                console.log('no record found');
                 setFilteredRecords([]);
             }
         } else {
-            console.log('not searching');
             setFilteredRecords([]);
         }
     };

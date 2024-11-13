@@ -114,7 +114,7 @@ export default function SessionProvider({ children }) {
 
     useEffect(() => {
         const socket = io(serverURL, {
-            auth: { username: 'Computer', isAdmin: true },
+            auth: { deviceID: 'ServerComputer' },
         });
 
         setSocket(socket);
@@ -169,12 +169,12 @@ export default function SessionProvider({ children }) {
         });
 
         socket.on('user-connected', newUser => {
-            addSessionLog(`User ${newUser.username} connected to server`, LOG_TYPES.CONNECTED);
+            addSessionLog(`${newUser.username} connected to server`, LOG_TYPES.CONNECTED);
             setConnectedUsers(users => [...users, newUser]);
         });
 
         socket.on('user-disconnect', user => {
-            addSessionLog(`User ${user.username} disconnected server`, LOG_TYPES.DISCONNECTED);
+            addSessionLog(`${user.username} disconnected server`, LOG_TYPES.DISCONNECTED);
             setConnectedUsers(users => users.filter(({ userID }) => user.userID !== userID));
         });
 
