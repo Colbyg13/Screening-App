@@ -10,7 +10,6 @@ import CustomDataPickerOffline from '../../components/Inputs/CustomDataPickerOff
 import DatePicker from '../../components/Inputs/DatePicker';
 const OfflineAddRecordStep3 = ({ route, navigation }) => {
     const item = route.params.item;
-    // console.log('HERE IS THE ITEM TO UPDATE', item);
     const customDataTypes = route.params.customDataTypes;
     const selectedDataTypes = [
         { name: 'ID', key: 'id', type: 'number' },
@@ -30,9 +29,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
         let newFields = [];
         for (let i = 0; i < numFields; i++) {
             const varName = selectedDataTypes[i].key;
-            // console.log('varName', varName);
             if (item.hasOwnProperty(varName)) {
-                // console.log('item has property', varName);
                 setFormState(prevState => ({
                     ...prevState,
                     [varName]: item[varName],
@@ -67,11 +64,6 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
         //sets the state for the form dynamically. I have not implemented validation yet.
         defaultState();
     }, []);
-
-    useEffect(() => {
-        //sets the state for the form dynamically. I have not implemented validation yet.
-        // console.log('formState updated', formState);
-    }, [formState]);
 
     const handleFormUpdate = (field, selectedItem) => {
         setFormState(prevState => ({
@@ -302,7 +294,6 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                         style={{ marginLeft: 10, marginRight: 10 }}
                         onPress={() => {
                             setIsVisible(false);
-                            // console.log('formState before submit in dialog', formState);
                             navigation.navigate({
                                 name: 'Offline Records',
                                 params: { updatedRecord: formState, oldRecordID: item.id },

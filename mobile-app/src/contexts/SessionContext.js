@@ -138,7 +138,6 @@ export default function SessionProvider({ children }) {
         setSocket(socket);
 
         socket.on('connect', () => {
-            console.log('Connected to server');
             setIsConnected(true);
         });
 
@@ -173,7 +172,6 @@ export default function SessionProvider({ children }) {
         });
 
         socket.on('disconnect', () => {
-            console.log('Disconnected from server');
             setIsConnected(false);
             setSessionIsRunning(false);
             setSessionId();
@@ -195,7 +193,7 @@ export default function SessionProvider({ children }) {
         try {
             const deviceID = await getDeviceID();
             setDeviceID(deviceID);
-            return
+            return;
         } catch (err) {
             console.warn('unable to get device id', err);
         }
@@ -274,14 +272,12 @@ export default function SessionProvider({ children }) {
 
     async function joinStation(stationId) {
         if (!socket) return;
-        console.log('join station');
         setSelectedStationId(stationId);
         socket.emit('station-join', { stationId });
     }
 
     async function leaveStation() {
         if (!socket) return;
-        console.log('leave station');
         setSelectedStationId();
         socket.emit('station-leave');
     }
@@ -334,7 +330,6 @@ export default function SessionProvider({ children }) {
     }
 
     async function sendRecord(recordPayload) {
-        console.log('Sending record...');
         const payload = {
             ...recordPayload,
             record: {

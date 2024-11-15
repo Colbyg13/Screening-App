@@ -45,13 +45,12 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
             }
         } catch (error) {
             // Error retrieving data
-            console.log('no records found');
+            console.warn('error getting records', error);
         }
     };
 
     const storeRecords = async () => {
         if (records.length > 0) {
-            console.log('storing the records');
             try {
                 const sorted = records.sort((a, b) => (a.id > b.id ? 1 : -1));
                 const jsonValue = JSON.stringify(sorted);
@@ -60,21 +59,19 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
                 setNeedsUpdate(true);
             } catch (e) {
                 // saving error
-                console.log('error saving record');
+                console.warn('error storing the records', error);
             }
         } else return; //no records to store
     };
 
     useEffect(() => {
         //should fire when a new record is submitted
-        console.log('firing new record. ');
         if (route.params?.newRecord) {
             //check if ID is already in records
             const newRecord = route.params.newRecord;
             const newRecordID = newRecord.id;
             const found = records.find(record => record.id === newRecordID);
             if (found) {
-                console.log('found a record with the same ID'); //replace or ignore? for now, ignore
                 setIdInUse(String(newRecordID));
                 setIdInUseType('newRecord');
                 setIsVisible(true);

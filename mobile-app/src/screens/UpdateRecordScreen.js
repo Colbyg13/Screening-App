@@ -61,10 +61,7 @@ const UpdateRecordScreen = ({ route }) => {
     const checkForStationInfo = () => {
         fields.forEach(field => {
             if (record.hasOwnProperty(field)) {
-                //console.log('field', field, 'exists in record', record);
                 setHasStationInfo(true);
-            } else {
-                //console.log('field', field, 'does not exist');
             }
         });
     };
@@ -76,16 +73,10 @@ const UpdateRecordScreen = ({ route }) => {
     }, []);
 
     useEffect(() => {
-        //console.log('FORM STATE UPDATED', formState);
-    }, [formState]);
-
-    useEffect(() => {
-        //console.log('Fields after default state was called', fields);
         checkForStationInfo();
     }, [fields]);
 
     const handleFormUpdate = (field, selectedItem) => {
-        //console.log('handling update', field, selectedItem);
         setFormState(prevState => ({
             ...prevState,
             [field.key]: selectedItem, //year/month/day
@@ -93,7 +84,6 @@ const UpdateRecordScreen = ({ route }) => {
     };
 
     const handleDateUpdate = (field, showname, newDate) => {
-        // console.log('handling date update', field, showname, newDate);
         setFormState(prevState => ({
             ...prevState,
             [field.key]: newDate, //year/month/day
@@ -196,7 +186,6 @@ const UpdateRecordScreen = ({ route }) => {
                                 returnKeyType="done"
                                 onSubmitEditing={Keyboard.dismiss}
                                 onChangeText={newText => {
-                                    // console.log(newText);
                                     setFormState(prevState => ({
                                         ...prevState,
                                         [field.key]: newText,

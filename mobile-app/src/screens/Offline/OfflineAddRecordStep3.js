@@ -7,7 +7,6 @@ import CustomDataPickerOffline from '../../components/Inputs/CustomDataPickerOff
 import DatePicker from '../../components/Inputs/DatePicker';
 import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 const OfflineAddRecordStep3 = ({ route, navigation }) => {
-    // console.log('add to queue offline screen', route.params);
     const { customDataTypes } = useCustomDataTypesContext();
     const selectedDataTypes = [
         { name: 'ID', key: 'id', type: 'number' },
@@ -45,11 +44,9 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
 
     useEffect(() => {
         //sets the state for the form dynamically. I have not implemented validation yet.
-        // console.log('formState updated', formState);
     }, [formState]);
 
     const handleFormUpdate = (field, selectedItem) => {
-        //console.log('handling update', field, selectedItem);
         const customFieldData = customDataTypes.find(({ type }) => type === field.type);
         const customData = customFieldData ? { [field.key]: customFieldData.unit } : {};
         setFormState(prevState => ({
@@ -162,7 +159,6 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                                 returnKeyType="done"
                                 onSubmitEditing={Keyboard.dismiss}
                                 onChangeText={newText => {
-                                    // console.log(newText);
                                     const customFieldData = customDataTypes.find(
                                         ({ type }) => type === field.type,
                                     );

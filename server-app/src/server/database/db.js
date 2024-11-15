@@ -2,6 +2,8 @@ const { MongoClient } = require('mongodb');
 const { LOG_LEVEL, writeLog } = require('../utils/logger');
 const { initializeIDCounterCollection } = require('./utils/idCounters');
 const { initializeUserCollection } = require('./utils/users');
+const { initializeRecordCollection } = require('./utils/records');
+const { initializeSessionCollection } = require('./utils/sessions');
 
 const uri = 'mongodb://localhost:27017';
 const DB_NAME = 'screening_app';
@@ -17,16 +19,17 @@ async function connectToMongo() {
         // SETUP TASKS
         await createMandatoryCollections();
         await createMandatoryDocuments();
-        await createIndexes();
         await initializeIDCounterCollection(database);
         await initializeUserCollection(database);
+        await initializeSessionCollection(database);
+        await initializeRecordCollection(database);
     } catch (error) {
         writeLog(LOG_LEVEL.ERROR, `Error connecting to DB: ${error}`);
     }
 }
 
 async function createMandatoryCollections() {
-    const mandatoryCollections = ['records', 'sessions', 'fields'];
+    const mandatoryCollections = ['fields'];
 
     writeLog(LOG_LEVEL.INFO, 'Creating needed collections...');
     try {
@@ -62,21 +65,6 @@ async function createMandatoryDocuments() {
     }
 
     writeLog(LOG_LEVEL.INFO, 'Finished ensuring collection has needed documents...');
-}
-
-async function createIndexes() {
-    writeLog(LOG_LEVEL.INFO, 'Creating indexes...');
-
-    const recordsCollection = database.collection('records');
-
-    const recordIDIndexExists = await recordsCollection.indexExists('id');
-    if (!recordIDIndexExists) {
-        await recordsCollection.createIndex({
-            id: 1,
-        });
-    }
-
-    writeLog(LOG_LEVEL.INFO, 'Finished creating indexes...');
 }
 
 module.exports = { database, connectToMongo };
