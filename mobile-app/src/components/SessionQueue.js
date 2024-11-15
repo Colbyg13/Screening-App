@@ -16,8 +16,8 @@ const SessionQueue = props => {
     } = useSessionContext();
     const stationIndex = stations.indexOf(station);
     const isStationOne = stations[0] === station;
-    const [isSearching, setIsSearching] = React.useState(false);
-    const [searchText, setSearchText] = React.useState('');
+    const [isSearching, setIsSearching] = useState(false);
+    const [searchText, setSearchText] = useState('');
     const [filteredRecords, setFilteredRecords] = useState([]);
     const sortedRecords = [...sessionRecords].sort((recordA, recordB) => {
         if (recordA.nextStationIndex === recordB.nextStationIndex) {
@@ -69,14 +69,11 @@ const SessionQueue = props => {
     }, [isSearching, searchText]);
     const searchForRecord = () => {
         if (isSearching) {
-            const foundRecord = sortedRecords.filter(record =>
+            const filteredRecords = sortedRecords.filter(record =>
                 record.id.toString().includes(searchText),
             );
-            if (foundRecord.length > 0) {
-                setFilteredRecords(foundRecord);
-            } else {
-                setFilteredRecords([]);
-            }
+            // if we are searching, we want the ids to be in numerical order
+            setFilteredRecords(filteredRecords.sort((a, b) => a.id - b.id));
         } else {
             setFilteredRecords([]);
         }

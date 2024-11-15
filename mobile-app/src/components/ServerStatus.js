@@ -20,7 +20,7 @@ export default function ServerStatus({ onPress = () => {} }) {
                 borderWidth: 1,
                 borderColor: sessionIsRunning ? 'green' : isConnected ? 'blue' : 'gray',
             }}
-            onPress={onPress}
+            onPressOut={onPress}
         >
             {(!isConnected && findingServers) ? <ActivityIndicator /> : null}
             <Text>{sessionIsRunning ? 'Running' : isConnected ? 'Connected' : 'Offline'}</Text>
