@@ -39,13 +39,10 @@ export async function initializeFieldCollection(database) {
 }
 
 export async function getFields() {
-    writeLog(LOG_LEVEL.INFO, `Getting field`);
-
     try {
         const fields = await fieldCollection.find({}).toArray();
         return fields;
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error getting fields ${error}`);
         throw error;
     }
 }

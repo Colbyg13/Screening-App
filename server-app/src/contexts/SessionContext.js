@@ -114,7 +114,7 @@ export default function SessionProvider({ children }) {
 
     useEffect(() => {
         const socket = io(serverURL, {
-            auth: { deviceID: 'ServerComputer' },
+            auth: { deviceId: 'ServerComputer' },
         });
 
         setSocket(socket);
@@ -144,7 +144,7 @@ export default function SessionProvider({ children }) {
             );
             setConnectedUsers(users =>
                 users.map(user =>
-                    user.userID === data.userID
+                    user.userId === data.userId
                         ? {
                               ...user,
                               stationId: data.stationId,
@@ -158,7 +158,7 @@ export default function SessionProvider({ children }) {
             addSessionLog(`User ${data.username} left their station`, LOG_TYPES.LEAVE_STATION);
             setConnectedUsers(users =>
                 users.map(user =>
-                    user.userID === data.userID
+                    user.userId === data.userId
                         ? {
                               ...user,
                               stationId: undefined,
@@ -175,7 +175,7 @@ export default function SessionProvider({ children }) {
 
         socket.on('user-disconnect', user => {
             addSessionLog(`${user.username} disconnected server`, LOG_TYPES.DISCONNECTED);
-            setConnectedUsers(users => users.filter(({ userID }) => user.userID !== userID));
+            setConnectedUsers(users => users.filter(({ userId }) => user.userId !== userId));
         });
 
         socket.on('users', data => {

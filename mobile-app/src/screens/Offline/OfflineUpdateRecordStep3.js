@@ -107,7 +107,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
             //no ID change
             navigation.navigate({
                 name: 'Offline Records',
-                params: { updatedRecord: formState, oldRecordID: item.id },
+                params: { updatedRecord: formState, oldRecordId: item.id },
                 merge: true,
             });
         }
@@ -296,7 +296,7 @@ const OfflineAddRecordStep3 = ({ route, navigation }) => {
                             setIsVisible(false);
                             navigation.navigate({
                                 name: 'Offline Records',
-                                params: { updatedRecord: formState, oldRecordID: item.id },
+                                params: { updatedRecord: formState, oldRecordId: item.id },
                                 merge: true,
                             });
                         }}

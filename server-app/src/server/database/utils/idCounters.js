@@ -1,7 +1,7 @@
 import { LOG_LEVEL, writeLog } from '../../utils/logger.js';
 
 // DEPRECATED but used for migration
-const LATEST_RECORD_ID_COLLECTION_NAME = 'latestRecordID';
+const LATEST_RECORD_ID_COLLECTION_NAME = 'latestRecordId';
 
 // NEW DATA
 const ID_COUNTER_COLLECTION_NAME = 'idCounters';
@@ -28,8 +28,8 @@ export async function initializeIDCounterCollection(database) {
         idCounterCollection = database.collection(ID_COUNTER_COLLECTION_NAME);
 
         // add indexes
-        const recordIDIndexExists = await idCounterCollection.indexExists('sequenceName');
-        if (!recordIDIndexExists) {
+        const recordIdIndexExists = await idCounterCollection.indexExists('sequenceName');
+        if (!recordIdIndexExists) {
             await idCounterCollection.createIndex({
                 sequenceName: 1,
             });
@@ -55,10 +55,8 @@ export async function initializeIDCounterCollection(database) {
 }
 
 async function migrateOldData(database) {
-    writeLog(LOG_LEVEL.INFO, 'migrating old idCounter data...');
-
     try {
-        // replace latestRecordID with idCounters
+        // replace latestRecordId with idCounters
         const collections = await database
             .listCollections({ name: LATEST_RECORD_ID_COLLECTION_NAME })
             .toArray();
@@ -68,24 +66,21 @@ async function migrateOldData(database) {
 
             const latestRecordDoc = await oldCollection.findOne();
             if (latestRecordDoc) {
-                const latestID = latestRecordDoc.latestID;
+                const latestId = latestRecordDoc.latestId;
                 await idCounterCollection.findOneAndUpdate(
                     { sequenceName: SEQUENCE_NAMES.RECORDS },
-                    { $set: { sequenceValue: latestID } },
+                    { $set: { sequenceValue: latestId } },
                 );
             }
 
             await oldCollection.drop();
         }
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error migrating old data: ${error}`);
         throw error;
     }
 }
 
 export async function getNextSequenceValue(sequenceName) {
-    writeLog(LOG_LEVEL.INFO, `getting next sequence data: ${sequenceName}`);
-
     try {
         // updates the sequence value for the next document
         const document = await idCounterCollection.findOneAndUpdate(
@@ -95,14 +90,11 @@ export async function getNextSequenceValue(sequenceName) {
         );
         return document.value.sequenceValue;
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error getting next sequence value: ${error}`);
         throw error;
     }
 }
 
 export async function resetSequenceValue(sequenceName) {
-    writeLog(LOG_LEVEL.INFO, `resetting sequence data: ${sequenceName}`);
-
     try {
         // updates the sequence value for the next document
         const document = await idCounterCollection.findOneAndUpdate(
@@ -112,7 +104,6 @@ export async function resetSequenceValue(sequenceName) {
         );
         return document.sequenceValue;
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error resetting sequence value: ${error}`);
         throw error;
     }
 }

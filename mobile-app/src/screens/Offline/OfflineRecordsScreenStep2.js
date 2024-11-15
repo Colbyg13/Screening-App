@@ -69,10 +69,10 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
         if (route.params?.newRecord) {
             //check if ID is already in records
             const newRecord = route.params.newRecord;
-            const newRecordID = newRecord.id;
-            const found = records.find(record => record.id === newRecordID);
+            const newRecordId = newRecord.id;
+            const found = records.find(record => record.id === newRecordId);
             if (found) {
-                setIdInUse(String(newRecordID));
+                setIdInUse(String(newRecordId));
                 setIdInUseType('newRecord');
                 setIsVisible(true);
                 //if found, replace the record
@@ -92,8 +92,8 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
 
         if (route.params?.updatedRecord) {
             const updatedRecord = route.params.updatedRecord;
-            const oldRecordID = route.params.oldRecordID;
-            if (updatedRecord.id != oldRecordID) {
+            const oldRecordId = route.params.oldRecordId;
+            if (updatedRecord.id != oldRecordId) {
                 //check if the new ID is already in use
                 const found = records.find(record => record.id === updatedRecord.id);
                 if (found) {
@@ -102,7 +102,7 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
                     setIsVisible(true);
                 } else {
                     for (let i = 0; i < records.length; i++) {
-                        if (records[i].id === oldRecordID) {
+                        if (records[i].id === oldRecordId) {
                             //find the record with the old ID
                             let update = [...records];
                             update[i] = updatedRecord; //replace the record with the updated record and new ID
@@ -220,11 +220,11 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
                                     break;
                                 case 'updatedRecord':
                                     data = route.params.updatedRecord;
-                                    const oldRecordID = route.params.oldRecordID;
+                                    const oldRecordId = route.params.oldRecordId;
 
                                     for (let i = 0; i < records.length; i++) {
                                         //remove old record, and overwrite with new record
-                                        if (records[i].id === oldRecordID) {
+                                        if (records[i].id === oldRecordId) {
                                             //find the record with the old ID
                                             let update = [...records];
                                             update.splice(i, 1);
@@ -276,11 +276,11 @@ const OfflineRecordsScreenStep2 = ({ route, navigation }) => {
                                         case 'updatedRecord':
                                             data = route.params.updatedRecord;
                                             data.id = +replacementID;
-                                            const oldRecordID = route.params.oldRecordID;
+                                            const oldRecordId = route.params.oldRecordId;
 
                                             for (let i = 0; i < records.length; i++) {
                                                 //remove old record, and overwrite with new record
-                                                if (records[i].id === oldRecordID) {
+                                                if (records[i].id === oldRecordId) {
                                                     //find the record with the old ID
                                                     let update = [...records];
                                                     update.splice(i, 1); //remove the old record

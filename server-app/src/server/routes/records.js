@@ -15,8 +15,6 @@ const io = global.io;
 const pageSize = 50;
 
 router.get('/', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `getting records, ${JSON.stringify(req.query)}`);
-
     const {
         query: {
             // Getting record count
@@ -89,8 +87,6 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:recordId', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `getting record, ${req.params.recordId}`);
-
     const { query: { unitConversions = {} } = {}, params: { recordId } = {} } = req;
 
     try {
@@ -104,8 +100,6 @@ router.get('/:recordId', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `creating/updating records: ${JSON.stringify(req.body)}`);
-
     const {
         record = {},
         // need this separate if offline mode or other reasons
@@ -148,8 +142,6 @@ router.post('/', async (req, res) => {
 });
 
 router.delete('/:recordId', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `deleting record, ${req.params.recordId}`);
-
     const recordId = +req.params.recordId;
 
     try {

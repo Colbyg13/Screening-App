@@ -4,7 +4,6 @@ const { LOG_LEVEL, writeLog } = require('../utils/logger');
 const { getSessions, getSingleSession } = require('../database/utils/sessions');
 
 router.get('/', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `Getting sessions`);
     try {
         const sessions = await getSessions();
         res.status(200).json(sessions);
@@ -19,7 +18,6 @@ router.get('/:sessionId', async (req, res) => {
         params: { sessionId },
     } = req;
 
-    writeLog(LOG_LEVEL.INFO, `Getting session: ${sessionId}`);
     try {
         const session = await getSingleSession({ sessionId });
 

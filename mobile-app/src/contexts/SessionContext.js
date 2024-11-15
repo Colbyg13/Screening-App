@@ -65,7 +65,7 @@ export default function SessionProvider({ children }) {
     const [selectedStationId, setSelectedStationId] = useState();
 
     // Device
-    const [deviceID, setDeviceID] = useState(null);
+    const [deviceId, setDeviceId] = useState(null);
 
     // snackbar
     const { addSnackbar } = useSnackbarContext();
@@ -84,7 +84,7 @@ export default function SessionProvider({ children }) {
     );
 
     useEffect(() => {
-        getAndSetDeviceID();
+        getAndSetDeviceId();
     }, []);
 
     // UPLOAD OFFLINE RECORDS TO SERVER WHEN CONNECTED
@@ -113,21 +113,13 @@ export default function SessionProvider({ children }) {
     }, [sessionId]);
 
     useEffect(() => {
-        if (deviceID === null) {
+        if (deviceId === null) {
             return;
-        }
-
-        if (deviceID === '') {
-            addSnackbar({
-                message:
-                    'Unable to connect to session server with deviceID, so we will not be able to track your devices updates',
-                severity: SNACKBAR_SEVERITIES.WARNING,
-            });
         }
 
         const socket = io(serverURL, {
             auth: {
-                deviceID,
+                deviceId,
             },
         });
 
@@ -187,20 +179,33 @@ export default function SessionProvider({ children }) {
             socket.disconnect();
             setSocket(null);
         };
-    }, [serverURL, deviceID]);
+    }, [serverURL, deviceId]);
 
-    async function getAndSetDeviceID() {
+    async function getAndSetDeviceId() {
         try {
-            const deviceID = await getDeviceID();
-            setDeviceID(deviceID);
+            const deviceId = await getDeviceId();
+            addDeviceIdToAxiosRequests(deviceId);
+            setDeviceId(deviceId);
             return;
         } catch (err) {
             console.warn('unable to get device id', err);
         }
-        setDeviceID('');
+        setDeviceId('');
     }
 
-    async function getDeviceID() {
+    function addDeviceIdToAxiosRequests(deviceId) {
+        axios.interceptors.request.use(
+            config => {
+                config.headers['deviceId'] = deviceId;
+                return config;
+            },
+            error => {
+                return Promise.reject(error);
+            },
+        );
+    }
+
+    async function getDeviceId() {
         if (Platform.OS === 'ios') {
             // TODO test that this works with ipads
             return await Application.getIosIdForVendorAsync();

@@ -16,12 +16,12 @@ export async function initializeUserCollection(database) {
             await database.createCollection(USER_COLLECTION_NAME);
         }
 
-        userCollection =  database.collection(USER_COLLECTION_NAME);
+        userCollection = database.collection(USER_COLLECTION_NAME);
         // add indexes
-        const userDeviceIDIndexExists = await userCollection.indexExists('deviceID');
-        if (!userDeviceIDIndexExists) {
+        const userDeviceIdIndexExists = await userCollection.indexExists('deviceId');
+        if (!userDeviceIdIndexExists) {
             await userCollection.createIndex({
-                deviceID: 1,
+                deviceId: 1,
             });
         }
 
@@ -31,36 +31,44 @@ export async function initializeUserCollection(database) {
     }
 }
 
-export async function createNewUser(deviceID) {
-    writeLog(LOG_LEVEL.INFO, `Creating new user: ${deviceID}`);
-
+export async function getOrCreateUser(deviceId) {
+    let user;
     try {
-        const userID = await getNextSequenceValue(SEQUENCE_NAMES.USERS);
-        const username = `user-${userID}`;
+        user = await getUser(deviceId);
+        if (!user) {
+            user = await createNewUser(deviceId);
+        }
+
+        return user;
+    } catch (error) {
+        throw error;
+    }
+}
+
+export async function createNewUser(deviceId) {
+    try {
+        const userId = await getNextSequenceValue(SEQUENCE_NAMES.USERS);
+        const username = `user-${userId}`;
 
         const user = {
-            deviceID,
-            userID,
+            deviceId,
+            userId,
             username,
-        }
+        };
 
         await userCollection.insertOne(user);
 
         return user;
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error creating new user: ${error}`);
         throw error;
     }
 }
 
-export async function getUser(deviceID) {
-    writeLog(LOG_LEVEL.INFO, `Getting user: ${deviceID}`);
-
+export async function getUser(deviceId) {
     try {
-        const record = await userCollection.findOne({ deviceID });
+        const record = await userCollection.findOne({ deviceId });
         return record;
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error getting user: ${error}`);
         throw error;
     }
 }

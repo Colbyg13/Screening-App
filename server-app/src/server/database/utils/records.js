@@ -21,8 +21,8 @@ export async function initializeRecordCollection(database) {
 
         recordCollection = database.collection(RECORD_COLLECTION_NAME);
         // add indexes
-        const recordIDIndexExists = await recordCollection.indexExists('id');
-        if (!recordIDIndexExists) {
+        const recordIdIndexExists = await recordCollection.indexExists('id');
+        if (!recordIdIndexExists) {
             await recordCollection.createIndex({
                 id: 1,
             });
@@ -41,18 +41,15 @@ export async function initializeRecordCollection(database) {
 }
 
 export async function getRecordCount() {
-    writeLog(LOG_LEVEL.INFO, `Getting record count`);
     try {
         const recordCount = await recordCollection.count({});
         return recordCount;
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error getting record count ${error}`);
         throw error;
     }
 }
 
 export async function getRecordsBySessionId({ sessionId, unitConversions }) {
-    writeLog(LOG_LEVEL.INFO, `Getting records by sessionId - ${JSON.stringify(arguments[0])}`);
     try {
         const sessionRecords = await recordCollection.find({ sessionId }).toArray();
         const convertedRecords = sessionRecords.map(record =>
@@ -60,13 +57,11 @@ export async function getRecordsBySessionId({ sessionId, unitConversions }) {
         );
         return convertedRecords;
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error getting session records ${error}`);
         throw error;
     }
 }
 
 export async function getRecords({ find, sort, skip, pageSize, unitConversions }) {
-    writeLog(LOG_LEVEL.INFO, `Getting records -  ${JSON.stringify(arguments[0])}`);
     try {
         const records = await recordCollection
             .find(find)
@@ -81,33 +76,26 @@ export async function getRecords({ find, sort, skip, pageSize, unitConversions }
 
         return convertedRecords;
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error getting records ${error}`);
         throw error;
     }
 }
 
 export async function getSingleRecord({ recordId, unitConversions }) {
-    writeLog(LOG_LEVEL.INFO, `Getting single record -  ${JSON.stringify(arguments[0])}`);
-
     try {
         const record = await recordCollection.findOne({ _id: new ObjectId(recordId) });
         return convertRecordFromBaseUnits(record, unitConversions);
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error getting single record ${error}`);
         throw error;
     }
 }
 
 export async function createRecord({ record, customData }) {
-    writeLog(LOG_LEVEL.INFO, `Creating record -  ${JSON.stringify(arguments[0])}`);
-
     if (!record.sessionId) {
-        writeLog(LOG_LEVEL.ERROR, `Records cannot be created without a sessionId: ${error}`);
         throw new Error('Records cannot be created without a sessionId');
     }
 
     try {
-        const nextRecordID = await getNextSequenceValue(SEQUENCE_NAMES.RECORDS);
+        const nextRecordId = await getNextSequenceValue(SEQUENCE_NAMES.RECORDS);
 
         const sessionData = await getSingleSession({ sessionId: record.sessionId });
 
@@ -118,7 +106,7 @@ export async function createRecord({ record, customData }) {
 
         // put the record in the DB with base units for better conversion
         const newRecord = convertRecordToBaseUnits({
-            id: nextRecordID,
+            id: nextRecordId,
             createdAt: new Date(),
             lastModified: new Date(),
             customData: customData ?? {},
@@ -135,14 +123,11 @@ export async function createRecord({ record, customData }) {
 
         return newRecordWithId;
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error creating record: ${error}`);
         throw error;
     }
 }
 
 export async function updateRecord({ record, customData }) {
-    writeLog(LOG_LEVEL.INFO, `Updating record - ${JSON.stringify(arguments[0])}`);
-
     // remove _id and sessionId as they cannot be overridden
     const { _id, sessionId, ...recordRest } = record;
     const recordUpdate = convertRecordToBaseUnits(recordRest, customData);
@@ -181,19 +166,15 @@ export async function updateRecord({ record, customData }) {
         const updatedRecord = convertRecordFromBaseUnits(result.value);
         return updatedRecord;
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error creating record: ${error}`);
         throw error;
     }
 }
 
 export async function deleteRecord({ recordId }) {
-    writeLog(LOG_LEVEL.INFO, `Updating record -  ${JSON.stringify(arguments[0])}`);
-
     try {
         await recordCollection.deleteOne({ id: recordId });
         return true;
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error deleting record: ${error}`);
         throw error;
     }
 }

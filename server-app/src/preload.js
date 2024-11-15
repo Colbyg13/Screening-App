@@ -5,6 +5,8 @@ const http = require('http');
 const helmet = require('helmet');
 const { setupContextBridge } = require('./server/context-bridge');
 const { connectToMongo } = require('./server/database/db');
+const { default: userMiddleware } = require('./server/middleware/userMiddleware');
+const { writeLog, LOG_LEVEL } = require('./server/utils/logger');
 
 const PORT = 3333;
 
@@ -17,7 +19,6 @@ setupContextBridge();
     try {
         // Connect to MongoDB
         await connectToMongo();
-        
 
         const app = express();
         const server = http.createServer(app);
@@ -44,6 +45,20 @@ setupContextBridge();
                 },
             }),
         );
+        app.use(userMiddleware);
+        app.use((req, res, next) => {
+            const logRequest = {
+                method: req.method,
+                endpoint: req.url.split('?')[0],
+                query: req.query,
+                body: req.body,
+                params: req.params,
+                user: req?.metadata?.user ?? 'Unknown',
+            };
+
+            writeLog(LOG_LEVEL.INFO, `Incoming Request: ${JSON.stringify(logRequest, null, 2)}`);
+            next();
+        });
 
         // API ROUTES
         const serverRoutes = require('./server/routes/server');

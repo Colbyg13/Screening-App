@@ -4,7 +4,6 @@ const { database } = require('../database/db');
 const { LOG_LEVEL, writeLog } = require('../utils/logger');
 
 router.get('/', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `Getting fields`);
     try {
         const fieldsCol = database.collection('fields');
         const fields = await fieldsCol.find({}).toArray();
