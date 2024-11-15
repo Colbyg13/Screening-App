@@ -3,6 +3,10 @@ const remoteMain = require('@electron/remote/main');
 const isDev = require('electron-is-dev');
 const Store = require('electron-store');
 const store = new Store();
+const { LOG_LEVEL, writeLog, setup } = require('./server/utils/logger');
+
+// setup logger
+setup()
 
 let sleepBlockerId = null;
 
@@ -46,6 +50,18 @@ app.on('ready', () => {
 
     // Open the DevTools.
     if (isDev) mainWindow.webContents.openDevTools();
+
+    // Catch unhandled exceptions in the main process
+    process.on('uncaughtException', error => {
+        console.error('Unhandled Exception:', error);
+        writeLog(LOG_LEVEL.ERROR, `Uncaught exeption: ${error.stack}`);
+    });
+    
+    // Catch unhandled promise rejections in the main process
+    process.on('unhandledRejection', (reason, promise) => {
+        console.error('Unhandled Rejection:', reason);
+        writeLog(LOG_LEVEL.ERROR, `Uncaught rejection: ${reason}`);
+    });
 });
 
 // Reload the app when called from context bridge

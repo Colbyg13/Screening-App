@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { database } = require('../db');
+const { database } = require('../database/db');
 const { LOG_LEVEL, writeLog } = require('../utils/logger');
 const { ObjectId } = require('mongodb');
 
 router.get('/', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `Getting custom data types`);
     try {
         const dataTypesCol = database.collection('customDataTypes');
         const customData = await dataTypesCol.find().toArray();
@@ -20,7 +19,6 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `Updating custom data types, ${JSON.stringify(req.body)}`);
 
     const {
         body: { customDataTypes, dataTypeIdsToDelete },

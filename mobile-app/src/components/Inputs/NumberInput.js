@@ -22,7 +22,6 @@ const NumberInput = props => {
                     returnKeyType="done"
                     onSubmitEditing={Keyboard.dismiss}
                     onChangeText={newText => {
-                        // console.log('new text in field', field, newText);
                         props.updateForm(field, newText);
                     }}
                     style={styles.fieldInput}

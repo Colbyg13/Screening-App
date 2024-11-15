@@ -67,13 +67,13 @@ async function setup() {
     console.log('Checking application exists', applicationPath);
     if (!fs.existsSync(applicationPath)) {
         console.log('Making App dir...');
-        fs.mkdirSync(applicationPath);
+        fs.mkdirSync(applicationPath, { recursive: true });
     }
     // LOGS
     console.log('Checking application Logs exists', logsPath);
     if (!fs.existsSync(logsPath)) {
         console.log('Making Logs dir...');
-        fs.mkdirSync(logsPath);
+        fs.mkdirSync(logsPath, { recursive: true });
     }
 }
 

@@ -6,21 +6,19 @@ import { useSessionContext } from '../contexts/SessionContext';
 //returns the list of stations received from the session context. Clicking on a station lets an iPad start collecting data for those fields.
 const StationsList = props => {
     const { sessionInfo, sessionInfo: { stations = [] } = {}, joinStation } = useSessionContext();
-    // console.log('Session info in Ipad', { sessionInfo })
     const navigation = useNavigation();
     const createLabels = () => {
-        for (let i = 0; i < sessionInfo.stations.length; i++) {
+        for (let i = 0; i < stations.length; i++) {
             if (i < 10) {
-                sessionInfo.stations[i].label = `0${i + 1}`;
+                stations[i].label = `0${i + 1}`;
             } else {
-                sessionInfo.stations[i].label = `${i + 1}`;
+                stations[i].label = `${i + 1}`;
             }
         }
     };
     createLabels();
     const handlePress = item => {
         joinStation(item.id);
-        // console.log('you pressed me', item);
         navigation.navigate('Current Session Queue');
     };
     const renderStationItem = ({ item }) => {

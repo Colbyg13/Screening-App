@@ -1,13 +1,12 @@
 import { Button, CircularProgress } from '@mui/material';
 import axios from 'axios';
 import { isEqual } from 'lodash';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { LOG_LEVEL } from '../../constants/log-levels';
 import { serverURL } from '../../constants/server';
 import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 import { useSnackBarContext } from '../../contexts/SnackbarContext';
 import { usePrompt } from '../../hooks/prompt';
-import replace from '../../utils/replace';
 import BaseFields from './BaseFields';
 import UserDefinedFields from './UserDefinedFields';
 import { v4 as uuidv4 } from 'uuid';
@@ -23,12 +22,15 @@ export default function CustomFields() {
     const { addSnackBar } = useSnackBarContext();
     const { customDataTypes: initialDataTypes = [], fetchData } = useCustomDataTypesContext();
 
-    const [customDataTypes, setCustomDataTypes] = useState(initialDataTypes);
+    const [customDataTypes, setCustomDataTypes] = useState([]);
     const [dataTypeIdsToDelete, setDataTypeIdsToDelete] = useState([]);
 
-    const hasChanges =
-        initialDataTypes.length !== customDataTypes.length ||
-        !initialDataTypes.every((dataType, i) => isEqual(dataType, customDataTypes[i]));
+    const hasChanges = useMemo(
+        () =>
+            initialDataTypes.length !== customDataTypes.length ||
+            !initialDataTypes.every((dataType, i) => isEqual(dataType, customDataTypes[i])),
+        [initialDataTypes, customDataTypes],
+    );
 
     usePrompt('You have unsaved changes. Are you sure you want to leave?', hasChanges);
 
@@ -37,9 +39,7 @@ export default function CustomFields() {
     }
 
     function updateCustomDataType(update, index) {
-        setCustomDataTypes(dataTypes =>
-            replace(dataTypes, index, { ...dataTypes[index], ...update }),
-        );
+        setCustomDataTypes(dataTypes => dataTypes.with(index, { ...dataTypes[index], ...update }));
     }
 
     function deleteCustomDataType(index) {
@@ -51,7 +51,7 @@ export default function CustomFields() {
 
     function addCustomDataTypeValue(dataTypeIndex) {
         setCustomDataTypes(dataTypes =>
-            replace(dataTypes, dataTypeIndex, {
+            dataTypes.with(dataTypeIndex, {
                 ...dataTypes[dataTypeIndex],
                 values: [...dataTypes[dataTypeIndex].values, ''],
             }),
@@ -60,16 +60,16 @@ export default function CustomFields() {
 
     function updateCustomDataTypeValue(update, dataTypeIndex, valueIndex) {
         setCustomDataTypes(dataTypes =>
-            replace(dataTypes, dataTypeIndex, {
+            dataTypes.with(dataTypeIndex, {
                 ...dataTypes[dataTypeIndex],
-                values: replace(dataTypes[dataTypeIndex].values, valueIndex, update),
+                values: dataTypes[dataTypeIndex].values.with(valueIndex, update),
             }),
         );
     }
 
     function deleteCustomDataTypeValue(dataTypeIndex, valueIndex) {
         setCustomDataTypes(dataTypes =>
-            replace(dataTypes, dataTypeIndex, {
+            dataTypes.with(dataTypeIndex, {
                 ...dataTypes[dataTypeIndex],
                 values: dataTypes[dataTypeIndex].values.filter((_, i) => i !== valueIndex),
             }),

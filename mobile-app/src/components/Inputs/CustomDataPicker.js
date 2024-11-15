@@ -64,7 +64,6 @@ const CustomDataPicker = props => {
                         defaultValue={value}
                         data={customData?.values}
                         onSelect={(selectedItem, index) => {
-                            // console.log(selectedItem, index);
                             props.updateForm(field, selectedItem);
                         }}
                         rowTextForSelection={(item, index) => {

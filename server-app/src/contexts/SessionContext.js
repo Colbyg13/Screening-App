@@ -8,7 +8,6 @@ import {
     REQUIRED_DB_FIELDS,
 } from '../constants/required-station-fields';
 import { serverURL } from '../constants/server';
-import replace from '../utils/replace';
 import { useSnackBarContext } from './SnackbarContext';
 
 const SessionContext = createContext({
@@ -115,7 +114,7 @@ export default function SessionProvider({ children }) {
 
     useEffect(() => {
         const socket = io(serverURL, {
-            auth: { username: 'Computer', isAdmin: true },
+            auth: { deviceId: 'ServerComputer' },
         });
 
         setSocket(socket);
@@ -170,12 +169,12 @@ export default function SessionProvider({ children }) {
         });
 
         socket.on('user-connected', newUser => {
-            addSessionLog(`User ${newUser.username} connected to server`, LOG_TYPES.CONNECTED);
+            addSessionLog(`${newUser.username} connected to server`, LOG_TYPES.CONNECTED);
             setConnectedUsers(users => [...users, newUser]);
         });
 
         socket.on('user-disconnect', user => {
-            addSessionLog(`User ${user.username} disconnected server`, LOG_TYPES.DISCONNECTED);
+            addSessionLog(`${user.username} disconnected server`, LOG_TYPES.DISCONNECTED);
             setConnectedUsers(users => users.filter(({ userId }) => user.userId !== userId));
         });
 
@@ -244,7 +243,7 @@ export default function SessionProvider({ children }) {
         else
             setSessionInfo(sessionInfo => ({
                 ...sessionInfo,
-                stations: replace(sessionInfo.stations, stationIndex, {
+                stations: sessionInfo.stations.with(stationIndex, {
                     ...sessionInfo.stations[stationIndex],
                     fields: [...sessionInfo.stations[stationIndex].fields, { name: '', type: '' }],
                 }),
@@ -256,15 +255,15 @@ export default function SessionProvider({ children }) {
         if (stationIndex === undefined)
             setSessionInfo(sessionInfo => ({
                 ...sessionInfo,
-                generalFields: replace(sessionInfo.generalFields, fieldIndex, update),
+                generalFields: sessionInfo.generalFields.with(fieldIndex, update),
             }));
         // Station Field
         else
             setSessionInfo(sessionInfo => ({
                 ...sessionInfo,
-                stations: replace(sessionInfo.stations, stationIndex, {
+                stations: sessionInfo.stations.with(stationIndex, {
                     ...sessionInfo.stations[stationIndex],
-                    fields: replace(sessionInfo.stations[stationIndex].fields, fieldIndex, update),
+                    fields: sessionInfo.stations[stationIndex].fields.with(fieldIndex, update),
                 }),
             }));
     }
@@ -278,7 +277,7 @@ export default function SessionProvider({ children }) {
         else
             setSessionInfo(sessionInfo => ({
                 ...sessionInfo,
-                stations: replace(sessionInfo.stations, stationIndex, {
+                stations: sessionInfo.stations.with(stationIndex, {
                     ...sessionInfo.stations[stationIndex],
                     fields: sessionInfo.stations[stationIndex].fields.filter(
                         (_, i) => i !== fieldIndex,
@@ -310,11 +309,15 @@ export default function SessionProvider({ children }) {
     async function getSessionTemplates() {
         try {
             const result = await axios.get(`${serverURL}/api/v1/sessionTemplates`);
-            const sessionTemplates = result.data;
-            return sessionTemplates.map(template => ({
-                ...template,
-                createdAt: new Date(template.createdAt),
-            }));
+            if (result.data) {
+                const sessionTemplates = result.data;
+                return sessionTemplates.map(template => ({
+                    ...template,
+                    createdAt: new Date(template.createdAt),
+                }));
+            }
+
+            return [];
         } catch (error) {
             console.error('Could not get session template list from server.', error);
             addSnackBar({
@@ -364,11 +367,15 @@ export default function SessionProvider({ children }) {
     async function getSessionList() {
         try {
             const result = await axios.get(`${serverURL}/api/v1/sessions`);
-            const sessionList = result.data;
-            return sessionList.map(session => ({
-                ...session,
-                createdAt: new Date(session.createdAt),
-            }));
+            if (result.data) {
+                const sessionList = result.data;
+                return sessionList.map(session => ({
+                    ...session,
+                    createdAt: new Date(session.createdAt),
+                }));
+            }
+
+            return [];
         } catch (error) {
             console.error('Could not get session list from server.', error);
             addSnackBar({

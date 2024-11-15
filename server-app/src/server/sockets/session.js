@@ -1,27 +1,65 @@
 const { LOG_LEVEL, writeLog } = require('../utils/logger');
-const { database } = require('../db');
+const { database } = require('../database/db');
 const { normalizeFields } = require('../utils/index');
-const { uniqueId } = require('lodash');
+const { getOrCreateUser } = require('../database/utils/users');
+
+const SERVER_COMPUTER_DEVICE_ID = 'ServerComputer';
 
 let sessionState = {
     sessionIsRunning: false,
     sessionId: null,
 };
 
+let sessionUsers = [];
+
 module.exports = io => {
-    io.on('connection', socket => {
-        const userId = uniqueId();
-        const username = socket.handshake.auth.username;
-        const isAdmin = socket.handshake.auth.isAdmin;
+    io.on('connection', async socket => {
+        const deviceId = socket.handshake.auth.deviceId;
+        const isServerComputer = deviceId === SERVER_COMPUTER_DEVICE_ID;
+        let userId = '';
+        let username = '';
 
-        writeLog(LOG_LEVEL.INFO, `Session Connect: ${username}  ${isAdmin ? '(Admin)' : ''}`);
+        if (isServerComputer) {
+            userId = -1;
+            username = 'Server Computer';
+        } else {
+            try {
+                const user = await getOrCreateUser(deviceId);
 
+                userId = user?.userId;
+                username = user?.username;
+            } catch (error) {
+                writeLog(LOG_LEVEL.ERROR, `Error getting username from device ID: ${deviceId}`);
+                return;
+            }
+        }
+
+        writeLog(LOG_LEVEL.INFO, `Session Connect: ${username}`);
+
+        sessionUsers.push({
+            userId,
+            username,
+        });
+
+        // to everyone on the socket
+        io.emit('user-connected', {
+            userId,
+            username,
+        });
+
+        // socket specific
+        socket.emit('users', sessionUsers);
+        socket.emit('session-info', {
+            ...sessionState,
+            initial: true,
+        });
+
+        /**
+         * SOCKET EVENT HANDLERS
+         */
         socket.on('session-start', async (data, callback) => {
-            writeLog(
-                LOG_LEVEL.INFO,
-                `Session start: ${username}${isAdmin ? ' (Admin)' : ''}-${JSON.stringify(data)}`,
-            );
-            if (!isAdmin) return;
+            writeLog(LOG_LEVEL.INFO, `Session start: ${username}-${JSON.stringify(data)}`);
+            if (!isServerComputer) return;
 
             const { sessionId, generalFields, stations } = data;
 
@@ -85,8 +123,8 @@ module.exports = io => {
         });
 
         socket.on('session-stop', (data, callback) => {
-            writeLog(LOG_LEVEL.INFO, `Session stop: ${username}${isAdmin ? ' (Admin)' : ''}`);
-            if (!isAdmin) return;
+            writeLog(LOG_LEVEL.INFO, `Session stop: ${username}`);
+            if (!isServerComputer) return;
 
             sessionState = {
                 sessionIsRunning: false,
@@ -97,7 +135,7 @@ module.exports = io => {
 
         socket.on('station-join', (data, callback) => {
             socket.stationId = data.stationId;
-            writeLog(LOG_LEVEL.INFO, `Station Join: ${username}-${socket.stationId}`);
+            writeLog(LOG_LEVEL.INFO, `Station Join: ${username} - ${socket.stationId}`);
             io.emit('station-join', {
                 userId,
                 username,
@@ -106,7 +144,7 @@ module.exports = io => {
         });
 
         socket.on('station-leave', (data, callback) => {
-            writeLog(LOG_LEVEL.INFO, `Station Leave: ${username}-${socket.stationId}`);
+            writeLog(LOG_LEVEL.INFO, `Station Leave: ${username} - ${socket.stationId}`);
             socket.stationId = undefined;
             io.emit('station-leave', {
                 userId,
@@ -115,33 +153,12 @@ module.exports = io => {
         });
 
         socket.on('disconnect', () => {
-            writeLog(LOG_LEVEL.INFO, `Station Disconnect: ${username}-${socket.stationId}`);
+            writeLog(LOG_LEVEL.INFO, `Session Disconnect: ${username} - ${socket.stationId}`);
             io.emit('user-disconnect', {
                 userId,
                 username,
             });
-        });
-
-        io.emit('user-connected', {
-            userId,
-            username,
-        });
-
-        const users = [];
-
-        for (let [id, socket] of io.of('/').sockets) {
-            if (!isAdmin)
-                users.push({
-                    userID: id,
-                    username: username,
-                    stationId: socket.stationId,
-                });
-        }
-
-        socket.emit('users', users);
-        socket.emit('session-info', {
-            ...sessionState,
-            initial: true,
+            sessionUsers = sessionUsers.filter(user => user.userId !== userId);
         });
     });
 };

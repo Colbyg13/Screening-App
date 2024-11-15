@@ -14,16 +14,23 @@ import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import { View } from 'react-native';
 import { io } from 'socket.io-client';
 import PatientRecord from '../classes/patient-record';
-import Snackbar from '../components/Snackbar';
+import { SNACKBAR_SEVERITIES } from '../components/Snackbar';
+import { ROUTES } from '../constants/navigation';
 import { LOCAL_RECORDS_STORAGE_KEY } from '../screens/Offline/OfflineRecordsScreenStep2';
-import replace from '../utils/replace';
-import { useServerContext } from './ServerContext';
 import { useCustomDataTypesContext } from './CustomDataContext';
-
-export const SERVER_PORT = 3333;
+import { useServerContext } from './ServerContext';
+import { useSnackbarContext } from './SnackbarContext';
+import * as Application from 'expo-application';
+import { Platform } from 'react-native';
 
 export const STATION_FIELDS_STORAGE_KEY = 'sessionFields';
-const DEVICE_NAME_STORAGE_KEY = 'device-name';
+
+const REDIRECT_ON_SESSION_END_ROUTES = [
+    ROUTES.STATION_SELECTION,
+    ROUTES.UPDATE_RECORD,
+    ROUTES.ADD_TO_QUEUE,
+    ROUTES.CURRENT_SESSION_QUEUE,
+];
 
 const SessionContext = createContext({
     isConnected: false,
@@ -31,26 +38,23 @@ const SessionContext = createContext({
     loading: false,
     sessionInfo: {},
     sessionRecords: [],
-    deviceName: '',
     selectedStation: {},
-    setDeviceName: () => { },
-    uploadOfflineRecords: () => { },
-    joinStation: () => { },
-    leaveStation: () => { },
-    sendRecord: () => { },
+    uploadOfflineRecords: () => {},
+    joinStation: () => {},
+    leaveStation: () => {},
+    sendRecord: () => {},
 });
 
 export const useSessionContext = () => useContext(SessionContext);
 
 export default function SessionProvider({ children }) {
-    const { serverIp } = useServerContext();
+    const { serverURL } = useServerContext();
     const { customDataTypeMap } = useCustomDataTypesContext();
 
     const navigation = useNavigation();
 
     const [isConnected, setIsConnected] = useState(false);
     const [socket, setSocket] = useState(null);
-    const [deviceName, setDeviceName] = useState('');
 
     // SESSION
     const [loading, setLoading] = useState(false);
@@ -60,8 +64,11 @@ export default function SessionProvider({ children }) {
     const [sessionRecords, setSessionRecords] = useState([]);
     const [selectedStationId, setSelectedStationId] = useState();
 
+    // Device
+    const [deviceId, setDeviceId] = useState(null);
+
     // snackbar
-    const [snackbarInfo, setSnackbarInfo] = useState();
+    const { addSnackbar } = useSnackbarContext();
 
     // MODAL
     const [modalMessage, setModalMessage] = useState('');
@@ -77,19 +84,8 @@ export default function SessionProvider({ children }) {
     );
 
     useEffect(() => {
-        // get device name
-        AsyncStorage.getItem(DEVICE_NAME_STORAGE_KEY).then(name =>
-            setDeviceName(name || `device-${~~(Math.random() * 1000)}`),
-        );
+        getAndSetDeviceId();
     }, []);
-
-    // updates device name in local storage and in socket
-    useEffect(() => {
-        if (deviceName) AsyncStorage.setItem(DEVICE_NAME_STORAGE_KEY, deviceName);
-        if (socket) {
-            socket.auth = { username: deviceName };
-        }
-    }, [deviceName, socket]);
 
     // UPLOAD OFFLINE RECORDS TO SERVER WHEN CONNECTED
     useEffect(() => {
@@ -103,10 +99,10 @@ export default function SessionProvider({ children }) {
     }, [isConnected]);
 
     useEffect(() => {
-        if (serverIp) {
+        if (serverURL) {
             updateFieldsFromServer();
         }
-    }, [serverIp]);
+    }, [serverURL]);
 
     // get session data
     useEffect(() => {
@@ -117,74 +113,119 @@ export default function SessionProvider({ children }) {
     }, [sessionId]);
 
     useEffect(() => {
-        const socket = io(serverIp);
+        if (deviceId === null) {
+            return;
+        }
+
+        const socket = io(serverURL, {
+            auth: {
+                deviceId,
+            },
+        });
+
+        if (!socket) {
+            return;
+        }
+
         setSocket(socket);
 
-        if (socket) {
-            socket.auth = { username: deviceName };
-            socket.on('connect', () => {
-                console.log('Connected to server');
-                setIsConnected(true);
+        socket.on('connect', () => {
+            setIsConnected(true);
+        });
+
+        socket.on('record-created', createdRecord => {
+            setSessionRecords(records => [...records, createdRecord]);
+        });
+
+        socket.on('record-updated', updatedRecord => {
+            setSessionRecords(records => {
+                const oldRecordIndex = records.findIndex(({ id }) => id === updatedRecord?.id);
+                return oldRecordIndex >= 0 ? records.with(oldRecordIndex, updatedRecord) : records;
             });
+        });
 
-            socket.on('record-created', createdRecord => {
-                setSessionRecords(records => [...records, createdRecord]);
-            });
+        socket.on('session-info', data => {
+            const {
+                initial,
+                sessionIsRunning: newSessionIsRunning,
+                sessionId: newSessionId,
+            } = data;
 
-            socket.on('record-updated', updatedRecord => {
-                setSessionRecords(records => {
-                    const oldRecord = records.find(({ id }) => id === updatedRecord?.id);
-                    return oldRecord
-                        ? replace(records, records.indexOf(oldRecord), updatedRecord)
-                        : records;
-                });
-            });
+            setSessionIsRunning(newSessionIsRunning);
+            setSessionId(newSessionId);
 
-            socket.on('session-info', data => {
-                const {
-                    initial,
-                    sessionIsRunning: newSessionIsRunning,
-                    sessionId: newSessionId,
-                } = data;
+            if (newSessionIsRunning) {
+                setModalMessage('');
+                // already was running
+            } else if (!initial) {
+                setModalMessage('The current session has ended.');
+                setSessionRecords([]);
+            }
+        });
 
-                setSessionIsRunning(newSessionIsRunning);
-                setSessionId(newSessionId);
+        socket.on('disconnect', () => {
+            setIsConnected(false);
+            setSessionIsRunning(false);
+            setSessionId();
 
-                if (newSessionIsRunning) {
-                    setModalMessage('');
-                    // already was running
-                } else if (!initial) {
-                    setModalMessage('The current session has ended.');
-                    setSessionRecords([]);
-                }
-            });
-
-            socket.on('disconnect', () => {
-                console.log('Disconnected from server');
-                setIsConnected(false);
-                setSessionIsRunning(false);
-                setSessionId();
+            const state = navigation.getState();
+            const currentPageName = state?.routes?.at(-1)?.name;
+            if (currentPageName && REDIRECT_ON_SESSION_END_ROUTES.includes(currentPageName)) {
                 setModalMessage('You have disconnected from the server.');
-            });
+            }
+        });
 
-            return () => {
-                socket.disconnect();
-                setSocket(null);
-            };
+        return () => {
+            socket.disconnect();
+            setSocket(null);
+        };
+    }, [serverURL, deviceId]);
+
+    async function getAndSetDeviceId() {
+        try {
+            const deviceId = await getDeviceId();
+            addDeviceIdToAxiosRequests(deviceId);
+            setDeviceId(deviceId);
+            return;
+        } catch (err) {
+            console.warn('unable to get device id', err);
         }
-    }, [serverIp]);
+        setDeviceId('');
+    }
+
+    function addDeviceIdToAxiosRequests(deviceId) {
+        axios.interceptors.request.use(
+            config => {
+                config.headers['deviceId'] = deviceId;
+                return config;
+            },
+            error => {
+                return Promise.reject(error);
+            },
+        );
+    }
+
+    async function getDeviceId() {
+        if (Platform.OS === 'ios') {
+            // TODO test that this works with ipads
+            return await Application.getIosIdForVendorAsync();
+        } else if (Platform.OS === 'android') {
+            return Application.getAndroidId();
+        }
+        return null;
+    }
 
     async function getSessionInfo(sessionId) {
         setLoading(true);
         try {
-            const result = await axios.get(`${serverIp}/api/v1/sessions/${sessionId}`);
+            const result = await axios.get(`${serverURL}/api/v1/sessions/${sessionId}`);
             if (result.data) {
                 setSessionInfo(result.data);
             }
         } catch (error) {
-            setSnackbarInfo({
-                status: 'error',
+            addSnackbar({
                 message: `Could not get session from server: ${error}`,
+                severity: SNACKBAR_SEVERITIES.ERROR,
             });
         } finally {
             setLoading(false);
@@ -193,34 +234,39 @@ export default function SessionProvider({ children }) {
 
     async function getSessionRecords(sessionId) {
         try {
-            const result = await axios.get(`${serverIp}/api/v1/records`, {
+            const result = await axios.get(`${serverURL}/api/v1/records`, {
                 params: { sessionId, unitConversions: customDataTypeMap },
             });
             if (result.data) {
                 setSessionRecords(result.data);
             }
         } catch (error) {
-            setSnackbarInfo({
-                status: 'error',
+            addSnackbar({
                 message: `Could not get session records from server: ${error}`,
+                severity: SNACKBAR_SEVERITIES.ERROR,
             });
         }
     }
 
     async function updateFieldsFromServer() {
         try {
-            const result = await axios.get(`${serverIp}/api/v1/fields`);
+            const result = await axios.get(`${serverURL}/api/v1/fields`);
             if (result.data) {
                 const existingFieldsJSON = await AsyncStorage.getItem(STATION_FIELDS_STORAGE_KEY);
                 const existingFields = existingFieldsJSON ? JSON.parse(existingFieldsJSON) : [];
 
                 // remove duplicate keys
-                const allFieldsMap = [...existingFields, ...result.data].reduce((allFieldsMap, field) => {
-                    allFieldsMap[field.key] = field;
-                    return allFieldsMap;
-                }, {});
+                const allFieldsMap = [...existingFields, ...result.data].reduce(
+                    (allFieldsMap, field) => {
+                        allFieldsMap[field.key] = field;
+                        return allFieldsMap;
+                    },
+                    {},
+                );
 
-                const allFields = Object.values(allFieldsMap).sort((a, b) => a.key < b.key ? -1 : 1);
+                const allFields = Object.values(allFieldsMap).sort((a, b) =>
+                    a.key < b.key ? -1 : 1,
+                );
 
                 AsyncStorage.setItem(STATION_FIELDS_STORAGE_KEY, JSON.stringify(allFields));
             }
@@ -231,23 +277,21 @@ export default function SessionProvider({ children }) {
 
     async function joinStation(stationId) {
         if (!socket) return;
-        console.log('join station');
         setSelectedStationId(stationId);
         socket.emit('station-join', { stationId });
     }
 
     async function leaveStation() {
         if (!socket) return;
-        console.log('leave station');
         setSelectedStationId();
         socket.emit('station-leave');
     }
 
     async function uploadOfflineRecords(showModal) {
         if (!isConnected) {
-            setSnackbarInfo({
-                status: 'error',
+            addSnackbar({
                 message: 'Cannot sync records when not connected to a server',
+                severity: SNACKBAR_SEVERITIES.ERROR,
             });
             return;
         }
@@ -269,28 +313,28 @@ export default function SessionProvider({ children }) {
                             LOCAL_RECORDS_STORAGE_KEY,
                             JSON.stringify(notUpdatedRecords),
                         );
-                        setSnackbarInfo({
-                            status: 'error',
+
+                        addSnackbar({
+                            severity: SNACKBAR_SEVERITIES.ERROR,
                             message: 'Could not sync all offline records',
                         });
                     } else {
                         AsyncStorage.removeItem(LOCAL_RECORDS_STORAGE_KEY);
-                        setSnackbarInfo({
-                            status: 'success',
+                        addSnackbar({
+                            severity: SNACKBAR_SEVERITIES.SUCCESS,
                             message: 'Offline records successfully synced',
                         });
                     }
                 })
                 .catch(err => console.warn(err));
         } else if (showModal)
-            setSnackbarInfo({
-                status: 'success',
+            addSnackbar({
+                severity: SNACKBAR_SEVERITIES.SUCCESS,
                 message: 'offline records have already been synced',
             });
     }
 
     async function sendRecord(recordPayload) {
-        console.log('Sending record...');
         const payload = {
             ...recordPayload,
             record: {
@@ -300,11 +344,11 @@ export default function SessionProvider({ children }) {
         };
 
         try {
-            const result = await axios.post(`${serverIp}/api/v1/records`, payload);
+            const result = await axios.post(`${serverURL}/api/v1/records`, payload);
             return result.data;
         } catch (error) {
             console.warn(error);
-            throw new Error("Error sending record to server.")
+            throw new Error('Error sending record to server.');
         }
     }
 
@@ -317,22 +361,13 @@ export default function SessionProvider({ children }) {
                 sessionInfo,
                 sessionRecords: patientRecords,
                 selectedStation,
-                deviceName,
-                setDeviceName,
                 uploadOfflineRecords,
                 joinStation,
                 leaveStation,
                 sendRecord,
             }}
         >
-            <Snackbar
-                open={!!snackbarInfo}
-                onClose={() => setSnackbarInfo()}
-                message={snackbarInfo?.message}
-                severity={snackbarInfo?.status}
-                duration={6000}
-            />
-            <Dialog visible={!!modalMessage} onDismiss={() => { }}>
+            <Dialog visible={!!modalMessage} onDismiss={() => {}}>
                 <DialogHeader title={modalMessage} />
                 <DialogContent>
                     <View style={{ display: 'flex', flexDirection: 'row' }}>

@@ -1,23 +1,23 @@
-import { Pressable, TextInput } from '@react-native-material/core';
 import {
-    Provider,
     Button,
     Dialog,
-    DialogHeader,
-    DialogContent,
     DialogActions,
+    DialogContent,
+    DialogHeader,
+    Pressable,
     Text,
+    TextInput,
 } from '@react-native-material/core';
 import { useNavigation } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
-import { View, Keyboard, ScrollView, SafeAreaView } from 'react-native';
-import { useSessionContext } from '../contexts/SessionContext';
-import CustomDataPicker from '../components/Inputs/CustomDataPicker';
-import { styles } from '../style/styles';
-import DatePicker from '../components/Inputs/DatePicker';
-import BoolInput from '../components/Inputs/BoolInput';
-import { useCustomDataTypesContext } from '../contexts/CustomDataContext';
+import { Keyboard, SafeAreaView, View } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import BoolInput from '../components/Inputs/BoolInput';
+import CustomDataPicker from '../components/Inputs/CustomDataPicker';
+import DatePicker from '../components/Inputs/DatePicker';
+import { useCustomDataTypesContext } from '../contexts/CustomDataContext';
+import { useSessionContext } from '../contexts/SessionContext';
+import { styles } from '../style/styles';
 
 const AddToOnlineQueue = ({ route }) => {
     const navigation = useNavigation();
@@ -61,7 +61,6 @@ const AddToOnlineQueue = ({ route }) => {
     useEffect(() => {
         //sets the default patient to have a null id, and the correct fields for the station.
         setPatient(prevState => ({ ...prevState, data: formState, id: null }));
-        // console.log(formState);
     }, [formState]);
 
     const handleSubmit = async () => {
@@ -80,17 +79,17 @@ const AddToOnlineQueue = ({ route }) => {
 
                     return shouldAddKey
                         ? {
-                            ...customData,
-                            [usedField.key]: unit,
-                        }
+                              ...customData,
+                              [usedField.key]: unit,
+                          }
                         : customData;
                 }, {}),
             });
-            setPatient(prevState => ({ ...prevState, id: result.newId })); //on server success set the patient in state for display.
+            setPatient(prevState => ({ ...prevState, id: result.id })); //on server success set the patient in state for display.
 
             setVisible(true); //opens the modal/dialog
         } catch (error) {
-            console.warn("Could not send record")
+            console.warn('Could not send record');
         }
     };
 
@@ -102,7 +101,6 @@ const AddToOnlineQueue = ({ route }) => {
     };
 
     const handleDateUpdate = (field, showname, newDate) => {
-        //console.log('handling date update', field, showname, newDate);
         setFormState(prevState => ({
             ...prevState,
             [field.key]: newDate, //year/month/day
@@ -166,7 +164,6 @@ const AddToOnlineQueue = ({ route }) => {
                         returnKeyType="done"
                         onSubmitEditing={Keyboard.dismiss}
                         onChangeText={newText => {
-                            // console.log(newText);
                             setFormState(prevState => ({
                                 ...prevState,
                                 [field.key]: newText,

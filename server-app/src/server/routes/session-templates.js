@@ -1,11 +1,10 @@
 const express = require('express');
 const router = express.Router();
-const { database } = require('../db');
+const { database } = require('../database/db');
 const { LOG_LEVEL, writeLog } = require('../utils/logger');
 const { ObjectId } = require('mongodb');
 
 router.get('/', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `Getting session templates`);
     try {
         const sessionTemplatesCol = database.collection('sessionTemplates');
         const sessionTemplates = await sessionTemplatesCol.find({}).toArray();
@@ -20,8 +19,6 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `Creating session templates: ${JSON.stringify(req.body)}`);
-
     const template = req.body;
 
     try {
@@ -46,8 +43,6 @@ router.post('/', async (req, res) => {
 });
 
 router.delete('/:templateId', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `Deleting session templates, ${JSON.stringify(req.params)}`);
-
     const templateId = req.params.templateId;
 
     try {

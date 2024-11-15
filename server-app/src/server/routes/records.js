@@ -1,22 +1,26 @@
 const express = require('express');
 const router = express.Router();
-const { database } = require('../db');
 const { LOG_LEVEL, writeLog } = require('../utils/logger');
-const { ObjectId } = require('mongodb');
-const { default: convert, getBaseUnit } = require('../../utils/convert');
+const {
+    getRecordsBySessionId,
+    getRecordCount,
+    getRecords,
+    getSingleRecord,
+    createRecord,
+    updateRecord,
+    deleteRecord,
+} = require('../database/utils/records');
 const io = global.io;
 
 const pageSize = 50;
 
 router.get('/', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `getting records, ${JSON.stringify(req.query)}`);
-
     const {
         query: {
             // Getting record count
             getCount = false,
 
-            // Getting records based on sessionID
+            // Getting records based on sessionId
             sessionId,
 
             // Search records
@@ -29,37 +33,10 @@ router.get('/', async (req, res) => {
         } = {},
     } = req;
 
-    function convertRecordFromBaseUnits(record) {
-        const completeUnitConversion = {
-            ...record.customData,
-            ...unitConversions,
-        };
-        const convertedRecord = Object.entries(completeUnitConversion).reduce(
-            (convertedRecord, [key, unit]) => {
-                const value = +record[key];
-                if (!isNaN(value)) {
-                    const baseUnit = getBaseUnit(unit);
-                    if (baseUnit !== unit) {
-                        return {
-                            ...convertedRecord,
-                            [key]: convert(value).from(baseUnit).to(unit),
-                        };
-                    }
-                }
-                return convertedRecord;
-            },
-            record,
-        );
-
-        return convertedRecord;
-    }
-
-    const recordsCol = database.collection('records');
-
     // if we just want the count
     if (getCount) {
         try {
-            const recordCount = await recordsCol.count({});
+            const recordCount = await getRecordCount();
             res.status(200).json(recordCount);
         } catch (error) {
             writeLog(LOG_LEVEL.ERROR, `Error getting record count ${error}`);
@@ -72,9 +49,8 @@ router.get('/', async (req, res) => {
 
     if (sessionId !== undefined) {
         try {
-            const sessionRecords = await recordsCol.find({ sessionId }).toArray();
+            const convertedRecords = await getRecordsBySessionId({ sessionId, unitConversions });
 
-            const convertedRecords = sessionRecords.map(convertRecordFromBaseUnits);
             res.status(200).json(convertedRecords);
         } catch (error) {
             writeLog(LOG_LEVEL.ERROR, `Error getting session records ${error}`);
@@ -90,22 +66,20 @@ router.get('/', async (req, res) => {
 
         const find = search
             ? {
-                $or: ['id', 'name'].map(key => ({
-                    $expr: {
-                        $regexMatch: {
-                            input: { $toString: `$${key}` },
-                            regex: new RegExp(search, 'i'),
-                        },
-                    },
-                })),
-            }
+                  $or: ['id', 'name'].map(key => ({
+                      $expr: {
+                          $regexMatch: {
+                              input: { $toString: `$${key}` },
+                              regex: new RegExp(search, 'i'),
+                          },
+                      },
+                  })),
+              }
             : {};
 
-        const records = await recordsCol.find(find).sort(sort).skip(skip).limit(pageSize).toArray();
+        const records = await getRecords({ find, sort, skip, pageSize, unitConversions });
 
-        const convertedRecords = records.map(convertRecordFromBaseUnits);
-
-        res.status(200).json(convertedRecords);
+        res.status(200).json(records);
     } catch (error) {
         writeLog(LOG_LEVEL.ERROR, `Error getting records ${error}`);
         res.status(500).json({ error: 'Could not get records due to Internal Server Error' });
@@ -113,13 +87,10 @@ router.get('/', async (req, res) => {
 });
 
 router.get('/:recordId', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `getting record, ${req.params.recordId}`);
-
-    const recordId = req.params.recordId;
+    const { query: { unitConversions = {} } = {}, params: { recordId } = {} } = req;
 
     try {
-        const recordsCol = database.collection('records');
-        const record = await recordsCol.findOne({ _id: new ObjectId(recordId) });
+        const record = await getSingleRecord({ recordId, unitConversions });
 
         res.status(200).json(record);
     } catch (error) {
@@ -129,8 +100,6 @@ router.get('/:recordId', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `creating/updating records: ${JSON.stringify(req.body)}`);
-
     const {
         record = {},
         // need this separate if offline mode or other reasons
@@ -139,41 +108,6 @@ router.post('/', async (req, res) => {
 
     const creatingRecord = !record.id;
     const sessionId = record?.sessionId;
-
-    function convertRecordToBaseUnits(record) {
-        const convertedRecord = Object.entries(customData ?? {}).reduce(
-            (convertedRecord, [key, unit]) => {
-                const value = record[key] === '' ? NaN : +record[key];
-                if (!isNaN(value)) {
-                    const baseUnit = getBaseUnit(unit);
-                    convertedRecord[key] =
-                        baseUnit === unit ? value : convert(value).from(unit).to(baseUnit);
-                }
-                return convertedRecord;
-            },
-            record,
-        );
-
-        return convertedRecord;
-    }
-
-    function convertRecordFromBaseUnits(record) {
-        const convertedRecord = Object.entries(record.customData ?? {}).reduce(
-            (convertedRecord, [key, unit]) => {
-                const value = +record[key];
-                if (!isNaN(value)) {
-                    const baseUnit = getBaseUnit(unit);
-                    if (baseUnit !== unit) {
-                        convertedRecord[key] = convert(value).from(baseUnit).to(unit);
-                    }
-                }
-                return convertedRecord;
-            },
-            record,
-        );
-
-        return convertedRecord;
-    }
 
     if (creatingRecord && !sessionId) {
         writeLog(
@@ -186,92 +120,32 @@ router.post('/', async (req, res) => {
 
     if (creatingRecord) {
         try {
-            const latestIDCol = database.collection('latestRecordID');
-            const updatedRecordID = await latestIDCol.findOneAndUpdate(
-                {},
-                { $inc: { latestID: 1 } },
-            );
-
-            const sessionCol = database.collection('sessions');
-            const sessionData = await sessionCol.findOne({ _id: new ObjectId(sessionId) });
-
-            const generalInfo = sessionData.generalFields.reduce((generalInfo, { key, value }) => {
-                generalInfo[key] = value;
-                return generalInfo;
-            }, {});
-
-            const newRecord = {
-                id: updatedRecordID.value.latestID,
-                createdAt: new Date(),
-                lastModified: new Date(),
-                sessionId,
-                customData: customData ?? {},
-                ...generalInfo,
-                ...convertRecordToBaseUnits(record),
-            };
-
-            const recordsCol = database.collection('records');
-            const result = recordsCol.insertOne(newRecord);
-
-            const newRecordWithId = convertRecordFromBaseUnits({
-                _id: result.insertedId,
-                ...newRecord,
-            });
-
-            io.sockets.emit('record-created', newRecordWithId);
-
-            res.status(200).json(newRecordWithId);
+            const newRecord = await createRecord({ record, customData });
+            io.sockets.emit('record-created', newRecord);
+            res.status(200).json(newRecord);
         } catch (error) {
             writeLog(LOG_LEVEL.ERROR, `Error creating record: ${error}`);
             res.status(500).json({ error: 'Could not update record due to Internal Server Error' });
         }
-    } else {
-        // we need to remove these attributes so we don't override them
-        const { _id, sessionId, ...recordRest } = record;
-        const recordUpdate = convertRecordToBaseUnits(recordRest);
+        return;
+    }
 
-        try {
-            const recordsCol = database.collection('records');
-            const result = await recordsCol.findOneAndUpdate(
-                { id: record.id },
-                {
-                    $set: {
-                        lastModified: new Date(),
-                        ...recordUpdate,
-                        // only updates the fields the record is tied to
-                        ...Object.entries(customData).reduce(
-                            (all, [key, value]) => ({
-                                ...all,
-                                [`customData.${key}`]: value,
-                            }),
-                            {},
-                        ),
-                    },
-                },
-                { returnDocument: 'after' },
-            );
+    try {
+        const updatedRecord = await updateRecord({ record, customData });
 
-            const updatedRecord = convertRecordFromBaseUnits(result.value);
-
-            io.sockets.emit('record-updated', updatedRecord);
-
-            res.status(200).json(updatedRecord);
-        } catch (error) {
-            writeLog(LOG_LEVEL.ERROR, `Error creating record: ${error}`);
-            res.status(500).json({ error: 'Could not update record due to Internal Server Error' });
-        }
+        io.sockets.emit('record-updated', updatedRecord);
+        res.status(200).json(updatedRecord);
+    } catch (error) {
+        writeLog(LOG_LEVEL.ERROR, `Error creating record: ${error}`);
+        res.status(500).json({ error: 'Could not update record due to Internal Server Error' });
     }
 });
 
 router.delete('/:recordId', async (req, res) => {
-    writeLog(LOG_LEVEL.INFO, `deleting record, ${req.params.recordId}`);
-
     const recordId = +req.params.recordId;
 
     try {
-        const recordsCol = database.collection('records');
-        await recordsCol.deleteOne({ id: recordId });
-
+        await deleteRecord({ recordId });
         res.status(200).json({ message: 'Success' });
     } catch (error) {
         writeLog(LOG_LEVEL.ERROR, `Error deleting record: ${error}`);

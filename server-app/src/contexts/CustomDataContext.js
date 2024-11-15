@@ -47,7 +47,9 @@ export default function CustomDataTypesProvider({ children }) {
         setLoading(true);
         try {
             const result = await axios.get(`${serverURL}/api/v1/dataTypes`);
-            setCustomDataTypes(result.data);
+            if (result.data) {
+                setCustomDataTypes(result.data);
+            }
         } catch (error) {
             console.error('Could not get custom data types', error);
             addSnackBar({

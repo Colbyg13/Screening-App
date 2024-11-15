@@ -1,40 +1,35 @@
-import React, { useEffect } from 'react';
 import { Snackbar as MuiSnackbar } from '@react-native-material/core';
-//displays an error or success message throughout the app.
-export default function Snackbar({
-    open,
-    onClose = () => {},
-    message,
-    severity,
-    duration,
-    action,
-}) {
+import React, { useEffect } from 'react';
+export const SNACKBAR_SEVERITIES = {
+    SUCCESS: 'success',
+    ERROR: 'error',
+    INFO: 'info',
+    WARNING: 'warning',
+};
+
+export default function Snackbar({ open, onClose = () => {}, message, severity, duration }) {
     useEffect(() => {
         if (open && duration) setTimeout(onClose, duration);
     }, [open]);
 
     const backgroundColor =
-        severity === 'success'
+        severity === SNACKBAR_SEVERITIES.SUCCESS
             ? '#2E7D32'
-            : severity === 'error'
-              ? '#D32F2F'
-              : severity === 'info'
-                ? '#0288D1'
-                : severity === 'warning'
-                  ? '#ED6C02'
-                  : '#323232';
+            : severity === SNACKBAR_SEVERITIES.ERROR
+            ? '#D32F2F'
+            : severity === SNACKBAR_SEVERITIES.INFO
+            ? '#0288D1'
+            : severity === SNACKBAR_SEVERITIES.WARNING
+            ? '#ED6C02'
+            : '#323232';
 
     return open ? (
         <MuiSnackbar
-            action={action}
             message={message}
             style={{
-                position: 'absolute',
-                zIndex: 99,
-                bottom: 16,
-                start: 16,
-                end: 16,
+                zIndex: 999,
                 backgroundColor,
+                marginBottom: 5,
             }}
         />
     ) : null;

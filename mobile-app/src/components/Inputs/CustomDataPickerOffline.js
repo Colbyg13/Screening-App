@@ -1,16 +1,14 @@
-import React, { useEffect } from 'react';
-import { Text, View, Keyboard } from 'react-native';
 import { TextInput } from '@react-native-material/core';
+import React, { useEffect } from 'react';
+import { Keyboard, Text, View } from 'react-native';
 import SelectDropdown from 'react-native-select-dropdown';
 import { styles } from '../../style/styles';
-import { useCustomDataTypesContext } from '../../contexts/CustomDataContext';
 /**
  *
  * @param {the field being rendered, and the current value from the parent} props
  * @returns either a dropdown or a text input for number values.
  */
 const CustomDataPickerOffline = props => {
-    console.log('CustomDataPickerOffline props', props);
     const [value, setValue] = React.useState(undefined);
     const field = props.field;
     const customDataTypes = props.customFields; //grabs custom data types that were passed in by props. Those values come from Async storage.
@@ -38,7 +36,6 @@ const CustomDataPickerOffline = props => {
                         returnKeyType="done"
                         onSubmitEditing={Keyboard.dismiss}
                         onChangeText={newText => {
-                            // console.log(newText);
                             props.updateForm(field, newText);
                         }}
                         style={styles.fieldInput}
@@ -67,7 +64,6 @@ const CustomDataPickerOffline = props => {
                         defaultValue={value}
                         data={customData[0]?.values}
                         onSelect={(selectedItem, index) => {
-                            // console.log(selectedItem, index);
                             props.updateForm(field, selectedItem);
                         }}
                         rowTextForSelection={(item, index) => {

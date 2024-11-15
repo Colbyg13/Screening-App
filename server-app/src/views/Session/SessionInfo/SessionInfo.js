@@ -22,8 +22,10 @@ export default function SessionInfo() {
                     sessionId,
                 },
             });
-            const offlineId = result.data.id;
-            setOfflineId(offlineId);
+            if (result.data) {
+                const offlineId = result.data.id;
+                setOfflineId(offlineId);
+            }
         } catch (error) {
             console.error('Could get new offline id.', error);
             addSnackBar({

@@ -39,7 +39,9 @@ export default function RecordTitleBar({
             const result = await axios.get(`${serverURL}/api/v1/records`, {
                 params: { getCount: true },
             });
-            setTotalRecordCount(result.data);
+            if (result.data) {
+                setTotalRecordCount(result.data);
+            }
         } catch (error) {
             console.error('Could not get records from server', error);
             addSnackBar({
