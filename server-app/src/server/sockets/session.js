@@ -1,7 +1,7 @@
 const { LOG_LEVEL, writeLog } = require('../utils/logger');
-const { database } = require('../database/db');
-const { normalizeFields } = require('../utils/index');
 const { getOrCreateUser } = require('../database/utils/users');
+const { createNewSession } = require('../database/utils/sessions');
+const { upsertMultipleFields } = require('../database/utils/fields');
 
 const SERVER_COMPUTER_DEVICE_ID = 'ServerComputer';
 
@@ -71,49 +71,25 @@ module.exports = io => {
                 io.emit('session-info', sessionState);
             } else {
                 try {
-                    const normalizedGeneralFields = normalizeFields(generalFields);
-                    const normalizedStations = stations.map((station, i) => ({
-                        id: i + 1,
-                        ...station,
-                        fields: normalizeFields(station.fields),
-                    }));
-                    const sessionsCol = database.collection('sessions');
-                    const result = await sessionsCol.insertOne({
-                        generalFields: normalizedGeneralFields,
-                        stations: normalizedStations,
-                        createdAt: new Date(),
-                    });
+                    const newSession = await createNewSession({ generalFields, stations });
 
                     sessionState = {
                         sessionIsRunning: true,
-                        sessionId: result.insertedId,
+                        sessionId: newSession._id,
                     };
 
-                    // Update the fields in db so we have everything
+                    console.log({});
+
+                    // use the newSession variable here because it's fields have been normalized already
                     const allFields = [
-                        ...normalizedGeneralFields,
-                        ...normalizedStations.reduce(
+                        ...newSession.generalFields,
+                        ...newSession.stations.reduce(
                             (all, { fields = [] }) => [...all, ...fields],
                             [],
                         ),
                     ];
 
-                    const bulkPayload = allFields.map(field => ({
-                        updateOne: {
-                            filter: { key: field.key },
-                            upsert: true,
-                            update: {
-                                $set: {
-                                    key: field.key,
-                                    name: field.name ?? field.key,
-                                    type: field.type,
-                                },
-                            },
-                        },
-                    }));
-
-                    const fieldCol = database.collection('fields');
-                    await fieldCol.bulkWrite(bulkPayload);
+                    await upsertMultipleFields({ fields: allFields });
 
                     io.emit('session-info', sessionState);
                 } catch (error) {

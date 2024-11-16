@@ -37,6 +37,7 @@ export async function initializeRecordCollection(database) {
         writeLog(LOG_LEVEL.INFO, 'Finished initializeRecordCollection...');
     } catch (error) {
         writeLog(LOG_LEVEL.ERROR, `Error initializing record collection: ${error}`);
+        throw error;
     }
 }
 
@@ -45,6 +46,7 @@ export async function getRecordCount() {
         const recordCount = await recordCollection.count({});
         return recordCount;
     } catch (error) {
+        writeLog(LOG_LEVEL.ERROR, `Error getRecordCount - ${error}`);
         throw error;
     }
 }
@@ -57,6 +59,7 @@ export async function getRecordsBySessionId({ sessionId, unitConversions }) {
         );
         return convertedRecords;
     } catch (error) {
+        writeLog(LOG_LEVEL.ERROR, `Error getRecordsBySessionId - ${error}, args: ${JSON.stringify(arguments)}`);
         throw error;
     }
 }
@@ -76,6 +79,7 @@ export async function getRecords({ find, sort, skip, pageSize, unitConversions }
 
         return convertedRecords;
     } catch (error) {
+        writeLog(LOG_LEVEL.ERROR, `Error getRecords - ${error}, args: ${JSON.stringify(arguments)}`);
         throw error;
     }
 }
@@ -85,6 +89,7 @@ export async function getSingleRecord({ recordId, unitConversions }) {
         const record = await recordCollection.findOne({ _id: new ObjectId(recordId) });
         return convertRecordFromBaseUnits(record, unitConversions);
     } catch (error) {
+        writeLog(LOG_LEVEL.ERROR, `Error getSingleRecord - ${error}, args: ${JSON.stringify(arguments)}`);
         throw error;
     }
 }
@@ -123,6 +128,7 @@ export async function createRecord({ record, customData }) {
 
         return newRecordWithId;
     } catch (error) {
+        writeLog(LOG_LEVEL.ERROR, `Error createRecord - ${error}, args: ${JSON.stringify(arguments)}`);
         throw error;
     }
 }
@@ -166,6 +172,7 @@ export async function updateRecord({ record, customData }) {
         const updatedRecord = convertRecordFromBaseUnits(result.value);
         return updatedRecord;
     } catch (error) {
+        writeLog(LOG_LEVEL.ERROR, `Error updateRecord - ${error}, args: ${JSON.stringify(arguments)}`);
         throw error;
     }
 }

@@ -1,13 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { database } = require('../database/db');
 const { LOG_LEVEL, writeLog } = require('../utils/logger');
+const { getFields } = require('../database/utils/fields');
 
 router.get('/', async (req, res) => {
     try {
-        const fieldsCol = database.collection('fields');
-        const fields = await fieldsCol.find({}).toArray();
-
+        const fields = await getFields();
         res.status(200).json(fields);
     } catch (error) {
         writeLog(LOG_LEVEL.ERROR, `Error getting fields ${error}`);
