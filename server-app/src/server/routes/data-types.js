@@ -1,13 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const { database } = require('../database/db');
 const { LOG_LEVEL, writeLog } = require('../utils/logger');
-const { ObjectId } = require('mongodb');
+const {
+    getCustomDataTypes,
+    upsertMultipleCustomDataTypes,
+    deleteMultipleCustomDataTypes,
+} = require('../database/utils/customDataTypes');
 
 router.get('/', async (req, res) => {
     try {
-        const dataTypesCol = database.collection('customDataTypes');
-        const customData = await dataTypesCol.find().toArray();
+        const customData = await getCustomDataTypes();
 
         res.status(200).json(customData);
     } catch (error) {
@@ -19,30 +21,17 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-
     const {
-        body: { customDataTypes, dataTypeIdsToDelete },
+        body: { customDataTypes = [], dataTypeIdsToDelete = [] },
     } = req;
 
     try {
-        const dataTypesCol = database.collection('customDataTypes');
-        await dataTypesCol.bulkWrite([
-            ...customDataTypes.map(({ _id, ...dataType }) => ({
-                updateOne: {
-                    filter: { _id: new ObjectId(_id) },
-                    upsert: true,
-                    update: {
-                        $set: dataType,
-                    },
-                },
-            })),
-            ...dataTypeIdsToDelete.map(_id => ({
-                deleteOne: {
-                    filter: { _id: new ObjectId(_id) },
-                },
-            })),
-        ]);
-
+        if (customDataTypes.length) {
+            await upsertMultipleCustomDataTypes({ customDataTypes });
+        }
+        if (dataTypeIdsToDelete.length) {
+            await deleteMultipleCustomDataTypes({ dataTypeIdsToDelete });
+        }
         res.status(200).json({ message: 'Success' });
     } catch (error) {
         writeLog(LOG_LEVEL.ERROR, `Error getting custom data types ${error}`);

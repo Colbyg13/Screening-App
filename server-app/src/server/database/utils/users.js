@@ -28,6 +28,7 @@ export async function initializeUserCollection(database) {
         writeLog(LOG_LEVEL.INFO, 'Finished initializeUserCollection...');
     } catch (error) {
         writeLog(LOG_LEVEL.ERROR, `Error initializing user collection: ${error}`);
+        throw error;
     }
 }
 
@@ -41,6 +42,10 @@ export async function getOrCreateUser(deviceId) {
 
         return user;
     } catch (error) {
+        writeLog(
+            LOG_LEVEL.ERROR,
+            `Error getOrCreateUser - ${error}, args: ${JSON.stringify(arguments)}`,
+        );
         throw error;
     }
 }
@@ -60,6 +65,10 @@ export async function createNewUser(deviceId) {
 
         return user;
     } catch (error) {
+        writeLog(
+            LOG_LEVEL.ERROR,
+            `Error createNewUser - ${error}, args: ${JSON.stringify(arguments)}`,
+        );
         throw error;
     }
 }
@@ -69,6 +78,7 @@ export async function getUser(deviceId) {
         const record = await userCollection.findOne({ deviceId });
         return record;
     } catch (error) {
+        writeLog(LOG_LEVEL.ERROR, `Error getUser - ${error}, args: ${JSON.stringify(arguments)}`);
         throw error;
     }
 }

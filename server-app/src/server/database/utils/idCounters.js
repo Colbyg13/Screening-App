@@ -1,7 +1,7 @@
 import { LOG_LEVEL, writeLog } from '../../utils/logger.js';
 
 // DEPRECATED but used for migration
-const LATEST_RECORD_ID_COLLECTION_NAME = 'latestRecordId';
+const LATEST_RECORD_ID_COLLECTION_NAME = 'latestRecordID';
 
 // NEW DATA
 const ID_COUNTER_COLLECTION_NAME = 'idCounters';
@@ -50,7 +50,8 @@ export async function initializeIDCounterCollection(database) {
         await migrateOldData(database);
         writeLog(LOG_LEVEL.INFO, 'Finished initializeIDCounterCollection...');
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error initializing ID counter collection: ${error}`);
+        writeLog(LOG_LEVEL.ERROR, `Error initializing ID counter collection - ${error}`);
+        throw error;
     }
 }
 
@@ -64,9 +65,9 @@ async function migrateOldData(database) {
         if (collections.length > 0) {
             const oldCollection = database.collection(LATEST_RECORD_ID_COLLECTION_NAME);
 
-            const latestRecordDoc = await oldCollection.findOne();
+            const latestRecordDoc = await oldCollection.findOne({});
             if (latestRecordDoc) {
-                const latestId = latestRecordDoc.latestId;
+                const latestId = latestRecordDoc.latestID;
                 await idCounterCollection.findOneAndUpdate(
                     { sequenceName: SEQUENCE_NAMES.RECORDS },
                     { $set: { sequenceValue: latestId } },
@@ -76,6 +77,7 @@ async function migrateOldData(database) {
             await oldCollection.drop();
         }
     } catch (error) {
+        writeLog(LOG_LEVEL.ERROR, `Error migrating old data for idCounters - ${error}`);
         throw error;
     }
 }
@@ -90,6 +92,10 @@ export async function getNextSequenceValue(sequenceName) {
         );
         return document.value.sequenceValue;
     } catch (error) {
+        writeLog(
+            LOG_LEVEL.ERROR,
+            `Error getNextSequenceValue - ${error}, args: ${JSON.stringify(arguments)}`,
+        );
         throw error;
     }
 }
@@ -104,6 +110,10 @@ export async function resetSequenceValue(sequenceName) {
         );
         return document.sequenceValue;
     } catch (error) {
+        writeLog(
+            LOG_LEVEL.ERROR,
+            `Error resetSequenceValue - ${error}, args: ${JSON.stringify(arguments)}`,
+        );
         throw error;
     }
 }

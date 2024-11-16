@@ -1,6 +1,5 @@
 import { ObjectId } from 'mongodb';
 import { LOG_LEVEL, writeLog } from '../../utils/logger.js';
-import { getNextSequenceValue, SEQUENCE_NAMES } from './idCounters.js';
 
 const FIELD_COLLECTION_NAME = 'fields';
 
@@ -34,7 +33,8 @@ export async function initializeFieldCollection(database) {
 
         writeLog(LOG_LEVEL.INFO, 'Finished initializeFieldCollection...');
     } catch (error) {
-        writeLog(LOG_LEVEL.ERROR, `Error initializing field collection: ${error}`);
+        writeLog(LOG_LEVEL.ERROR, `Error initializing field collection - ${error}`);
+        throw error;
     }
 }
 
@@ -43,8 +43,30 @@ export async function getFields() {
         const fields = await fieldCollection.find({}).toArray();
         return fields;
     } catch (error) {
+        writeLog(LOG_LEVEL.ERROR, `Error in getFields - ${error}`);
         throw error;
     }
 }
 
-// TODO: Finish up CRUD operations so we can remove them from elsewhere
+export async function upsertMultipleFields({ fields = [] }) {
+    try {
+        await fieldCollection.bulkWrite([
+            ...fields.map(({ _id, ...field }) => ({
+                updateOne: {
+                    filter: { _id: new ObjectId(_id) },
+                    upsert: true,
+                    update: {
+                        $set: field,
+                    },
+                },
+            })),
+        ]);
+
+        return true;
+    } catch (error) {
+        writeLog(
+            LOG_LEVEL.ERROR,
+            `Error upserting custom data types -  ${error}, args: ${JSON.stringify(arguments)}`,
+        );
+    }
+}
