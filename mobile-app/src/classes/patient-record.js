@@ -17,15 +17,20 @@ export default class PatientRecord {
     }
 
     get nextStationIndex() {
-        return this.progress.findIndex(status => status !== PATIENT_RECORD_STATUS.COMPLETE);
+        const nextStationIndex = this.progress.findIndex(status => status !== PATIENT_RECORD_STATUS.COMPLETE);
+        if (nextStationIndex === -1) {
+            return this.progress.length;
+        }
+
+        return nextStationIndex;
     }
 
     get nextStationStatus() {
-        return this.progress[this.nextStationIndex];
+        return this.progress[this.nextStationIndex] ?? PATIENT_RECORD_STATUS.COMPLETE;
     }
 
     get isComplete() {
-        return this.nextStationIndex === -1;
+        return this.nextStationIndex === this.progress.length;
     }
 }
 

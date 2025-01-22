@@ -135,11 +135,12 @@ export async function createRecord({ record, customData }) {
 
 export async function updateRecord({ record, customData }) {
     // remove _id and sessionId as they cannot be overridden
-    const { _id, sessionId, ...recordRest } = record;
-    const recordUpdate = convertRecordToBaseUnits(recordRest, customData);
+    const { _id, sessionId, customData: recordCustomData, ...recordRest } = record;
+    const fullCustomData = { ...recordCustomData, ...customData };
+    const recordUpdate = convertRecordToBaseUnits(recordRest, fullCustomData);
 
     // we only want to update the custom values that were updated with this update
-    const updatedCustomDataKeyValues = Object.entries(customData).reduce(
+    const updatedCustomDataKeyValues = Object.entries(fullCustomData).reduce(
         (updatedCustomDataKeyValues, [key, value]) => {
             if (record[key] !== undefined) {
                 updatedCustomDataKeyValues[key] = value;

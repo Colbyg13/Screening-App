@@ -6,7 +6,7 @@ import { useSessionContext } from '../contexts/SessionContext';
 const { width, height } = Dimensions.get('window');
 
 export default function HomeScreen({ navigation }) {
-    const { uploadOfflineRecords, sessionIsRunning } = useSessionContext();
+    const { uploadOfflineRecords, sessionIsRunning, username } = useSessionContext();
 
     const handleOnPress = async () => {
         navigation.navigate('Station Selection');
@@ -29,6 +29,9 @@ export default function HomeScreen({ navigation }) {
                     source={require('../../assets/healthylogo.png')}
                     style={{ ...styles.logo, height: logoHeight }}
                 />
+                {username ? (
+                    <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Device: {username}</Text>
+                ) : null}
                 <Button
                     style={styles.button}
                     title="Connect to Session"

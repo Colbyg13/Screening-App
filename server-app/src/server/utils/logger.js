@@ -39,9 +39,13 @@ async function writeLog(logLevel, message) {
             break;
     }
 
-    if (fs.existsSync(pathToLog)) {
+    if (!fs.existsSync(pathToLog)) {
+        console.log('creating new log file...');
+        const dirPath = path.dirname(pathToLog);
+        fs.mkdirSync(dirPath, { recursive: true });
+    } else {
         const logStats = fs.statSync(pathToLog);
-
+        
         if (logStats.size > 10_000_000) {
             console.log('File full. removing backup and recreating new log file...');
             if (fs.existsSync(pathToBackup)) {
@@ -88,6 +92,7 @@ async function getLogsPath() {
 async function setPaths() {
     try {
         const appDataPath = await ipcRenderer.invoke('get-path');
+        console.log('AppData Path:', appDataPath);
         const applicationName = 'HealthySamoa';
         applicationPath = path.join(appDataPath, applicationName);
         logsPath = path.join(applicationPath, 'logs');

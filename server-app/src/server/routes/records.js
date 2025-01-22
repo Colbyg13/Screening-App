@@ -66,15 +66,15 @@ router.get('/', async (req, res) => {
 
         const find = search
             ? {
-                  $or: ['id', 'name'].map(key => ({
-                      $expr: {
-                          $regexMatch: {
-                              input: { $toString: `$${key}` },
-                              regex: new RegExp(search, 'i'),
-                          },
-                      },
-                  })),
-              }
+                $or: ['id', 'name'].map(key => ({
+                    $expr: {
+                        $regexMatch: {
+                            input: { $toString: `$${key}` },
+                            regex: new RegExp(search, 'i'),
+                        },
+                    },
+                })),
+            }
             : {};
 
         const records = await getRecords({ find, sort, skip, pageSize, unitConversions });
@@ -100,11 +100,17 @@ router.get('/:recordId', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
+
     const {
-        record = {},
-        // need this separate if offline mode or other reasons
-        customData,
-    } = req.body;
+        body: {
+            record = {},
+            // need this separate if offline mode or other reasons
+            customData,
+        } = {},
+        metadata: {
+            user = "Unknown",
+        } = {},
+    } = req;
 
     const creatingRecord = !record.id;
     const sessionId = record?.sessionId;
@@ -122,6 +128,7 @@ router.post('/', async (req, res) => {
         try {
             const newRecord = await createRecord({ record, customData });
             io.sockets.emit('record-created', newRecord);
+            writeLog(LOG_LEVEL.INFO, `USER ${user.username} created a record - ${JSON.stringify(newRecord, null, 2)}`);
             res.status(200).json(newRecord);
         } catch (error) {
             writeLog(LOG_LEVEL.ERROR, `Error creating record: ${error}`);
@@ -132,7 +139,7 @@ router.post('/', async (req, res) => {
 
     try {
         const updatedRecord = await updateRecord({ record, customData });
-
+        writeLog(LOG_LEVEL.INFO, `USER ${user.username} updated a record - ${JSON.stringify(updatedRecord, null, 2)}`);
         io.sockets.emit('record-updated', updatedRecord);
         res.status(200).json(updatedRecord);
     } catch (error) {
@@ -146,6 +153,7 @@ router.delete('/:recordId', async (req, res) => {
 
     try {
         await deleteRecord({ recordId });
+        writeLog(LOG_LEVEL.INFO, `USER ${user.username} deleted a record - ${recordId}`);
         res.status(200).json({ message: 'Success' });
     } catch (error) {
         writeLog(LOG_LEVEL.ERROR, `Error deleting record: ${error}`);
