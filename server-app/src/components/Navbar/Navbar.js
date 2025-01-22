@@ -101,30 +101,26 @@ export default function Navbar() {
                     selected={pathname.startsWith(ROUTES.Records.path)}
                     onClick={() => navigate(ROUTES.Records.path)}
                 />
-                {/* <NavbarItem
-          open={open}
-          Icon={ROUTES.Offline.Icon}
-          title={ROUTES.Offline.title}
-          selected={pathname.startsWith(ROUTES.Offline.path)}
-          onClick={() => navigate(ROUTES.Offline.path)}
-        /> */}
             </List>
-            <div className="mb-4">
-                <List>
-                    <NavbarItem
-                        open={open}
-                        Icon={ROUTES.Settings.Icon}
-                        title={ROUTES.Settings.title}
-                        selected={pathname.startsWith(ROUTES.Settings.path)}
-                        onClick={() => navigate(ROUTES.Settings.path)}
-                    />
-                </List>
+            <div>
+                <NavbarItem
+                    open={open}
+                    Icon={ROUTES.Settings.Icon}
+                    title={ROUTES.Settings.title}
+                    selected={pathname.startsWith(ROUTES.Settings.path)}
+                    onClick={() => navigate(ROUTES.Settings.path)}
+                />
+                {open ? (
+                    <div className="flex flex-col text-center text-sm">
+                        <span>
+                            IPv4: {ip}
+                        </span>
+                        <span>
+                            Version: 1.2.0
+                        </span>
+                    </div>
+                ) : null}
             </div>
-            {open ? (
-                <div className="absolute bottom-1 left-0 right-0 text-center text-sm">
-                    IPv4: {ip}
-                </div>
-            ) : null}
         </div>
     );
 }
