@@ -1,6 +1,7 @@
 const { app, BrowserWindow, ipcMain, powerSaveBlocker } = require('electron');
 const remoteMain = require('@electron/remote/main');
-const isDev = require('electron-is-dev');
+const isDev = process.env.NODE_ENV !== 'production';
+
 const Store = require('electron-store');
 const store = new Store();
 const { LOG_LEVEL, writeLog, setup } = require('./server/utils/logger');

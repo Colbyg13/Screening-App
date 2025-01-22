@@ -12,7 +12,8 @@
         "package": "electron-forge package",
         "make": "electron-forge make",
         "publish": "electron-forge publish",
-        "lint": "echo \"No linting configured\""
+        "lint": "echo \"No linting configured\"",
+        "prod": "cross-env NODE_ENV=production electron-forge start"
     },
     "keywords": [],
     "author": {
@@ -37,7 +38,6 @@
         "babel-loader": "^9.1.0",
         "css-loader": "^6.0.0",
         "electron": "^33.0.0",
-        "electron-is-dev": "^2.0.0",
         "file-loader": "^6.2.0",
         "node-loader": "^2.0.0",
         "postcss": "^8.4.19",

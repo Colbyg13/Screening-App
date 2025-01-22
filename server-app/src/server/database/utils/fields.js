@@ -1,4 +1,3 @@
-import { ObjectId } from 'mongodb';
 import { LOG_LEVEL, writeLog } from '../../utils/logger.js';
 
 const FIELD_COLLECTION_NAME = 'fields';
@@ -17,6 +16,31 @@ export async function initializeFieldCollection(database) {
         }
 
         fieldCollection = database.collection(FIELD_COLLECTION_NAME);
+
+        // Remove duplicate entries
+        fieldCollection.aggregate([
+            {
+                $group: {
+                    _id: "$key",
+                    dups: { $addToSet: "$_id" },
+                    count: { $sum: 1 }
+                }
+            },
+            { $match: { count: { $gt: 1 } } }
+        ]).forEach(function (doc) {
+            doc.dups.shift();  // Keep one document
+            fieldCollection.deleteMany({ _id: { $in: doc.dups } });
+        })
+
+        // Add indexes
+        const fieldUniqueKeyIndex = await fieldCollection.indexExists('key');
+        if (!fieldUniqueKeyIndex) {
+            await fieldCollection.createIndex({
+                key: 1,
+            }, {
+                unique: true
+            });
+        }
 
         // Put needed documents in the DB
         const mandatoryDocuments = [
@@ -53,7 +77,7 @@ export async function upsertMultipleFields({ fields = [] }) {
         await fieldCollection.bulkWrite([
             ...fields.map(({ _id, ...field }) => ({
                 updateOne: {
-                    filter: { _id: new ObjectId(_id) },
+                    filter: { key: field.key },
                     upsert: true,
                     update: {
                         $set: field,
