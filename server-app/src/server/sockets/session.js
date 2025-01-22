@@ -48,6 +48,10 @@ module.exports = io => {
         });
 
         // socket specific
+        socket.emit('user-info', {
+            userId,
+            username,
+        });
         socket.emit('users', sessionUsers);
         socket.emit('session-info', {
             ...sessionState,

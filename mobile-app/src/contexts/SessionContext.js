@@ -10,8 +10,9 @@ import {
 } from '@react-native-material/core';
 import { useNavigation } from '@react-navigation/native';
 import axios from 'axios';
+import * as Application from 'expo-application';
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-import { View } from 'react-native';
+import { Platform, View } from 'react-native';
 import { io } from 'socket.io-client';
 import PatientRecord from '../classes/patient-record';
 import { SNACKBAR_SEVERITIES } from '../components/Snackbar';
@@ -20,8 +21,6 @@ import { LOCAL_RECORDS_STORAGE_KEY } from '../screens/Offline/OfflineRecordsScre
 import { useCustomDataTypesContext } from './CustomDataContext';
 import { useServerContext } from './ServerContext';
 import { useSnackbarContext } from './SnackbarContext';
-import * as Application from 'expo-application';
-import { Platform } from 'react-native';
 
 export const STATION_FIELDS_STORAGE_KEY = 'sessionFields';
 
@@ -39,10 +38,10 @@ const SessionContext = createContext({
     sessionInfo: {},
     sessionRecords: [],
     selectedStation: {},
-    uploadOfflineRecords: () => {},
-    joinStation: () => {},
-    leaveStation: () => {},
-    sendRecord: () => {},
+    uploadOfflineRecords: () => { },
+    joinStation: () => { },
+    leaveStation: () => { },
+    sendRecord: () => { },
 });
 
 export const useSessionContext = () => useContext(SessionContext);
@@ -66,6 +65,7 @@ export default function SessionProvider({ children }) {
 
     // Device
     const [deviceId, setDeviceId] = useState(null);
+    const [username, setUsername] = useState(null);
 
     // snackbar
     const { addSnackbar } = useSnackbarContext();
@@ -133,6 +133,12 @@ export default function SessionProvider({ children }) {
             setIsConnected(true);
         });
 
+        socket.on('user-info', data => {
+            if (data?.username) {
+                setUsername(data.username);
+            }
+        })
+
         socket.on('record-created', createdRecord => {
             setSessionRecords(records => [...records, createdRecord]);
         });
@@ -167,6 +173,8 @@ export default function SessionProvider({ children }) {
             setIsConnected(false);
             setSessionIsRunning(false);
             setSessionId();
+            setSessionRecords([]);
+            setUsername(null);
 
             const state = navigation.getState();
             const currentPageName = state?.routes?.at(-1)?.name;
@@ -361,13 +369,14 @@ export default function SessionProvider({ children }) {
                 sessionInfo,
                 sessionRecords: patientRecords,
                 selectedStation,
+                username,
                 uploadOfflineRecords,
                 joinStation,
                 leaveStation,
                 sendRecord,
             }}
         >
-            <Dialog visible={!!modalMessage} onDismiss={() => {}}>
+            <Dialog visible={!!modalMessage} onDismiss={() => { }}>
                 <DialogHeader title={modalMessage} />
                 <DialogContent>
                     <View style={{ display: 'flex', flexDirection: 'row' }}>

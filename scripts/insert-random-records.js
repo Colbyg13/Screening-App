@@ -5,40 +5,50 @@ const SERVER_PORT = 3333;
 const NUM_RECORDS_TO_INSERT = 5000;
 
 const SCHOOLS = ['Vaisala', 'Salelologa', 'Auala'];
-const EYES = ['20/20', '20/25', '20/30', '20/40', '20/50', '20/70', '20/100'];
+const VISION = ['20/20', '20/25', '20/30', '20/50'];
+const REGION = "Orem";
+const SESSION_ID = '6790423e87f3f08797a70b67';
 
-function main() {
+async function main() {
     const url = `http://127.0.0.1:${SERVER_PORT}/api/v1/records`;
 
-    Promise.all(
-        Array(NUM_RECORDS_TO_INSERT)
-            .fill()
-            .map(() =>
-                axios.post(url, {
-                    record: {
-                        sessionId: '6521bdffe2487f9e810f2b27',
-                        name: `${faker.name.firstName()} ${faker.name.lastName()}`,
-                        age: faker.datatype.number({ min: 5, max: 15 }),
-                        school: SCHOOLS[Math.floor(Math.random() * SCHOOLS.length)],
-                        weight: faker.datatype.number({ min: 22, max: 68 }),
-                        height: faker.datatype.number({ min: 22, max: 68 }),
-                        glucose: faker.datatype.number({ min: 20, max: 119 }),
-                        eyes: EYES[Math.floor(Math.random() * EYES.length)],
-                        problem: Math.random() > 0.8,
-                        date: faker.date.between('2000-01-01', '2020-12-31'),
-                    },
-                    customData: {
-                        height: 'm',
-                        weight: 'kg',
-                        glucose: 'mmol/mol',
-                    },
-                }),
-            ),
-    )
-        .then(() => console.log('created'))
-        .catch(err => {
-            console.error(err);
-        });
+    const batchSize = 10;
+    const batchCount = Math.ceil(NUM_RECORDS_TO_INSERT / batchSize);
+    for (let i = 0; i < batchCount; i++) {
+        const requests = Array.from({ length: batchSize }, () => axios.post(url, {
+            record: {
+                sessionId: SESSION_ID,
+                region: REGION,
+                name: faker.name.firstName() + ' ' + faker.name.lastName(),
+                age: getRandomNumber({ min: 4, max: 18 }),
+                school: SCHOOLS[Math.floor(Math.random() * SCHOOLS.length)],
+                height: getRandomNumber({ min: 1, max: 2, precision: 2 }),
+                weight: getRandomNumber({ min: 20, max: 100, precision: 1 }),
+                vision: VISION[Math.floor(Math.random() * VISION.length)],
+                bloodSugar: getRandomNumber({ min: 4, max: 10 }),
+            },
+            customData: { height: 'm', weight: 'kg', bloodSugar: 'HbA1c' },
+        }));
+
+        try {
+            const results = await Promise.all(requests)
+            // make sure none of them failed
+            results.forEach(result => {
+                if (result.status !== 200) {
+                    console.error('Failed to insert record', result);
+                }
+            });
+            
+            console.log(`Inserted ${batchSize} records. Count at ${i * batchSize}`);
+        } catch (error) {
+            console.error(error);
+        }
+    }
+}
+
+
+function getRandomNumber({ min, max, precision = 0 }) {
+    return +(Math.random() * (max - min) + min).toFixed(precision);
 }
 
 main();
