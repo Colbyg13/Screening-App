@@ -1,7 +1,5 @@
 const { app, BrowserWindow, ipcMain, powerSaveBlocker } = require('electron');
 const remoteMain = require('@electron/remote/main');
-const isDev = process.env.NODE_ENV !== 'production';
-
 const Store = require('electron-store');
 const store = new Store();
 const { LOG_LEVEL, writeLog, setup } = require('./server/utils/logger');
@@ -50,14 +48,16 @@ app.on('ready', () => {
     }
 
     // Open the DevTools.
-    if (isDev) mainWindow.webContents.openDevTools();
+    if (process.env.STAGE !== 'production') {
+        mainWindow.webContents.openDevTools();
+    }
 
     // Catch unhandled exceptions in the main process
     process.on('uncaughtException', error => {
         console.error('Unhandled Exception:', error);
         writeLog(LOG_LEVEL.ERROR, `Uncaught exeption: ${error.stack}`);
     });
-    
+
     // Catch unhandled promise rejections in the main process
     process.on('unhandledRejection', (reason, promise) => {
         console.error('Unhandled Rejection:', reason);
@@ -71,8 +71,8 @@ ipcMain.on('reload-app', () => {
 });
 
 ipcMain.handle('get-path', async (event, arg) => {
-    const preventSleep = app.getPath('appData');
-    return preventSleep;
+    const appPath = app.getPath('appData');
+    return appPath;
 });
 
 ipcMain.handle('get-prevent-sleep', event => {

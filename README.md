@@ -30,3 +30,7 @@ This project uses prettier and eslint extensions. Make sure to have both of them
 
 `The mobile application terminal will display a QR code that will open the app on your device.`
 `The server desktop application will automatically open on your computer when you run the npm run dev command.`
+
+## Local Production
+
+To run production locally run `npm run prod`

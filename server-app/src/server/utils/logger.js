@@ -16,7 +16,11 @@ let applicationPath = '';
 
 async function writeLog(logLevel, message) {
     if (!applicationPath || !logsPath) {
-        await setPaths();
+        const pathsSet = await setPaths();
+        if (!pathsSet) {
+            console.error('Paths not set. Could not write log.');
+            return;
+        }
     }
 
     const pathToLog = path.join(logsPath, logFile);
@@ -45,7 +49,7 @@ async function writeLog(logLevel, message) {
         fs.mkdirSync(dirPath, { recursive: true });
     } else {
         const logStats = fs.statSync(pathToLog);
-        
+
         if (logStats.size > 10_000_000) {
             console.log('File full. removing backup and recreating new log file...');
             if (fs.existsSync(pathToBackup)) {
@@ -64,8 +68,13 @@ async function writeLog(logLevel, message) {
 
 async function setup() {
     if (!applicationPath || !logsPath) {
-        await setPaths();
+        const pathsSet = await setPaths();
+        if (!pathsSet) {
+            console.error('Paths not set. Could not complete setup.');
+            return;
+        }
     }
+
     // sets up file system
     // ROOT
     console.log('Checking application exists', applicationPath);
@@ -91,14 +100,20 @@ async function getLogsPath() {
 
 async function setPaths() {
     try {
-        const appDataPath = await ipcRenderer.invoke('get-path');
-        console.log('AppData Path:', appDataPath);
+        if (!ipcRenderer) {
+            console.error('ipcRenderer not available');
+            return false;
+        }
+
+        const appDataPath = await ipcRenderer.invoke('get-path')
         const applicationName = 'HealthySamoa';
         applicationPath = path.join(appDataPath, applicationName);
         logsPath = path.join(applicationPath, 'logs');
+        return true;
     } catch (error) {
         console.error('Error setting logs path:', error);
     }
+    return false;
 }
 
 module.exports = {

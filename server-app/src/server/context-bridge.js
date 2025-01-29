@@ -176,6 +176,7 @@ function setupContextBridge() {
         openFile: async path => {
             shell.openPath(path);
         },
+        getPath: () => ipcRenderer.invoke('get-path'),
     });
 }
 
