@@ -9,7 +9,11 @@
         "format": "prettier --write .",
         "start": "npm-run-all --parallel start:server start:mobile-app",
         "start:server": "cd server-app && npm start",
-        "start:mobile-app": "cd mobile-app && npm start"
+        "start:mobile-app": "cd mobile-app && npm start",
+        "prod:server": "cd server-app && npm run prod",
+        "prod:mobile-app": "cd mobile-app && npm run prod",
+        "prod": "npm-run-all --parallel prod:server prod:mobile-app",
+        "stop:prod": "taskkill /F /IM node.exe"
     },
     "keywords": [],
     "author": "",

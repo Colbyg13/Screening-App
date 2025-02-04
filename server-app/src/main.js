@@ -1,9 +1,9 @@
 const { app, BrowserWindow, ipcMain, powerSaveBlocker } = require('electron');
 const remoteMain = require('@electron/remote/main');
-const isDev = require('electron-is-dev');
 const Store = require('electron-store');
 const store = new Store();
 const { LOG_LEVEL, writeLog, setup } = require('./server/utils/logger');
+const path = require('path');
 
 // setup logger
 setup()
@@ -49,14 +49,16 @@ app.on('ready', () => {
     }
 
     // Open the DevTools.
-    if (isDev) mainWindow.webContents.openDevTools();
+    if (process.env.STAGE !== 'production') {
+        mainWindow.webContents.openDevTools();
+    }
 
     // Catch unhandled exceptions in the main process
     process.on('uncaughtException', error => {
         console.error('Unhandled Exception:', error);
         writeLog(LOG_LEVEL.ERROR, `Uncaught exeption: ${error.stack}`);
     });
-    
+
     // Catch unhandled promise rejections in the main process
     process.on('unhandledRejection', (reason, promise) => {
         console.error('Unhandled Rejection:', reason);
@@ -70,8 +72,8 @@ ipcMain.on('reload-app', () => {
 });
 
 ipcMain.handle('get-path', async (event, arg) => {
-    const preventSleep = app.getPath('appData');
-    return preventSleep;
+    const appPath = app.getPath('appData');
+    return appPath;
 });
 
 ipcMain.handle('get-prevent-sleep', event => {
@@ -109,6 +111,33 @@ app.on('activate', () => {
         createWindow();
     }
 });
+
+app.on('before-quit', (event) => {
+    event.preventDefault(); // Prevents the app from quitting immediately
+
+    // This is to kill the production applications when exiting the server app
+    if (process.env.STAGE === 'production') {
+        const rootDir = path.resolve(__dirname, '../../../');
+        console.log('Root directory, ', rootDir);
+
+        // Run your cleanup code here
+        const { exec } = require('child_process');
+        exec('npm run stop:prod', { cwd: rootDir }, (error, stdout, stderr) => {
+            if (error) {
+                console.error(`Error: ${error}`);
+                return;
+            }
+            console.log(`stdout: ${stdout}`);
+            console.error(`stderr: ${stderr}`);
+
+            // Now we can safely quit the app
+            app.quit();
+        });
+    } else {
+        app.quit();
+    }
+});
+
 
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.

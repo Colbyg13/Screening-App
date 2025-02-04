@@ -1,5 +1,6 @@
 import { Button, FormControlLabel, TextField } from '@mui/material';
 import Switch from '@mui/material/Switch';
+import { QRCodeSVG } from 'qrcode.react';
 import React, { useEffect, useState } from 'react';
 import ConfirmModal from '../../components/ConfirmModal/ConfirmModal';
 import { useSessionContext } from '../../contexts/SessionContext';
@@ -10,6 +11,23 @@ export default function Settings() {
     const { sessionIsRunning } = useSessionContext();
 
     const [preventSleep, setPreventSleep] = useState(true);
+
+    const [ipState, setIPState] = useState({
+        ip: '',
+        ipError: '',
+        loading: true,
+    });
+
+    useEffect(() => {
+        setIPState({ ip: '', ipError: '', loading: true });
+        try {
+            const ip = window.api.getIP();
+            setIPState({ ip, ipError: '', loading: false });
+        } catch (error) {
+            setIPState({ ip: '', ipError: 'Could not get ip from server', loading: false });
+            console.error('Could not get ip from server', error);
+        }
+    }, []);
 
     useEffect(() => {
         async function getPreventSleep() {
@@ -63,9 +81,14 @@ export default function Settings() {
                     <TextField disabled className="w-52" size="small" value="Server Computer" />
                 </div>
                 <div>
-                    <h2 className="text-xl mt-4 mb-2">Developers</h2>
-                    <div>Andrew Giles - andrewgiles@gilezapps.com</div>
-                    <div>Colby Gardiner - colbygardiner13@gmail.com</div>
+                    <h2 className="text-xl mt-4 mb-2">Device Connection</h2>
+                    {ipState.loading ? (
+                        <div>Loading...</div>
+                    ) : ipState.ipError ? (
+                        <div className="text-red-600">{ipState.ipError}</div>
+                    ) : (
+                        <QRCodeSVG value={`exp://${ipState.ip}:8081`} />
+                    )}
                 </div>
                 <div>
                     <h2 className="text-xl mt-4 mb-2">Device Settings</h2>
@@ -132,6 +155,11 @@ export default function Settings() {
                         >
                             <span>Factory Reset</span>
                         </Button>
+                    </div>
+                    <div>
+                        <h2 className="text-xl mt-4 mb-2">Developers</h2>
+                        <div>Andrew Giles - andrewgiles@gilezapps.com</div>
+                        <div>Colby Gardiner - colbygardiner13@gmail.com</div>
                     </div>
                 </div>
             </div>
