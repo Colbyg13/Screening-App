@@ -33,4 +33,4 @@ This project uses prettier and eslint extensions. Make sure to have both of them
 
 ## Local Production
 
-To run production locally run `npm run prod`
+use the start.bat to start a local production system
