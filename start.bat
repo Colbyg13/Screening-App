@@ -8,8 +8,6 @@ if not exist .env (
         echo GIT_USERNAME=
         echo GIT_EMAIL=
     ) > .env
-    echo Please update the .env file with your actual credentials.
-    pause
 )
 
 :: 0.1 Load environment variables from .env file
