@@ -16,15 +16,6 @@ if %errorlevel% neq 0 (
     exit /b 1
 )
 
-:: call npx expo whoami -> save to variable If VARIABLE = "Not logged in", run npx expo login
-for /f "tokens=*" %%a in ('npx expo whoami 2^>^&1') do set "output=%%a"
-if "%output%"=="Not logged in" (
-    echo Please login to Expo
-    call npx expo login
-) else (
-    echo User is logged in to expo
-)
-
 :: Pull latest code
 echo Attempting to pull latest code...
 git remote set-url origin https://github.com/Colbyg13/Screening-App
@@ -37,6 +28,16 @@ if %errorlevel% neq 0 (
 call :install_deps "" "root directory"
 call :install_deps "server-app" "server-app"
 call :install_deps "mobile-app" "mobile-app"
+
+:: LOGIN TO EXPO
+:: call npx expo whoami -> save to variable If VARIABLE = "Not logged in", run npx expo login
+for /f "tokens=*" %%a in ('npx expo whoami 2^>^&1') do set "output=%%a"
+if "%output%"=="Not logged in" (
+    echo Please login to Expo
+    call npx expo login
+) else (
+    echo User is logged in to expo
+)
 
 :start_prod
 :: 2.0 Run npm run prod
