@@ -29,15 +29,21 @@ call :install_deps "" "root directory"
 call :install_deps "server-app" "server-app"
 call :install_deps "mobile-app" "mobile-app"
 
-:: LOGIN TO EXPO
-:: call npx expo whoami -> save to variable If VARIABLE = "Not logged in", run npx expo login
-for /f "tokens=*" %%a in ('npx expo whoami 2^>^&1') do set "output=%%a"
-if "%output%"=="Not logged in" (
-    echo Please login to Expo
-    call npx expo login
-) else (
-    echo User is logged in to expo
-)
+:: MAY NOT BE NEEDED DUE TO running `expo start --offline` in the mobile-app
+:: :: LOGIN TO EXPO
+:: cd mobile-app
+:: for /f "tokens=*" %%a in ('npx expo whoami 2^>^&1') do set "output=%%a"
+:: if "%output%"=="Not logged in" (
+::     echo Please login to Expo
+::     call npx expo login
+::     if %errorlevel% neq 0 (
+::         echo Warning: Expo login failed. Please check your credentials and try again.
+::         pause
+::     )
+:: ) else (
+::     echo User is logged in to expo
+:: )
+:: cd ..
 
 :start_prod
 :: 2.0 Run npm run prod
