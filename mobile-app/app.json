@@ -1,40 +1,30 @@
 {
-    "expo": {
-        "name": "Healthy Samoa Screening App",
-        "slug": "healthy-samoa",
-        "version": "1.2.0",
-        "orientation": "portrait",
-        "icon": "./assets/icon.png",
-        "userInterfaceStyle": "light",
-        "newArchEnabled": true,
-        "splash": {
-            "image": "./assets/splash.png",
-            "resizeMode": "contain",
-            "backgroundColor": "#ffffff"
-        },
-        "updates": {
-            "fallbackToCacheTimeout": 0
-        },
-        "assetBundlePatterns": ["**/*"],
-        "ios": {
-            "supportsTablet": true,
-            "bundleIdentifier": "com.gilezapps.healthysamoa"
-        },
-        "android": {
-            "adaptiveIcon": {
-                "foregroundImage": "./assets/adaptive-icon.png",
-                "backgroundColor": "#FFFFFF"
-            },
-            "package": "com.gilezapps.healthysamoa"
-        },
-        "web": {
-            "favicon": "./assets/favicon.png"
-        },
-        "extra": {
-            "eas": {
-                "projectId": "2e6ac906-03a0-4fef-88c0-71f7f32777c0"
-            }
-        },
-        "owner": "uvu_wms"
+"expo": {
+    "name": "Healthy Samoa Screening App",
+    "slug": "healthy-samoa",
+    "version": "1.2.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+        "image": "./assets/splash.png",
+        "resizeMode": "contain",
+        "backgroundColor": "#ffffff"
+    },
+    "updates": {
+        "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+        "supportsTablet": true,
+        "bundleIdentifier": "com.gilezapps.healthysamoa"
+    },
+"extra": {
+    "eas": {
+    "projectId": "2e6ac906-03a0-4fef-88c0-71f7f32777c0"
     }
+},
+"owner": "uvu_wms"
+}
 }
