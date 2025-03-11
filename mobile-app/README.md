@@ -37,6 +37,8 @@ Both of the above paths have the same final steps:
 13. Submit the app to the app store for review
 14. Once approved and ready for distribution on the app store, tag the built commit with the release version number. e.g. `v1.2.0`
 
+**Make sure that iPad is the only supported device prior to submitting to the App Store for review*
+
 ## Troubleshooting
 There is a good chance you will have to fight the build and troubleshoot what you can.
 
