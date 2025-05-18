@@ -116,7 +116,7 @@ export default function Navbar() {
                             IPv4: {ip}
                         </span>
                         <span>
-                            Version: 1.2.0
+                            Version: 1.2.1
                         </span>
                     </div>
                 ) : null}

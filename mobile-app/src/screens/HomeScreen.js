@@ -62,7 +62,7 @@ export default function HomeScreen({ navigation }) {
                     titleStyle={styles.buttonText}
                     onPress={openSettings}
                 />
-                <Text style={styles.versionText}>Version 1.2.0</Text>
+                <Text style={styles.versionText}>Version 1.2.1</Text>
             </Stack>
         </SafeAreaView>
     );
